@@ -1,0 +1,15 @@
+name: commanddash
+description: CLI enhancments to Dash-AI
+version: 1.0.0
+repository: https://github.com/Welltested-AI/commanddash
+
+environment:
+  sdk: '>=2.14.0 <4.0.0'
+
+# Add regular dependencies here.
+dependencies:
+  # path: ^1.8.0
+
+dev_dependencies:
+  lints: ^2.1.0
+  test: ^1.24.0
