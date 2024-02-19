@@ -1,3 +1,3 @@
-#CommandDash
+# CommandDash
 
-CLI enhancments to Dash-AI. Coming Soon.
+CLI enhancments to Dash-AI. Coming Soon ✨
