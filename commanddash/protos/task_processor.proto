@@ -3,37 +3,46 @@ syntax = "proto3";
 package commanddash;
 
 service TaskProcessor {
-  rpc processTask(FetchRequest) returns (Response) {}
-  rpc startMultiStepTask (FetchRequest) returns (stream Response) {}
-
-  /// provide additional data to the multi step task
-  rpc provideData (FetchRequest) return (Response){}
+  rpc processTask(stream ClientMessage) returns (stream ProcessorMessage) {}
 }
 
-message FetchRequest {
-  string type = 1;
-  map<string, string> args = 2;
-}
-
-// A message that can hold either success, error or need more data information
-message Response {
-  oneof response_type {
-    SuccessResponse success = 1;
-    ErrorResponse error = 2;
-    NeedMoreDataResponse needMoreData= 3;
+// messages from IDEs or other clients talking to CLI
+message ClientMessage{
+  oneof request_type {
+    TaskStartMessage taskStart = 1;
+    AdditionalDataMessage additionalData = 2;
   }
 }
 
-message SuccessResponse {
+/// CLI's messages to the clients
+message ProcessorMessage{
+  oneof response_type {
+    SuccessMessage success = 1;
+    ErrorMessage error = 2;
+    GetAdditionalDataMessage getAdditionalData = 3;
+  }
+}
+
+message TaskStartMessage{
+  string task = 1;
+  map<string, string> args = 2;
+}
+
+message AdditionalDataMessage{
   map<string, string> args = 1;
 }
 
-message ErrorResponse {
-  string errorMessage = 1;
+message SuccessMessage{
+  string message = 1;
+  map<string, string> args = 2;
 }
 
-// Response indicating processor needs further data
-message NeedMoreDataResponse {
+message ErrorMessage{
+  string message = 1;
+  map<string, string> args = 2;
+}
+
+message GetAdditionalDataMessage{
   string kind = 1;
   map<string, string> args = 2;
 }

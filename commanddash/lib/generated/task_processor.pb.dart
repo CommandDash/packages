@@ -13,27 +13,40 @@ import 'dart:core' as $core;
 
 import 'package:protobuf/protobuf.dart' as $pb;
 
-class FetchRequest extends $pb.GeneratedMessage {
-  factory FetchRequest({
-    $core.String? type,
-    $core.Map<$core.String, $core.String>? args,
+enum ClientMessage_RequestType {
+  taskStart, 
+  additionalData, 
+  notSet
+}
+
+/// messages from IDEs or other clients talking to CLI
+class ClientMessage extends $pb.GeneratedMessage {
+  factory ClientMessage({
+    TaskStartMessage? taskStart,
+    AdditionalDataMessage? additionalData,
   }) {
     final $result = create();
-    if (type != null) {
-      $result.type = type;
+    if (taskStart != null) {
+      $result.taskStart = taskStart;
     }
-    if (args != null) {
-      $result.args.addAll(args);
+    if (additionalData != null) {
+      $result.additionalData = additionalData;
     }
     return $result;
   }
-  FetchRequest._() : super();
-  factory FetchRequest.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory FetchRequest.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  ClientMessage._() : super();
+  factory ClientMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ClientMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'FetchRequest', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'type')
-    ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'args', entryClassName: 'FetchRequest.ArgsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('commanddash'))
+  static const $core.Map<$core.int, ClientMessage_RequestType> _ClientMessage_RequestTypeByTag = {
+    1 : ClientMessage_RequestType.taskStart,
+    2 : ClientMessage_RequestType.additionalData,
+    0 : ClientMessage_RequestType.notSet
+  };
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ClientMessage', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
+    ..oo(0, [1, 2])
+    ..aOM<TaskStartMessage>(1, _omitFieldNames ? '' : 'taskStart', protoName: 'taskStart', subBuilder: TaskStartMessage.create)
+    ..aOM<AdditionalDataMessage>(2, _omitFieldNames ? '' : 'additionalData', protoName: 'additionalData', subBuilder: AdditionalDataMessage.create)
     ..hasRequiredFields = false
   ;
 
@@ -41,49 +54,62 @@ class FetchRequest extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  FetchRequest clone() => FetchRequest()..mergeFromMessage(this);
+  ClientMessage clone() => ClientMessage()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  FetchRequest copyWith(void Function(FetchRequest) updates) => super.copyWith((message) => updates(message as FetchRequest)) as FetchRequest;
+  ClientMessage copyWith(void Function(ClientMessage) updates) => super.copyWith((message) => updates(message as ClientMessage)) as ClientMessage;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static FetchRequest create() => FetchRequest._();
-  FetchRequest createEmptyInstance() => create();
-  static $pb.PbList<FetchRequest> createRepeated() => $pb.PbList<FetchRequest>();
+  static ClientMessage create() => ClientMessage._();
+  ClientMessage createEmptyInstance() => create();
+  static $pb.PbList<ClientMessage> createRepeated() => $pb.PbList<ClientMessage>();
   @$core.pragma('dart2js:noInline')
-  static FetchRequest getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<FetchRequest>(create);
-  static FetchRequest? _defaultInstance;
+  static ClientMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ClientMessage>(create);
+  static ClientMessage? _defaultInstance;
+
+  ClientMessage_RequestType whichRequestType() => _ClientMessage_RequestTypeByTag[$_whichOneof(0)]!;
+  void clearRequestType() => clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
-  $core.String get type => $_getSZ(0);
+  TaskStartMessage get taskStart => $_getN(0);
   @$pb.TagNumber(1)
-  set type($core.String v) { $_setString(0, v); }
+  set taskStart(TaskStartMessage v) { setField(1, v); }
   @$pb.TagNumber(1)
-  $core.bool hasType() => $_has(0);
+  $core.bool hasTaskStart() => $_has(0);
   @$pb.TagNumber(1)
-  void clearType() => clearField(1);
+  void clearTaskStart() => clearField(1);
+  @$pb.TagNumber(1)
+  TaskStartMessage ensureTaskStart() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  $core.Map<$core.String, $core.String> get args => $_getMap(1);
+  AdditionalDataMessage get additionalData => $_getN(1);
+  @$pb.TagNumber(2)
+  set additionalData(AdditionalDataMessage v) { setField(2, v); }
+  @$pb.TagNumber(2)
+  $core.bool hasAdditionalData() => $_has(1);
+  @$pb.TagNumber(2)
+  void clearAdditionalData() => clearField(2);
+  @$pb.TagNumber(2)
+  AdditionalDataMessage ensureAdditionalData() => $_ensure(1);
 }
 
-enum Response_ResponseType {
+enum ProcessorMessage_ResponseType {
   success, 
   error, 
-  needMoreData, 
+  getAdditionalData, 
   notSet
 }
 
-/// A message that can hold either success, error or need more data information
-class Response extends $pb.GeneratedMessage {
-  factory Response({
-    SuccessResponse? success,
-    ErrorResponse? error,
-    NeedMoreDataResponse? needMoreData,
+/// / CLI's messages to the clients
+class ProcessorMessage extends $pb.GeneratedMessage {
+  factory ProcessorMessage({
+    SuccessMessage? success,
+    ErrorMessage? error,
+    GetAdditionalDataMessage? getAdditionalData,
   }) {
     final $result = create();
     if (success != null) {
@@ -92,26 +118,26 @@ class Response extends $pb.GeneratedMessage {
     if (error != null) {
       $result.error = error;
     }
-    if (needMoreData != null) {
-      $result.needMoreData = needMoreData;
+    if (getAdditionalData != null) {
+      $result.getAdditionalData = getAdditionalData;
     }
     return $result;
   }
-  Response._() : super();
-  factory Response.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory Response.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  ProcessorMessage._() : super();
+  factory ProcessorMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ProcessorMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static const $core.Map<$core.int, Response_ResponseType> _Response_ResponseTypeByTag = {
-    1 : Response_ResponseType.success,
-    2 : Response_ResponseType.error,
-    3 : Response_ResponseType.needMoreData,
-    0 : Response_ResponseType.notSet
+  static const $core.Map<$core.int, ProcessorMessage_ResponseType> _ProcessorMessage_ResponseTypeByTag = {
+    1 : ProcessorMessage_ResponseType.success,
+    2 : ProcessorMessage_ResponseType.error,
+    3 : ProcessorMessage_ResponseType.getAdditionalData,
+    0 : ProcessorMessage_ResponseType.notSet
   };
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'Response', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ProcessorMessage', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
     ..oo(0, [1, 2, 3])
-    ..aOM<SuccessResponse>(1, _omitFieldNames ? '' : 'success', subBuilder: SuccessResponse.create)
-    ..aOM<ErrorResponse>(2, _omitFieldNames ? '' : 'error', subBuilder: ErrorResponse.create)
-    ..aOM<NeedMoreDataResponse>(3, _omitFieldNames ? '' : 'needMoreData', protoName: 'needMoreData', subBuilder: NeedMoreDataResponse.create)
+    ..aOM<SuccessMessage>(1, _omitFieldNames ? '' : 'success', subBuilder: SuccessMessage.create)
+    ..aOM<ErrorMessage>(2, _omitFieldNames ? '' : 'error', subBuilder: ErrorMessage.create)
+    ..aOM<GetAdditionalDataMessage>(3, _omitFieldNames ? '' : 'getAdditionalData', protoName: 'getAdditionalData', subBuilder: GetAdditionalDataMessage.create)
     ..hasRequiredFields = false
   ;
 
@@ -119,62 +145,120 @@ class Response extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  Response clone() => Response()..mergeFromMessage(this);
+  ProcessorMessage clone() => ProcessorMessage()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  Response copyWith(void Function(Response) updates) => super.copyWith((message) => updates(message as Response)) as Response;
+  ProcessorMessage copyWith(void Function(ProcessorMessage) updates) => super.copyWith((message) => updates(message as ProcessorMessage)) as ProcessorMessage;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static Response create() => Response._();
-  Response createEmptyInstance() => create();
-  static $pb.PbList<Response> createRepeated() => $pb.PbList<Response>();
+  static ProcessorMessage create() => ProcessorMessage._();
+  ProcessorMessage createEmptyInstance() => create();
+  static $pb.PbList<ProcessorMessage> createRepeated() => $pb.PbList<ProcessorMessage>();
   @$core.pragma('dart2js:noInline')
-  static Response getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<Response>(create);
-  static Response? _defaultInstance;
+  static ProcessorMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ProcessorMessage>(create);
+  static ProcessorMessage? _defaultInstance;
 
-  Response_ResponseType whichResponseType() => _Response_ResponseTypeByTag[$_whichOneof(0)]!;
+  ProcessorMessage_ResponseType whichResponseType() => _ProcessorMessage_ResponseTypeByTag[$_whichOneof(0)]!;
   void clearResponseType() => clearField($_whichOneof(0));
 
   @$pb.TagNumber(1)
-  SuccessResponse get success => $_getN(0);
+  SuccessMessage get success => $_getN(0);
   @$pb.TagNumber(1)
-  set success(SuccessResponse v) { setField(1, v); }
+  set success(SuccessMessage v) { setField(1, v); }
   @$pb.TagNumber(1)
   $core.bool hasSuccess() => $_has(0);
   @$pb.TagNumber(1)
   void clearSuccess() => clearField(1);
   @$pb.TagNumber(1)
-  SuccessResponse ensureSuccess() => $_ensure(0);
+  SuccessMessage ensureSuccess() => $_ensure(0);
 
   @$pb.TagNumber(2)
-  ErrorResponse get error => $_getN(1);
+  ErrorMessage get error => $_getN(1);
   @$pb.TagNumber(2)
-  set error(ErrorResponse v) { setField(2, v); }
+  set error(ErrorMessage v) { setField(2, v); }
   @$pb.TagNumber(2)
   $core.bool hasError() => $_has(1);
   @$pb.TagNumber(2)
   void clearError() => clearField(2);
   @$pb.TagNumber(2)
-  ErrorResponse ensureError() => $_ensure(1);
+  ErrorMessage ensureError() => $_ensure(1);
 
   @$pb.TagNumber(3)
-  NeedMoreDataResponse get needMoreData => $_getN(2);
+  GetAdditionalDataMessage get getAdditionalData => $_getN(2);
   @$pb.TagNumber(3)
-  set needMoreData(NeedMoreDataResponse v) { setField(3, v); }
+  set getAdditionalData(GetAdditionalDataMessage v) { setField(3, v); }
   @$pb.TagNumber(3)
-  $core.bool hasNeedMoreData() => $_has(2);
+  $core.bool hasGetAdditionalData() => $_has(2);
   @$pb.TagNumber(3)
-  void clearNeedMoreData() => clearField(3);
+  void clearGetAdditionalData() => clearField(3);
   @$pb.TagNumber(3)
-  NeedMoreDataResponse ensureNeedMoreData() => $_ensure(2);
+  GetAdditionalDataMessage ensureGetAdditionalData() => $_ensure(2);
 }
 
-class SuccessResponse extends $pb.GeneratedMessage {
-  factory SuccessResponse({
+class TaskStartMessage extends $pb.GeneratedMessage {
+  factory TaskStartMessage({
+    $core.String? task,
+    $core.Map<$core.String, $core.String>? args,
+  }) {
+    final $result = create();
+    if (task != null) {
+      $result.task = task;
+    }
+    if (args != null) {
+      $result.args.addAll(args);
+    }
+    return $result;
+  }
+  TaskStartMessage._() : super();
+  factory TaskStartMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory TaskStartMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'TaskStartMessage', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'task')
+    ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'args', entryClassName: 'TaskStartMessage.ArgsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('commanddash'))
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  TaskStartMessage clone() => TaskStartMessage()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  TaskStartMessage copyWith(void Function(TaskStartMessage) updates) => super.copyWith((message) => updates(message as TaskStartMessage)) as TaskStartMessage;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static TaskStartMessage create() => TaskStartMessage._();
+  TaskStartMessage createEmptyInstance() => create();
+  static $pb.PbList<TaskStartMessage> createRepeated() => $pb.PbList<TaskStartMessage>();
+  @$core.pragma('dart2js:noInline')
+  static TaskStartMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<TaskStartMessage>(create);
+  static TaskStartMessage? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get task => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set task($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasTask() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearTask() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.Map<$core.String, $core.String> get args => $_getMap(1);
+}
+
+class AdditionalDataMessage extends $pb.GeneratedMessage {
+  factory AdditionalDataMessage({
     $core.Map<$core.String, $core.String>? args,
   }) {
     final $result = create();
@@ -183,12 +267,12 @@ class SuccessResponse extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  SuccessResponse._() : super();
-  factory SuccessResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory SuccessResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  AdditionalDataMessage._() : super();
+  factory AdditionalDataMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory AdditionalDataMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SuccessResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
-    ..m<$core.String, $core.String>(1, _omitFieldNames ? '' : 'args', entryClassName: 'SuccessResponse.ArgsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('commanddash'))
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'AdditionalDataMessage', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
+    ..m<$core.String, $core.String>(1, _omitFieldNames ? '' : 'args', entryClassName: 'AdditionalDataMessage.ArgsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('commanddash'))
     ..hasRequiredFields = false
   ;
 
@@ -196,43 +280,48 @@ class SuccessResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  SuccessResponse clone() => SuccessResponse()..mergeFromMessage(this);
+  AdditionalDataMessage clone() => AdditionalDataMessage()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  SuccessResponse copyWith(void Function(SuccessResponse) updates) => super.copyWith((message) => updates(message as SuccessResponse)) as SuccessResponse;
+  AdditionalDataMessage copyWith(void Function(AdditionalDataMessage) updates) => super.copyWith((message) => updates(message as AdditionalDataMessage)) as AdditionalDataMessage;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static SuccessResponse create() => SuccessResponse._();
-  SuccessResponse createEmptyInstance() => create();
-  static $pb.PbList<SuccessResponse> createRepeated() => $pb.PbList<SuccessResponse>();
+  static AdditionalDataMessage create() => AdditionalDataMessage._();
+  AdditionalDataMessage createEmptyInstance() => create();
+  static $pb.PbList<AdditionalDataMessage> createRepeated() => $pb.PbList<AdditionalDataMessage>();
   @$core.pragma('dart2js:noInline')
-  static SuccessResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SuccessResponse>(create);
-  static SuccessResponse? _defaultInstance;
+  static AdditionalDataMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<AdditionalDataMessage>(create);
+  static AdditionalDataMessage? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.Map<$core.String, $core.String> get args => $_getMap(0);
 }
 
-class ErrorResponse extends $pb.GeneratedMessage {
-  factory ErrorResponse({
-    $core.String? errorMessage,
+class SuccessMessage extends $pb.GeneratedMessage {
+  factory SuccessMessage({
+    $core.String? message,
+    $core.Map<$core.String, $core.String>? args,
   }) {
     final $result = create();
-    if (errorMessage != null) {
-      $result.errorMessage = errorMessage;
+    if (message != null) {
+      $result.message = message;
+    }
+    if (args != null) {
+      $result.args.addAll(args);
     }
     return $result;
   }
-  ErrorResponse._() : super();
-  factory ErrorResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory ErrorResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  SuccessMessage._() : super();
+  factory SuccessMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory SuccessMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ErrorResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
-    ..aOS(1, _omitFieldNames ? '' : 'errorMessage', protoName: 'errorMessage')
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'SuccessMessage', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'message')
+    ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'args', entryClassName: 'SuccessMessage.ArgsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('commanddash'))
     ..hasRequiredFields = false
   ;
 
@@ -240,36 +329,96 @@ class ErrorResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  ErrorResponse clone() => ErrorResponse()..mergeFromMessage(this);
+  SuccessMessage clone() => SuccessMessage()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  ErrorResponse copyWith(void Function(ErrorResponse) updates) => super.copyWith((message) => updates(message as ErrorResponse)) as ErrorResponse;
+  SuccessMessage copyWith(void Function(SuccessMessage) updates) => super.copyWith((message) => updates(message as SuccessMessage)) as SuccessMessage;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static ErrorResponse create() => ErrorResponse._();
-  ErrorResponse createEmptyInstance() => create();
-  static $pb.PbList<ErrorResponse> createRepeated() => $pb.PbList<ErrorResponse>();
+  static SuccessMessage create() => SuccessMessage._();
+  SuccessMessage createEmptyInstance() => create();
+  static $pb.PbList<SuccessMessage> createRepeated() => $pb.PbList<SuccessMessage>();
   @$core.pragma('dart2js:noInline')
-  static ErrorResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ErrorResponse>(create);
-  static ErrorResponse? _defaultInstance;
+  static SuccessMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<SuccessMessage>(create);
+  static SuccessMessage? _defaultInstance;
 
   @$pb.TagNumber(1)
-  $core.String get errorMessage => $_getSZ(0);
+  $core.String get message => $_getSZ(0);
   @$pb.TagNumber(1)
-  set errorMessage($core.String v) { $_setString(0, v); }
+  set message($core.String v) { $_setString(0, v); }
   @$pb.TagNumber(1)
-  $core.bool hasErrorMessage() => $_has(0);
+  $core.bool hasMessage() => $_has(0);
   @$pb.TagNumber(1)
-  void clearErrorMessage() => clearField(1);
+  void clearMessage() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.Map<$core.String, $core.String> get args => $_getMap(1);
 }
 
-/// Response indicating processor needs further data
-class NeedMoreDataResponse extends $pb.GeneratedMessage {
-  factory NeedMoreDataResponse({
+class ErrorMessage extends $pb.GeneratedMessage {
+  factory ErrorMessage({
+    $core.String? message,
+    $core.Map<$core.String, $core.String>? args,
+  }) {
+    final $result = create();
+    if (message != null) {
+      $result.message = message;
+    }
+    if (args != null) {
+      $result.args.addAll(args);
+    }
+    return $result;
+  }
+  ErrorMessage._() : super();
+  factory ErrorMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory ErrorMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'ErrorMessage', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
+    ..aOS(1, _omitFieldNames ? '' : 'message')
+    ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'args', entryClassName: 'ErrorMessage.ArgsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('commanddash'))
+    ..hasRequiredFields = false
+  ;
+
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
+  'Will be removed in next major version')
+  ErrorMessage clone() => ErrorMessage()..mergeFromMessage(this);
+  @$core.Deprecated(
+  'Using this can add significant overhead to your binary. '
+  'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
+  'Will be removed in next major version')
+  ErrorMessage copyWith(void Function(ErrorMessage) updates) => super.copyWith((message) => updates(message as ErrorMessage)) as ErrorMessage;
+
+  $pb.BuilderInfo get info_ => _i;
+
+  @$core.pragma('dart2js:noInline')
+  static ErrorMessage create() => ErrorMessage._();
+  ErrorMessage createEmptyInstance() => create();
+  static $pb.PbList<ErrorMessage> createRepeated() => $pb.PbList<ErrorMessage>();
+  @$core.pragma('dart2js:noInline')
+  static ErrorMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<ErrorMessage>(create);
+  static ErrorMessage? _defaultInstance;
+
+  @$pb.TagNumber(1)
+  $core.String get message => $_getSZ(0);
+  @$pb.TagNumber(1)
+  set message($core.String v) { $_setString(0, v); }
+  @$pb.TagNumber(1)
+  $core.bool hasMessage() => $_has(0);
+  @$pb.TagNumber(1)
+  void clearMessage() => clearField(1);
+
+  @$pb.TagNumber(2)
+  $core.Map<$core.String, $core.String> get args => $_getMap(1);
+}
+
+class GetAdditionalDataMessage extends $pb.GeneratedMessage {
+  factory GetAdditionalDataMessage({
     $core.String? kind,
     $core.Map<$core.String, $core.String>? args,
   }) {
@@ -282,13 +431,13 @@ class NeedMoreDataResponse extends $pb.GeneratedMessage {
     }
     return $result;
   }
-  NeedMoreDataResponse._() : super();
-  factory NeedMoreDataResponse.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
-  factory NeedMoreDataResponse.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
+  GetAdditionalDataMessage._() : super();
+  factory GetAdditionalDataMessage.fromBuffer($core.List<$core.int> i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromBuffer(i, r);
+  factory GetAdditionalDataMessage.fromJson($core.String i, [$pb.ExtensionRegistry r = $pb.ExtensionRegistry.EMPTY]) => create()..mergeFromJson(i, r);
 
-  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'NeedMoreDataResponse', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
+  static final $pb.BuilderInfo _i = $pb.BuilderInfo(_omitMessageNames ? '' : 'GetAdditionalDataMessage', package: const $pb.PackageName(_omitMessageNames ? '' : 'commanddash'), createEmptyInstance: create)
     ..aOS(1, _omitFieldNames ? '' : 'kind')
-    ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'args', entryClassName: 'NeedMoreDataResponse.ArgsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('commanddash'))
+    ..m<$core.String, $core.String>(2, _omitFieldNames ? '' : 'args', entryClassName: 'GetAdditionalDataMessage.ArgsEntry', keyFieldType: $pb.PbFieldType.OS, valueFieldType: $pb.PbFieldType.OS, packageName: const $pb.PackageName('commanddash'))
     ..hasRequiredFields = false
   ;
 
@@ -296,22 +445,22 @@ class NeedMoreDataResponse extends $pb.GeneratedMessage {
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.deepCopy] instead. '
   'Will be removed in next major version')
-  NeedMoreDataResponse clone() => NeedMoreDataResponse()..mergeFromMessage(this);
+  GetAdditionalDataMessage clone() => GetAdditionalDataMessage()..mergeFromMessage(this);
   @$core.Deprecated(
   'Using this can add significant overhead to your binary. '
   'Use [GeneratedMessageGenericExtensions.rebuild] instead. '
   'Will be removed in next major version')
-  NeedMoreDataResponse copyWith(void Function(NeedMoreDataResponse) updates) => super.copyWith((message) => updates(message as NeedMoreDataResponse)) as NeedMoreDataResponse;
+  GetAdditionalDataMessage copyWith(void Function(GetAdditionalDataMessage) updates) => super.copyWith((message) => updates(message as GetAdditionalDataMessage)) as GetAdditionalDataMessage;
 
   $pb.BuilderInfo get info_ => _i;
 
   @$core.pragma('dart2js:noInline')
-  static NeedMoreDataResponse create() => NeedMoreDataResponse._();
-  NeedMoreDataResponse createEmptyInstance() => create();
-  static $pb.PbList<NeedMoreDataResponse> createRepeated() => $pb.PbList<NeedMoreDataResponse>();
+  static GetAdditionalDataMessage create() => GetAdditionalDataMessage._();
+  GetAdditionalDataMessage createEmptyInstance() => create();
+  static $pb.PbList<GetAdditionalDataMessage> createRepeated() => $pb.PbList<GetAdditionalDataMessage>();
   @$core.pragma('dart2js:noInline')
-  static NeedMoreDataResponse getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<NeedMoreDataResponse>(create);
-  static NeedMoreDataResponse? _defaultInstance;
+  static GetAdditionalDataMessage getDefault() => _defaultInstance ??= $pb.GeneratedMessage.$_defaultFor<GetAdditionalDataMessage>(create);
+  static GetAdditionalDataMessage? _defaultInstance;
 
   @$pb.TagNumber(1)
   $core.String get kind => $_getSZ(0);

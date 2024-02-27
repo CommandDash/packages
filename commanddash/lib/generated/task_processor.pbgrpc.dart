@@ -21,14 +21,10 @@ export 'task_processor.pb.dart';
 
 @$pb.GrpcServiceName('commanddash.TaskProcessor')
 class TaskProcessorClient extends $grpc.Client {
-  static final _$processTask = $grpc.ClientMethod<$0.FetchRequest, $0.Response>(
+  static final _$processTask = $grpc.ClientMethod<$0.ClientMessage, $0.ProcessorMessage>(
       '/commanddash.TaskProcessor/processTask',
-      ($0.FetchRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $0.Response.fromBuffer(value));
-  static final _$processMultiStepTask = $grpc.ClientMethod<$0.FetchRequest, $0.Response>(
-      '/commanddash.TaskProcessor/processMultiStepTask',
-      ($0.FetchRequest value) => value.writeToBuffer(),
-      ($core.List<$core.int> value) => $0.Response.fromBuffer(value));
+      ($0.ClientMessage value) => value.writeToBuffer(),
+      ($core.List<$core.int> value) => $0.ProcessorMessage.fromBuffer(value));
 
   TaskProcessorClient($grpc.ClientChannel channel,
       {$grpc.CallOptions? options,
@@ -36,12 +32,8 @@ class TaskProcessorClient extends $grpc.Client {
       : super(channel, options: options,
         interceptors: interceptors);
 
-  $grpc.ResponseFuture<$0.Response> processTask($0.FetchRequest request, {$grpc.CallOptions? options}) {
-    return $createUnaryCall(_$processTask, request, options: options);
-  }
-
-  $grpc.ResponseStream<$0.Response> processMultiStepTask($0.FetchRequest request, {$grpc.CallOptions? options}) {
-    return $createStreamingCall(_$processMultiStepTask, $async.Stream.fromIterable([request]), options: options);
+  $grpc.ResponseStream<$0.ProcessorMessage> processTask($async.Stream<$0.ClientMessage> request, {$grpc.CallOptions? options}) {
+    return $createStreamingCall(_$processTask, request, options: options);
   }
 }
 
@@ -50,30 +42,14 @@ abstract class TaskProcessorServiceBase extends $grpc.Service {
   $core.String get $name => 'commanddash.TaskProcessor';
 
   TaskProcessorServiceBase() {
-    $addMethod($grpc.ServiceMethod<$0.FetchRequest, $0.Response>(
+    $addMethod($grpc.ServiceMethod<$0.ClientMessage, $0.ProcessorMessage>(
         'processTask',
-        processTask_Pre,
-        false,
-        false,
-        ($core.List<$core.int> value) => $0.FetchRequest.fromBuffer(value),
-        ($0.Response value) => value.writeToBuffer()));
-    $addMethod($grpc.ServiceMethod<$0.FetchRequest, $0.Response>(
-        'processMultiStepTask',
-        processMultiStepTask_Pre,
-        false,
+        processTask,
         true,
-        ($core.List<$core.int> value) => $0.FetchRequest.fromBuffer(value),
-        ($0.Response value) => value.writeToBuffer()));
+        true,
+        ($core.List<$core.int> value) => $0.ClientMessage.fromBuffer(value),
+        ($0.ProcessorMessage value) => value.writeToBuffer()));
   }
 
-  $async.Future<$0.Response> processTask_Pre($grpc.ServiceCall call, $async.Future<$0.FetchRequest> request) async {
-    return processTask(call, await request);
-  }
-
-  $async.Stream<$0.Response> processMultiStepTask_Pre($grpc.ServiceCall call, $async.Future<$0.FetchRequest> request) async* {
-    yield* processMultiStepTask(call, await request);
-  }
-
-  $async.Future<$0.Response> processTask($grpc.ServiceCall call, $0.FetchRequest request);
-  $async.Stream<$0.Response> processMultiStepTask($grpc.ServiceCall call, $0.FetchRequest request);
+  $async.Stream<$0.ProcessorMessage> processTask($grpc.ServiceCall call, $async.Stream<$0.ClientMessage> request);
 }
