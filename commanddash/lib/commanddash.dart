@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:cli_util/cli_logging.dart';
+
 void waitlistMethod() {
-  print("The new way to build apps - coming soon ✨");
+  Logger.standard();
 }
