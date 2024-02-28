@@ -4,5 +4,5 @@
 bin/*.exe
 bin/*.dill
 out.js
-out.js.deps.
+out.js.deps
 out.js.map
