@@ -1,17 +1,17 @@
 class IncomingMessage {
-  final String id;
+  final int id;
   const IncomingMessage(this.id);
 
   factory IncomingMessage.fromJson(Map<String, dynamic> json) {
     switch (json['method']) {
-      case 'taskStart':
+      case 'task_start':
         final taskId = json['id'];
         final taskKind = json['params']['kind'];
         final taskData = json['params']['data'];
         return TaskStartMessage(taskId, taskKind: taskKind, data: taskData);
-      case 'additionalData':
+      case 'additional_data':
         final taskId = json['id'];
-        final additionalData = json['params']['data'];
+        final additionalData = json['params'];
         return AdditionalDataMessage(taskId, data: additionalData);
       default:
         throw UnimplementedError();
@@ -22,26 +22,26 @@ class IncomingMessage {
 class TaskStartMessage extends IncomingMessage {
   final String taskKind;
   final Map<String, dynamic> data;
-  TaskStartMessage(String id, {required this.taskKind, required this.data})
+  TaskStartMessage(int id, {required this.taskKind, required this.data})
       : super(id);
 }
 
 class AdditionalDataMessage extends IncomingMessage {
   final Map<String, dynamic> data;
-  AdditionalDataMessage(String id, {required this.data}) : super(id);
+  AdditionalDataMessage(int id, {required this.data}) : super(id);
 }
 
 class OutgoingMessage {
-  final String id;
+  final int id;
   const OutgoingMessage(this.id);
 
   Map<String, dynamic> get toJson => {'id': id};
 }
 
-class SuccessMessage extends OutgoingMessage {
+class ResultMessage extends OutgoingMessage {
   final String message;
   final Map<String, dynamic> data;
-  SuccessMessage(String id, {required this.message, required this.data})
+  ResultMessage(int id, {required this.message, required this.data})
       : super(id);
 
   @override
@@ -49,7 +49,7 @@ class SuccessMessage extends OutgoingMessage {
     final json = super.toJson;
     json.addAll({
       'method': 'result',
-      'result': {
+      'params': {
         'message': message,
         'data': data,
       },
@@ -61,15 +61,33 @@ class SuccessMessage extends OutgoingMessage {
 class ErrorMessage extends OutgoingMessage {
   final String message;
   final Map<String, dynamic> data;
-  ErrorMessage(String id, {required this.message, required this.data})
-      : super(id);
+  ErrorMessage(int id, {required this.message, required this.data}) : super(id);
 
   @override
   Map<String, dynamic> get toJson {
     final json = super.toJson;
     json.addAll({
       'method': 'error',
-      'error': {
+      'params': {
+        'message': message,
+        'data': data,
+      },
+    });
+    return json;
+  }
+}
+
+class LogMessage extends OutgoingMessage {
+  final String message;
+  final Map<String, dynamic> data;
+  LogMessage(int id, {required this.message, required this.data}) : super(id);
+
+  @override
+  Map<String, dynamic> get toJson {
+    final json = super.toJson;
+    json.addAll({
+      'method': 'log',
+      'params': {
         'message': message,
         'data': data,
       },
@@ -81,14 +99,14 @@ class ErrorMessage extends OutgoingMessage {
 class GetAdditionalDataMessage extends OutgoingMessage {
   final String kind;
   final Map<String, dynamic> args;
-  GetAdditionalDataMessage(String id, {required this.kind, required this.args})
+  GetAdditionalDataMessage(int id, {required this.kind, required this.args})
       : super(id);
 
   @override
   Map<String, dynamic> get toJson {
     final json = super.toJson;
     json.addAll({
-      'method': 'additionalData',
+      'method': 'get_additional_data',
       'params': {
         'kind': kind,
         'args': args,

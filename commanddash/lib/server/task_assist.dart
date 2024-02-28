@@ -5,11 +5,12 @@ import 'package:rxdart/rxdart.dart';
 class TaskAssist {
   TaskAssist(this._server, this._taskId);
   final Server _server;
-  final String _taskId;
+  final int _taskId;
 
   Future<Map<String, dynamic>> getAdditionalData(
-      GetAdditionalDataMessage message) async {
-    _server.sendMessage(message);
+      {required String kind, required Map<String, dynamic> args}) async {
+    _server
+        .sendMessage(GetAdditionalDataMessage(_taskId, kind: kind, args: args));
     final dataResponse = await _server.messagesStream
         .whereType<AdditionalDataMessage>()
         .where((event) => event.id == _taskId)
@@ -17,9 +18,18 @@ class TaskAssist {
     return dataResponse.data;
   }
 
-  void sendCompletionMessage(OutgoingMessage message) {
-    assert(message is SuccessMessage || message is ErrorMessage,
-        'Completion can only be marked with success or error');
-    _server.sendMessage(message);
+  void sendResultMessage(
+      {required String message, required Map<String, dynamic> data}) {
+    _server.sendMessage(ResultMessage(_taskId, message: message, data: data));
+  }
+
+  void sendErrorMessage(
+      {required message, required Map<String, dynamic> data}) {
+    _server.sendMessage(ErrorMessage(_taskId, message: message, data: data));
+  }
+
+  /// Only use for debugging purposes. Clients can print the log on their end.
+  void sendLogMessage({required message, required Map<String, dynamic> data}) {
+    _server.sendMessage(LogMessage(_taskId, message: message, data: data));
   }
 }

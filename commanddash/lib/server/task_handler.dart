@@ -12,14 +12,22 @@ class TaskHandler {
         .listen((TaskStartMessage message) {
       final taskAssist = TaskAssist(_server, message.id);
       switch (message.taskKind) {
-        case 'randomTask':
-          taskAssist.sendCompletionMessage(
-              SuccessMessage(message.id, message: 'TASK_COMPLETED', data: {}));
+        case 'random_task':
+          someRandomFunction(taskAssist);
           break;
         default:
-          taskAssist.sendCompletionMessage(
-              ErrorMessage(message.id, message: 'INVALID_TASK_KIND', data: {}));
+          taskAssist.sendErrorMessage(message: 'INVALID_TASK_KIND', data: {});
       }
     });
+  }
+}
+
+Future<void> someRandomFunction(TaskAssist taskAssist) async {
+  final data =
+      await taskAssist.getAdditionalData(kind: 'random_data_kind', args: {});
+  if (data['value'] == 'unique_value') {
+    taskAssist.sendResultMessage(message: 'TASK_COMPLETED', data: {});
+  } else {
+    taskAssist.sendErrorMessage(message: 'TASK_FAILED', data: {});
   }
 }

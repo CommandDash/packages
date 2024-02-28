@@ -1,11 +1,7 @@
-import 'dart:io';
-
 import 'package:args/command_runner.dart';
 import 'package:commanddash/runner.dart';
 
 void main(List<String> arguments) async {
-  await Future.delayed(Duration(seconds: 2));
-  stdout.writeln('hello');
   var runner = CommandRunner("commanddash", "CLI enhancements for Dash AI")
     ..addCommand(ProcessCommand());
   await runner.run(arguments);
