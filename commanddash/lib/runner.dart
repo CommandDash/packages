@@ -1,7 +1,6 @@
 import 'package:args/command_runner.dart';
-import 'package:commanddash/grpc/task_processor.dart';
-import 'package:commanddash/utils/cli_utils.dart';
-import 'package:grpc/grpc.dart';
+import 'package:commanddash/server/server.dart';
+import 'package:commanddash/server/task_handler.dart';
 
 class ProcessCommand extends Command {
   bool dryrun = false;
@@ -16,10 +15,8 @@ class ProcessCommand extends Command {
 
   @override
   Future<void> run() async {
-    CLIUtils.terminateOnExit();
-
-    final server = Server.create(services: [TaskProcessor()]);
-    await server.serve(port: 50051);
-    print('Server listening on port ${server.port}...');
+    final server = Server();
+    final TaskHandler handler = TaskHandler(server);
+    handler.initProcessing();
   }
 }
