@@ -40,7 +40,7 @@ class AskCommand extends Command {
         WorkspaceQueryStep(query: '$matchingDocuments', output: matchingCode),
         PromptQueryStep(
             prompt:
-                '''You are an X agent. Here is the $userQuery, here is the $matchingCode and the document references: $matchingCode. Answer the user's query.''',
+                '''You are an X agent. Here is the $userQuery, here is the $matchingCode and the document references: $matchingDocuments. Answer the user's query.''',
             postProcessKind: PostProcessKind.raw,
             output: queryOutput),
         AppendToChatStep(
