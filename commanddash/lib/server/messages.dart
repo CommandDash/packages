@@ -9,10 +9,10 @@ class IncomingMessage {
         final taskKind = json['params']['kind'];
         final taskData = json['params']['data'];
         return TaskStartMessage(taskId, taskKind: taskKind, data: taskData);
-      case 'additional_data':
+      case 'process_step_response':
         final taskId = json['id'];
-        final additionalData = json['params'];
-        return AdditionalDataMessage(taskId, data: additionalData);
+        final responseData = json['params'];
+        return ProcessResponseMessage(taskId, data: responseData);
       default:
         throw UnimplementedError();
     }
@@ -26,9 +26,9 @@ class TaskStartMessage extends IncomingMessage {
       : super(id);
 }
 
-class AdditionalDataMessage extends IncomingMessage {
+class ProcessResponseMessage extends IncomingMessage {
   final Map<String, dynamic> data;
-  AdditionalDataMessage(int id, {required this.data}) : super(id);
+  ProcessResponseMessage(int id, {required this.data}) : super(id);
 }
 
 class OutgoingMessage {
@@ -96,17 +96,17 @@ class LogMessage extends OutgoingMessage {
   }
 }
 
-class GetAdditionalDataMessage extends OutgoingMessage {
+/// To be used to communicate with client to execute any user facing tasks or fetch data from client.
+class ProcessMessage extends OutgoingMessage {
   final String kind;
   final Map<String, dynamic> args;
-  GetAdditionalDataMessage(int id, {required this.kind, required this.args})
-      : super(id);
+  ProcessMessage(int id, {required this.kind, required this.args}) : super(id);
 
   @override
   Map<String, dynamic> get toJson {
     final json = super.toJson;
     json.addAll({
-      'method': 'get_additional_data',
+      'method': 'process_step',
       'params': {
         'kind': kind,
         'args': args,

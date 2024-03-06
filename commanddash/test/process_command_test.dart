@@ -24,13 +24,13 @@ void main() {
     expect(
         jsonDecode(result),
         equals({
-          'method': 'get_additional_data',
+          'method': 'process_step',
           'id': 1,
           'params': {'kind': 'random_data_kind', 'args': {}}
         }));
     // send additional data
     process.stdin.writeln(jsonEncode({
-      'method': 'additional_data',
+      'method': 'process_step_response',
       'id': 1,
       'params': {'value': 'unique_value'}
     }));
