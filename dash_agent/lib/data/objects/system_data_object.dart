@@ -58,7 +58,7 @@ class DirectoryFiles extends SystemDataObject {
 
     List<Map<String, dynamic>> files = [];
 
-    for (var file in directory.listSync(recursive: false)) {
+    for (var file in directory.listSync(recursive: true)) {
       if (file is File) {
         if (regex != null && !regex!.hasMatch(file.path)) {
           continue;
