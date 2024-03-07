@@ -1,5 +1,8 @@
-import 'package:commanddash/commanddash.dart' as commanddash;
+import 'package:args/command_runner.dart';
+import 'package:commanddash/runner.dart';
 
-void main(List<String> arguments) {
-  commanddash.waitlistMethod();
+void main(List<String> arguments) async {
+  var runner = CommandRunner("commanddash", "CLI enhancements for Dash AI")
+    ..addCommand(ProcessCommand());
+  await runner.run(arguments);
 }
