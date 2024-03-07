@@ -7,12 +7,11 @@ class TaskAssist {
   final Server _server;
   final int _taskId;
 
-  Future<Map<String, dynamic>> getAdditionalData(
+  Future<Map<String, dynamic>> processStep(
       {required String kind, required Map<String, dynamic> args}) async {
-    _server
-        .sendMessage(GetAdditionalDataMessage(_taskId, kind: kind, args: args));
+    _server.sendMessage(ProcessMessage(_taskId, kind: kind, args: args));
     final dataResponse = await _server.messagesStream
-        .whereType<AdditionalDataMessage>()
+        .whereType<ProcessResponseMessage>()
         .where((event) => event.id == _taskId)
         .first;
     return dataResponse.data;

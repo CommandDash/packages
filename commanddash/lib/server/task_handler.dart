@@ -23,8 +23,7 @@ class TaskHandler {
 }
 
 Future<void> someRandomFunction(TaskAssist taskAssist) async {
-  final data =
-      await taskAssist.getAdditionalData(kind: 'random_data_kind', args: {});
+  final data = await taskAssist.processStep(kind: 'random_data_kind', args: {});
   if (data['value'] == 'unique_value') {
     taskAssist.sendResultMessage(message: 'TASK_COMPLETED', data: {});
   } else {
