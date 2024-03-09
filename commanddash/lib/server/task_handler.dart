@@ -1,3 +1,5 @@
+import 'package:commanddash/steps/find_closest_files/embedding_generator.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_assist.dart';
@@ -14,6 +16,14 @@ class TaskHandler {
       switch (message.taskKind) {
         case 'random_task':
           someRandomFunction(taskAssist);
+          break;
+        case 'find_closest_files':
+          EmbeddingGenerator().findClosesResults(
+            taskAssist,
+            message.data['query'],
+            message.data['workspacePath'],
+            GeminiRepository(message.data['apiKey']),
+          );
           break;
         default:
           taskAssist.sendErrorMessage(message: 'INVALID_TASK_KIND', data: {});
