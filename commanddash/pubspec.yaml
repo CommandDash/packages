@@ -12,10 +12,15 @@ dependencies:
   args: ^2.4.2
   async: ^2.11.0
   cli_util: ^0.4.1
+  dio: ^5.4.1
+  equatable: ^2.0.5
   google_generative_ai: ^0.2.2
   rxdart: ^0.27.7
   # path: ^1.8.0
 
 dev_dependencies:
   lints: ^2.1.0
+  build_runner: ^2.4.8
+  mockito: ^5.4.4
   test: ^1.24.0
+  
