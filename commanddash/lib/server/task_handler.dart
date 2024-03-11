@@ -1,5 +1,7 @@
 import 'package:commanddash/repositories/client/dio_client.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
+import 'package:commanddash/agent/agent_handler.dart';
+import 'package:commanddash/steps/find_closest_files/embedding_generator.dart';
 import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
@@ -32,14 +34,18 @@ class TaskHandler {
           ///Other repositories using the backend client
           ///Pass this to the agent.
           break;
-        case 'find_closest_files':
-          EmbeddingGenerator().findClosesResults(
-            taskAssist,
-            message.data['query'],
-            message.data['workspacePath'],
-            GeminiRepository(message.data['apiKey']),
-          );
+        case 'agent-execute':
+          final handler = AgentHandler.fromJson(message.data);
+          handler.runTask(taskAssist);
           break;
+        // case 'find_closest_files':
+        //   EmbeddingGenerator().findClosesResults(
+        //     taskAssist,
+        //     message.data['query'],
+        //     message.data['workspacePath'],
+        //     GeminiRepository(message.data['apiKey']),
+        //   );
+        // break;
         default:
           taskAssist.sendErrorMessage(message: 'INVALID_TASK_KIND', data: {});
       }

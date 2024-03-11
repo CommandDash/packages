@@ -1,17 +1,10 @@
 import 'dart:io';
-import 'dart:convert';
+import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
-import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/utils/embedding_utils.dart';
 
 class EmbeddingGenerator {
-  Future<void> findClosesResults(
-    TaskAssist taskAssist,
-    String query,
-    String workspacePath,
-    GenerationRepository generationRepository,
-  ) async {
-    // Find all Dart files in the workspace
+  static List<WorkspaceFile> getDartFiles(String workspacePath) {
     final directory = Directory(workspacePath);
     const excludePattern =
         r"[/\\](android|ios|web|linux|macos|windows|.dart_tool)[\/\\]";
@@ -21,60 +14,47 @@ class EmbeddingGenerator {
         .where((file) {
       return !RegExp(excludePattern).hasMatch(file.path);
     }).toList();
-    final fileContents = dartFiles.map((file) {
-      // get the code hash
-      final codeHash = computeCodeHash(File(file.path).readAsStringSync());
-      // get the embedding
-      final content = File(file.path).readAsStringSync();
-      return <String, dynamic>{
-        'path': file.path,
-        'codeHash': codeHash,
-        'content': content,
-      };
-    });
-    // request for the chache from embedding
-    final codehashCache = jsonDecode(
-        (await taskAssist.processStep(kind: 'cache', args: {}))['value']);
-    taskAssist.sendLogMessage(message: "Cache recieved successfully", data: {});
-    final filesToUpdate = fileContents.where((element) {
-      final cacheEntry = codehashCache[element['path']];
+    final fileContents =
+        dartFiles.map((file) => WorkspaceFile.fromPaths(file.path)).toList();
+    return fileContents;
+  }
+
+  static List<WorkspaceFile> getFilesToUpdate(
+      List<WorkspaceFile> files, Map<String, dynamic> codehashCache) {
+    final filesToUpdate = files.where((element) {
+      final cacheEntry = codehashCache[element.path];
       if (cacheEntry == null) {
         return true; // File not in cache, update required
       }
-      return cacheEntry['codehash'] != element['codehash'];
-    });
+      return cacheEntry['codehash'] != element.codeHash;
+    }).toList();
+    return filesToUpdate;
+  }
 
-    // update the embeddings
-    for (var element in filesToUpdate) {
-      final embedding = await generationRepository
-          .getCodeEmbeddings(element['content'] ?? '');
-      if (codehashCache[element['path']] != null) {
-        codehashCache[element['path']]['embedding'] = embedding;
-      } else {
-        codehashCache[element['path']!] = element;
-        codehashCache[element['path']]['embedding'] = embedding;
-      }
+  static Future<List<WorkspaceFile>> updateEmbeddings(List<WorkspaceFile> files,
+      GenerationRepository generationRepository) async {
+    for (var file in files) {
+      final embedding =
+          await generationRepository.getCodeEmbeddings(file.content!);
+      file.embedding = embedding;
     }
-    // save to cache by sending message to ide
-    // TODO: Send message to ide according to requirements
+    return files;
+  }
 
-    final queryEmbedding =
-        await generationRepository.getStringEmbeddings(query);
+  static Future<List<double>> getQueryEmbedding(
+      String query, GenerationRepository generationRepository) async {
+    return await generationRepository.getStringEmbeddings(query);
+  }
 
-    final distances = fileContents.map((file) {
-      final embedding = codehashCache[file['path']]['embedding'];
-      final distance = calculateCosineSimilarity(queryEmbedding, embedding);
-      return {
-        'path': file['path'],
-        'distance': distance,
-      };
-    }).toList()
-      ..sort((a, b) =>
-          (a['distance'] as double).compareTo(b['distance'] as double))
-      ..take(3);
-
-    taskAssist.sendResultMessage(message: "TASK_COMPLETED", data: {
-      "result": distances,
-    });
+  static List<WorkspaceFile> getTop3NearestFiles(List<WorkspaceFile> files,
+      List<double> queryEmbeddings, GenerationRepository generationRepository) {
+    files.sort(((a, b) {
+      final distanceA =
+          calculateCosineSimilarity(queryEmbeddings, a.embedding!);
+      final distanceB =
+          calculateCosineSimilarity(queryEmbeddings, b.embedding!);
+      return distanceA.compareTo(distanceB);
+    }));
+    return files;
   }
 }

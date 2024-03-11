@@ -14,6 +14,7 @@ dependencies:
   cli_util: ^0.4.1
   dio: ^5.4.1
   equatable: ^2.0.5
+  crypto: ^3.0.3
   google_generative_ai: ^0.2.2
   rxdart: ^0.27.7
   # path: ^1.8.0
