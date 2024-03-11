@@ -107,6 +107,7 @@ void main() {
       expect(
           jsonDecode(result),
           equals({
+            'id': -1,
             'method': 'operation',
             'params': {'kind': 'operation_data_kind', 'args': {}}
           }));
@@ -149,6 +150,7 @@ void main() {
       expect(
           jsonDecode(result),
           equals({
+            'id': -1,
             'method': 'operation',
             'params': {'kind': 'operation_data_kind', 'args': {}}
           }));

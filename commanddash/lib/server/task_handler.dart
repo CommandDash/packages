@@ -1,12 +1,9 @@
+import 'package:commanddash/agent/agent_handler.dart';
 import 'package:commanddash/repositories/client/dio_client.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
-import 'package:commanddash/agent/agent_handler.dart';
-import 'package:commanddash/steps/find_closest_files/embedding_generator.dart';
-import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_assist.dart';
-import 'package:commanddash/steps/find_closest_files/embedding_generator.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TaskHandler {
@@ -65,13 +62,6 @@ Future<void> randomFunctionWithStep(TaskAssist taskAssist) async {
 
 /// Function for Integration Test of the side operation communication
 Future<void> randomFunctionWithSideOperation(TaskAssist taskAssist) async {
-  /// added these logs for debugging purposes on client
-  taskAssist.sendLogMessage(
-      message: 'operation_data_kind_request_received', data: {});
-
-  final data =
-      await taskAssist.processOperation(kind: 'operation_data_kind', args: {});
-  taskAssist.sendLogMessage(
-      message: 'operation_data_kind_received', data: data);
+  await taskAssist.processOperation(kind: 'operation_data_kind', args: {});
   taskAssist.sendResultMessage(message: 'TASK_COMPLETED', data: {});
 }
