@@ -9,6 +9,11 @@ class IncomingMessage {
         final taskKind = json['params']['kind'];
         final taskData = json['params']['data'];
         return TaskStartMessage(taskId, taskKind: taskKind, data: taskData);
+      case 'agent-execute':
+        final taskId = json['id'];
+        final taskKind = json['method'];
+        final taskData = json['params'];
+        return TaskStartMessage(taskId, taskKind: taskKind, data: taskData);
       case 'process_step_response':
         final taskId = json['id'];
         final responseData = json['params'];
@@ -19,11 +24,46 @@ class IncomingMessage {
   }
 }
 
+class GenerationTask extends TaskStartMessage {
+  final String apiKey;
+
+  GenerationTask(int id,
+      {required String taskKind,
+      required Map<String, dynamic> data,
+      required this.apiKey})
+      : super(id, taskKind: taskKind, data: data);
+}
+
+class ClosestFileTask extends GenerationTask {
+  final String query;
+  final String workspacePath;
+
+  ClosestFileTask(
+      {required int id,
+      required this.query,
+      required this.workspacePath,
+      required Map<String, dynamic> data})
+      : super(id, taskKind: 'find-closest-files', data: data, apiKey: '');
+
+  factory ClosestFileTask.fromJson(int id, Map<String, dynamic> json) {
+    return ClosestFileTask(
+        id: id,
+        query: json['query'],
+        workspacePath: json['workspacePath'],
+        data: json['data']);
+  }
+}
+
 class TaskStartMessage extends IncomingMessage {
-  final String taskKind;
+  final String taskKind; // agent-execute
   final Map<String, dynamic> data;
   TaskStartMessage(int id, {required this.taskKind, required this.data})
       : super(id);
+
+  factory TaskStartMessage.fromJson(
+      int id, String taskKind, Map<String, dynamic> data) {
+    return TaskStartMessage(id, taskKind: taskKind, data: data);
+  }
 }
 
 class ProcessResponseMessage extends IncomingMessage {
