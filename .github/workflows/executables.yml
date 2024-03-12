@@ -35,4 +35,4 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: native-executables
-          path: build
+          path: commanddash/build
