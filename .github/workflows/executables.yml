@@ -22,11 +22,13 @@ jobs:
     steps:
         - uses: actions/checkout@v4
         - uses: dart-lang/setup-dart@v1
-        - run: |
+        - name: Dart pub get
+          run: |
             cd commanddash
+            mkdir -p build
             dart pub get
-        - run: |
-            cd commanddash
+        - name: Compile
+          run: |
             dart compile exe bin/commanddash.dart -o build/${{ matrix.output-name }}
         - uses: actions/upload-artifact@v4
           with:
