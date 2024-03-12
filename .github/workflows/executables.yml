@@ -15,7 +15,7 @@ jobs:
         include:
           - os: ubuntu-latest
             output-name: commanddash-linux.exe
-          - os: macos-latest-xlarge
+          - os: macOS-latest
             output-name: commanddash-mac.exe
           - os: windows-latest
             output-name: commanddash-windows.exe
