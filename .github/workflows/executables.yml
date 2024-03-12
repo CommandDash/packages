@@ -33,6 +33,6 @@ jobs:
           cd commanddash
           dart compile exe bin/commanddash.dart -o build/${{ matrix.output-name }}
       - uses: actions/upload-artifact@v4
-            with:
-                name: native-executables
-                path: commanddash/build
+        with:
+          name: native-executables
+          path: build
