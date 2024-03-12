@@ -29,6 +29,7 @@ jobs:
             dart pub get
         - name: Compile
           run: |
+            cd commanddash
             dart compile exe bin/commanddash.dart -o build/${{ matrix.output-name }}
         - uses: actions/upload-artifact@v4
           with:
