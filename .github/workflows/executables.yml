@@ -24,6 +24,7 @@ jobs:
         - uses: dart-lang/setup-dart@v1
         - run: |
             cd commanddash
+            mkdir -p build
             dart pub get
         - run: |
             dart compile exe bin/commanddash.dart -o build/${{ matrix.output-name }}
