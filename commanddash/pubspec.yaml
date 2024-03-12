@@ -6,6 +6,9 @@ repository: https://github.com/Welltested-AI/commanddash
 environment:
   sdk: '>=2.14.0 <4.0.0'
 
+executables:
+  commanddash:
+
 # Add regular dependencies here.
 dependencies:
   analyzer: ^6.4.1
