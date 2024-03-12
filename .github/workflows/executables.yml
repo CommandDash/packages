@@ -1,0 +1,31 @@
+name: Publish CommandDash Executables
+
+on:
+  push:
+    branches:
+       - build/executables
+    
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            output-name: commanddash-linux
+          - os: macOS-latest
+            output-name: commanddash-mac
+          - os: windows-latest
+            output-name: commanddash-windows.exe
+    steps:
+        - uses: actions/checkout@v4
+        - uses: dart-lang/setup-dart@v1
+        - run: cd commanddash
+        - run: dart pub get
+        - run: dart compile exe bin/commanddash.dart -o build/${{ matrix.output-name }}
+        - uses: actions/upload-artifact@v4
+          with:
+            name: platform-executables
+            path: build
