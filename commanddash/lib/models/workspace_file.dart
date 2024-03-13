@@ -14,6 +14,9 @@ class WorkspaceFile {
       codeHash = computeCodeHash(content!);
     }
   }
+
+  WorkspaceFile(this.path, {this.content, this.codeHash, this.embedding});
+
   Map<String, dynamic> toJson() {
     return {
       "path": path,
