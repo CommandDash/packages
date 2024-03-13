@@ -38,7 +38,7 @@ class GeminiRepository implements GenerationRepository {
       final result = await model.embedContent(
         content,
         taskType: TaskType
-            .retrievalDocument, //TODO: using retervial document for code won't be ideal when matching code against code to find similar code snippets. allow to choose task type for any kind of embedding.
+            .retrievalDocument, //TODO: let's later think if we can improve this in a general way and make a single API for both string and code.
       );
       return result.embedding.values;
     } on InvalidApiKey catch (e) {
