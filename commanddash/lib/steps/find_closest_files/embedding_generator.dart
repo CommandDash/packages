@@ -33,10 +33,24 @@ class EmbeddingGenerator {
 
   static Future<List<WorkspaceFile>> updateEmbeddings(List<WorkspaceFile> files,
       GenerationRepository generationRepository) async {
-    for (var file in files) {
-      final embedding =
-          await generationRepository.getCodeEmbeddings(file.content!);
-      file.embedding = embedding;
+    // Batch the files in batches of 100s
+    const batchSize = 100;
+    final batches = <List<WorkspaceFile>>[];
+    for (var i = 0; i < files.length; i += batchSize) {
+      batches.add(files.sublist(
+          i, i + batchSize < files.length ? i + batchSize : files.length));
+    }
+
+    // Use the batches API to update the embeddings
+    final embeddings = await Future.wait(batches.map((batch) async {
+      final code = batch.map((file) => file.content!).toList();
+      final embeddings =
+          await generationRepository.getCodeBatchEmbeddings(code);
+      return embeddings;
+    }));
+
+    for (var i = 0; i < files.length; i++) {
+      files[i].embedding = embeddings[i ~/ batchSize][i % batchSize];
     }
     return files;
   }
