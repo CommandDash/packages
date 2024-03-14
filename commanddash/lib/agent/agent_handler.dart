@@ -7,7 +7,7 @@ import 'package:commanddash/server/task_assist.dart';
 class AgentHandler {
   final Map<String, Input> inputs;
   final Map<String, Output> outputs;
-  final List<Step> steps;
+  final List<Map<String, dynamic>> steps;
   final GenerationRepository generationRepository;
 
   AgentHandler({
@@ -26,10 +26,9 @@ class AgentHandler {
     for (Map<String, dynamic> output in (json['outputs'] as List)) {
       outputs.addAll({output['id']: Output.fromJson(output)});
     }
-    final steps = <Step>[];
-    for (Map<String, dynamic> step in (json['steps'] as List)) {
-      steps.add(Step.fromJson(step, inputs, outputs));
-    }
+    final List<Map<String, dynamic>> steps =
+        (json['steps'] as List).cast<Map<String, dynamic>>();
+
     final GenerationRepository generationRepository =
         GenerationRepository.fromJson(json['authdetails']);
     return AgentHandler(
@@ -45,10 +44,19 @@ class AgentHandler {
   // }
 
   void runTask(TaskAssist taskAssist) async {
-    // Step is of type SearchInSources -> backend call
-    // Step.run(taskAssist);
-    for (Step step in steps) {
-      await step.run(taskAssist, generationRepository);
+    for (Map<String, dynamic> stepJson in steps) {
+      final step = Step.fromJson(stepJson, inputs, outputs);
+      final output = await step.run(taskAssist, generationRepository);
+      if (step.outputId != null) {
+        if (output == null) {
+          // send error message of expected output not recieved
+        } else {
+          outputs[step.outputId!] = output;
+        }
+      }
     }
+    taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: {
+      "outputs": outputs,
+    });
   }
 }

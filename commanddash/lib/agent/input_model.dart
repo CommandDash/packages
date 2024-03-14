@@ -11,18 +11,25 @@ abstract class Input {
       throw UnimplementedError();
     }
   }
+
+  @override
+  String toString();
 }
 
 class StringInput extends Input {
   String value;
-  StringInput(String id, String type, this.value) : super(id, type);
+  StringInput(String id, this.value) : super(id, 'string_input');
 
   factory StringInput.fromJson(Map<String, dynamic> json) {
     return StringInput(
       json['id'],
-      json['type'],
       json['value'],
     );
+  }
+
+  @override
+  String toString() {
+    return value;
   }
 }
 

@@ -33,11 +33,11 @@ void main() {
         "steps": [
           {
             "type": "search_in_workspace",
-            "query": "<422243666>",
+            "query": "Find best file for: <422243666>",
             "workspace_object_type": "all",
             "workspacePath":
                 '/Users/keval/Desktop/dev/welltested/projects/dart_files',
-            "output": "<436621806>"
+            "output": "436621806"
           },
         ]
       }
