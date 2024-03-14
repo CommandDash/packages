@@ -68,4 +68,12 @@ class DefaultOutput extends Output {
       json['type'],
     );
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      "type": type.toString(),
+      "value": value,
+    };
+  }
 }

@@ -19,7 +19,7 @@ class GeminiRepository implements GenerationRepository {
   ) async {
     // For text-only input, use the gemini-pro model
     final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
-    final content = [Content.text('Write a story about a magic backpack.')];
+    final content = [Content.text(messages)];
     final response = await model.generateContent(content);
     if (response.text != null) {
       return response.text!;

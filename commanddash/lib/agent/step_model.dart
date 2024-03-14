@@ -3,6 +3,7 @@ import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/find_closest_files/search_in_workspace_step.dart';
+import 'package:commanddash/steps/prompt_query/prompt_query_step.dart';
 import 'package:commanddash/steps/steps_utils.dart';
 
 abstract class Step {
@@ -24,7 +25,10 @@ abstract class Step {
           (json['query'] as String).replacePlaceholder(inputs, outputs),
         );
       case 'prompt_query':
-      // return PromptQueryStep.fromJson(json);
+        return PromptQueryStep.fromJson(
+          json,
+          (json['query'] as String).replacePlaceholder(inputs, outputs),
+        );
       case 'append_to_chat':
       // return AppendToChatStep.fromJson(json);
       default:

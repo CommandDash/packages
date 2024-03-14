@@ -57,7 +57,7 @@ class AgentHandler {
     }
     // TODO: change this according to IDE requirements
     taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: {
-      "outputs": outputs.entries.map((e) => e.value.toJson()).toList(),
+      "outputs": outputs.values.last.toJson(),
     });
   }
 }
