@@ -9,19 +9,20 @@ extension ProcessedQueryExtension on String {
   String replacePlaceholder(
       Map<String, Input> inputs, Map<String, Output> outputs) {
     final RegExp queryIdPattern = RegExp(r'<(\d+)>');
-    final stringValue = this;
-    for (RegExpMatch match in queryIdPattern.allMatches(stringValue)) {
-      final inputId =
-          match.toString().substring(1, match.toString().length - 1);
+    String stringValue = this;
+    final allMatches = queryIdPattern.allMatches(stringValue).toList();
+    for (int i = allMatches.length - 1; i >= 0; i--) {
+      final match = allMatches[i];
+      final inputId = match.group(1);
       var replaceValue;
       if (inputs[inputId] != null) {
-        replaceValue = inputs[inputId];
+        replaceValue = inputs[inputId].toString();
       } else if (outputs[inputId] != null) {
-        replaceValue = outputs[inputId];
+        replaceValue = outputs[inputId].toString();
       }
       if (replaceValue != null) {
-        stringValue.replaceRange(
-            match.start, match.end, replaceValue.toString());
+        stringValue =
+            stringValue.replaceRange(match.start, match.end, replaceValue);
       }
     }
     return stringValue;

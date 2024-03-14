@@ -16,6 +16,11 @@ abstract class Output {
     }
   }
 
+  @override
+  String toString() {
+    throw UnimplementedError();
+  }
+
   Map<String, dynamic> toJson() {
     return {
       "type": type.toString(),
@@ -67,6 +72,11 @@ class DefaultOutput extends Output {
     return DefaultOutput(
       json['type'],
     );
+  }
+
+  @override
+  String toString() {
+    return value;
   }
 
   @override
