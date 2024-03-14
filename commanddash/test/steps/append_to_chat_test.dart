@@ -66,10 +66,25 @@ void main() {
     var result = await queue.next;
     expect(result, isA<StepMessage>());
     expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'message');
+    expect(result.args['message'], 'Preparing Result');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'none');
+    expect(result.args.containsKey('message'), false);
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
     expect((result as StepMessage).kind, 'append_to_chat');
     expect(result.args.containsKey('message'), true);
     expect(result.args['message'], isA<String>());
-    print(result);
     messageStreamController.add(
         StepResponseMessage(1, 'append_to_chat', data: {'result': 'success'}));
     result = await queue.next;
@@ -77,5 +92,5 @@ void main() {
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
     expect(result.data, {});
-  });
+  }, timeout: Timeout(Duration(minutes: 1)));
 }

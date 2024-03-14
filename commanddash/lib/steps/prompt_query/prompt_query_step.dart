@@ -1,3 +1,4 @@
+import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
@@ -8,14 +9,12 @@ import 'package:commanddash/steps/steps_utils.dart';
 class PromptQueryStep extends Step {
   final String query;
   final PromptResponseParser responseParser;
-  PromptQueryStep({
-    required String outputId,
-    required this.query,
-    required this.responseParser,
-  }) : super(
-          outputId: outputId,
-          type: StepType.promptQuery,
-        );
+  PromptQueryStep(
+      {required String outputId,
+      required this.query,
+      required this.responseParser,
+      Loader loader = const MessageLoader('Preparing Result')})
+      : super(outputId: outputId, type: StepType.promptQuery, loader: loader);
 
   factory PromptQueryStep.fromJson(
     Map<String, dynamic> json,
@@ -31,6 +30,7 @@ class PromptQueryStep extends Step {
   @override
   Future<DefaultOutput> run(
       TaskAssist taskAssist, GenerationRepository generationRepository) async {
+    await super.run(taskAssist, generationRepository);
     final response = await generationRepository.getCompletion(query);
     final parsedResponse = responseParser.parse(response);
     return DefaultOutput(parsedResponse);

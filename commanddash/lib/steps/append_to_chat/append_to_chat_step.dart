@@ -1,3 +1,4 @@
+import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
@@ -10,10 +11,8 @@ class AppendToChatStep extends Step {
   AppendToChatStep({
     String? outputId,
     required this.message,
-  }) : super(
-          outputId: outputId,
-          type: StepType.appendToChat,
-        );
+    Loader loader = const NoneLoader(),
+  }) : super(outputId: outputId, type: StepType.appendToChat, loader: loader);
 
   factory AppendToChatStep.fromJson(
     Map<String, dynamic> json,
@@ -28,6 +27,7 @@ class AppendToChatStep extends Step {
   @override
   Future<Output?> run(
       TaskAssist taskAssist, GenerationRepository generationRepository) async {
+    await super.run(taskAssist, generationRepository);
     final response = await taskAssist
         .processStep(kind: 'append_to_chat', args: {'message': message});
     if (response['error'] != null) {

@@ -1,4 +1,5 @@
 import 'package:commanddash/agent/input_model.dart';
+import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
@@ -9,11 +10,14 @@ import 'package:commanddash/steps/steps_utils.dart';
 
 abstract class Step {
   late StepType type;
+  final Loader loader;
   String? outputId;
   Step({
     required this.type,
+    required this.loader,
     required this.outputId,
   });
+
   factory Step.fromJson(Map<String, dynamic> json, Map<String, Input> inputs,
       Map<String, Output> outputs) {
     switch (json['type']) {
@@ -38,5 +42,8 @@ abstract class Step {
   }
 
   Future<Output?> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository);
+      TaskAssist taskAssist, GenerationRepository generationRepository) async {
+    await taskAssist.processStep(kind: 'loader_update', args: loader.toJson());
+    return null;
+  }
 }

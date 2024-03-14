@@ -1,5 +1,6 @@
 import 'package:commanddash/agent/agent_exceptions.dart';
 import 'package:commanddash/agent/input_model.dart';
+import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
@@ -13,15 +14,16 @@ class SearchInWorkspaceStep extends Step {
   final String
       query; // QueryInput -> Find similar to [code] -> references from it -> embedding
 
-  SearchInWorkspaceStep({
-    required String outputId,
-    required this.workspaceObjectType,
-    required this.workspacePath,
-    required this.query,
-  }) : super(
-          outputId: outputId,
-          type: StepType.searchInWorkspace,
-        );
+  SearchInWorkspaceStep(
+      {required String outputId,
+      required this.workspaceObjectType,
+      required this.workspacePath,
+      required this.query,
+      Loader loader = const MessageLoader('Finding relevant files')})
+      : super(
+            outputId: outputId,
+            type: StepType.searchInWorkspace,
+            loader: loader);
 
   factory SearchInWorkspaceStep.fromJson(
     Map<String, dynamic> json,
@@ -38,6 +40,7 @@ class SearchInWorkspaceStep extends Step {
   @override
   Future<MultiCodeOutput?> run(
       TaskAssist taskAssist, GenerationRepository generationRepository) async {
+    await super.run(taskAssist, generationRepository);
     final dartFiles = EmbeddingGenerator.getDartFiles(workspacePath);
     final codeCacheHash = await taskAssist.processStep(kind: 'cache', args: {});
     final filesToUpdate =
