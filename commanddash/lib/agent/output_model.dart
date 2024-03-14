@@ -10,7 +10,7 @@ abstract class Output {
   factory Output.fromJson(Map<String, dynamic> json) {
     final type = json['type'];
     if (type == 'default_output') {
-      return DefaultOutput(json['value']);
+      return DefaultOutput.fromJson(json);
     } else {
       throw UnimplementedError();
     }

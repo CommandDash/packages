@@ -1,7 +1,7 @@
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 
-enum StepType { searchInWorkspace }
+enum StepType { searchInWorkspace, promptQuery, appendToChat }
 
 enum OutputType { defaultOutput, multiCodeOutput }
 
@@ -14,7 +14,7 @@ extension ProcessedQueryExtension on String {
     for (int i = allMatches.length - 1; i >= 0; i--) {
       final match = allMatches[i];
       final inputId = match.group(1);
-      var replaceValue;
+      String? replaceValue;
       if (inputs[inputId] != null) {
         replaceValue = inputs[inputId].toString();
       } else if (outputs[inputId] != null) {

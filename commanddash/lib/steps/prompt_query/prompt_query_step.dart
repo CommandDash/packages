@@ -14,7 +14,7 @@ class PromptQueryStep extends Step {
     required this.responseParser,
   }) : super(
           outputId: outputId,
-          type: StepType.searchInWorkspace,
+          type: StepType.promptQuery,
         );
 
   factory PromptQueryStep.fromJson(

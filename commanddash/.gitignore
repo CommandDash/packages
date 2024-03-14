@@ -7,3 +7,4 @@ out.js
 out.js.deps
 out.js.map
 *.mocks.dart
+.env
