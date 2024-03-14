@@ -8,8 +8,10 @@ abstract class GenerationRepository {
   Future<String> getChatCompletion(); // TODO: add proper params here
   // Generates embeddings for the given [code]. This should be using a tasktype of retrievalDocument.
   Future getCodeEmbeddings(String code);
+  Future<List<List<double>>> getCodeBatchEmbeddings(List<String> code);
   // Generates embeddings for the given [value]. This should be using a tasktype of retrievalQuery.
   Future getStringEmbeddings(String value);
+  Future<List<List<double>>> getStringBatchEmbeddings(List<String> value);
 
   factory GenerationRepository.fromJson(Map<String, dynamic> json) {
     final type = json['type'];
