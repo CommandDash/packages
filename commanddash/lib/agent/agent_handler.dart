@@ -44,20 +44,24 @@ class AgentHandler {
   // }
 
   void runTask(TaskAssist taskAssist) async {
-    for (Map<String, dynamic> stepJson in steps) {
-      final step = Step.fromJson(stepJson, inputs, outputs);
-      final output = await step.run(taskAssist, generationRepository);
-      if (step.outputId != null) {
-        if (output == null) {
-          // send error message of expected output not recieved
-        } else {
-          outputs[step.outputId!] = output;
+    try {
+      for (Map<String, dynamic> stepJson in steps) {
+        final step = Step.fromJson(stepJson, inputs, outputs);
+        final output = await step.run(taskAssist, generationRepository);
+        if (step.outputId != null) {
+          if (output == null) {
+            taskAssist.sendErrorMessage(
+                message:
+                    'No output received from the step where output was expected.',
+                data: {});
+          } else {
+            outputs[step.outputId!] = output;
+          }
         }
       }
+      taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: {});
+    } catch (e) {
+      taskAssist.sendErrorMessage(message: e.toString(), data: {});
     }
-    // TODO: change this according to IDE requirements
-    taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: {
-      "outputs": outputs.values.last.toJson(),
-    });
   }
 }

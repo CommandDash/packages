@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:commanddash/server/messages.dart';
@@ -69,13 +70,12 @@ void main() {
     expect(result.args.containsKey('message'), true);
     expect(result.args['message'], isA<String>());
     print(result);
-    messageStreamController
-        .add(StepResponseMessage(1, 'append_to_chat', data: {'result': true}));
+    messageStreamController.add(
+        StepResponseMessage(1, 'append_to_chat', data: {'result': 'success'}));
     result = await queue.next;
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect(result.data['outputs']['type'], 'OutputType.defaultOutput');
-    expect(result.data['outputs']['value'], isA<String>());
-  }, timeout: Timeout(Duration(seconds: 100)));
+    expect(result.data, {});
+  });
 }

@@ -8,7 +8,7 @@ class AppendToChatStep extends Step {
   final String message;
 
   AppendToChatStep({
-    required String outputId,
+    String? outputId,
     required this.message,
   }) : super(
           outputId: outputId,
@@ -20,8 +20,7 @@ class AppendToChatStep extends Step {
     String message,
   ) {
     return AppendToChatStep(
-      outputId:
-          '', //TODO[KEVAL]: Output ID shouldn't be mandatory for all steps
+      outputId: null,
       message: message,
     );
   }
