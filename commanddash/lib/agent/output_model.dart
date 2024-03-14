@@ -15,6 +15,12 @@ abstract class Output {
       throw UnimplementedError();
     }
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "type": type.toString(),
+    };
+  }
 }
 
 class MultiCodeOutput extends Output {
@@ -27,6 +33,7 @@ class MultiCodeOutput extends Output {
     );
   }
 
+  @override
   String toString() {
     String code = "";
     if (value == null) {
@@ -43,9 +50,13 @@ class MultiCodeOutput extends Output {
     return code;
   }
 
-  // Map<String, dynamic> toJson() {
-  //   // return
-  // }
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      "type": type.toString(),
+      "value": value?.map((e) => e.toJson()).toList(),
+    };
+  }
 }
 
 class DefaultOutput extends Output {

@@ -13,32 +13,31 @@ void main() {
     final queue = StreamQueue<String>(processOutput);
     // send a task start message
     process.stdin.writeln(jsonEncode({
-      'method': 'agent-execute',
-      'id': 1,
-      'params': {
+      "method": "agent-execute",
+      "id": 1,
+      "params": {
         "inputs": [
           {
             "id": "736841542",
             "type": "string_input",
             "value": "Where is the themeing of the app?"
-          },
+          }
         ],
         "outputs": [],
         "authdetails": {
           "type": "gemini",
-          "key":
-              "AIzaSyCiS_Sp7U-MmXlvOEF_4aC617FCYLf_Xlo", // REPLACE THIS WITH KEY FROM GEMINI
-          "githubToken": "",
+          "key": "AIzaSyCUgTsTlr_zgfM7eElSYC488j7msF2b948",
+          "githubToken": ""
         },
         "steps": [
           {
             "type": "search_in_workspace",
-            "query": "Find best file for: <422243666>",
+            "query": "<422243666>",
             "workspace_object_type": "all",
             "workspacePath":
-                '/Users/keval/Desktop/dev/welltested/projects/dart_files',
-            "output": "436621806"
-          },
+                "/Users/keval/Desktop/dev/welltested/projects/dart_files",
+            "output": "<436621806>"
+          }
         ]
       }
     }));
@@ -47,15 +46,16 @@ void main() {
     expect(
         jsonDecode(result),
         equals({
-          'method': 'process_step',
-          'id': 1,
-          'params': {'kind': 'cache', 'args': {}}
+          "id": 1,
+          "method": "step",
+          "params": {"kind": "cache", "args": {}}
         }));
     // send additional data
     process.stdin.writeln(jsonEncode({
-      "method": "process_step_response",
+      "method": "step_response",
       "id": 1,
-      "params": {"value": "{}"}
+      "kind": "cache_response",
+      "data": {"value": "{}"}
     }));
     result = await queue.next;
     print(result);

@@ -44,9 +44,6 @@ class SearchInWorkspaceStep extends Step {
         EmbeddingGenerator.getFilesToUpdate(dartFiles, codeCacheHash);
     final embeddedFiles = await EmbeddingGenerator.updateEmbeddings(
         filesToUpdate, generationRepository);
-    if (taskAssist.inputs == null) {
-      throw InvalidInputException();
-    }
     final queryEmbeddings =
         await EmbeddingGenerator.getQueryEmbedding(query, generationRepository);
     final top3Files = EmbeddingGenerator.getTop3NearestFiles(
