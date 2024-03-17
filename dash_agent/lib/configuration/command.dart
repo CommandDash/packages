@@ -17,17 +17,17 @@ abstract class Command {
     processedJson['slug'] = slug;
     processedJson['intent'] = intent;
     processedJson['text_field_layout'] = textFieldLayout;
-    processedJson['inputs'] = [];
+    processedJson['registered_inputs'] = [];
     for (final input in registerInputs) {
-      processedJson['inputs'].add(await input.process());
+      processedJson['registered_inputs'].add(await input.process());
     }
-    processedJson['outputs'] = [];
+    processedJson['registered_output'] = [];
     for (final output in registerOutputs) {
-      processedJson['outputs'].add(await output.process());
+      processedJson['registered_output'].add(await output.process());
     }
-    processedJson['step'] = [];
+    processedJson['steps'] = [];
     for (final step in steps) {
-      processedJson['step'].add(await step.process());
+      processedJson['steps'].add(await step.process());
     }
     return processedJson;
   }
