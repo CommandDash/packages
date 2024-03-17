@@ -69,12 +69,11 @@ jobs:
         run: chmod +x ./executable/${{ matrix.binary-name }}
       
       # Execute a basic command or test for non-macOS, simplified for demonstration
-      - name: Test binary (Windows and Linux)
-        if: matrix.os != 'macos-latest'
-        run: ./executable/${{ matrix.binary-name }} --help
-      
-      # macOS requires a bit more work due to needing to specify the architecture
-      # IMPORTANT: Modify the execution command to fit your binary's test/validation command
       - name: Test binary (macOS)
         if: matrix.os == 'macos-latest'
-        run: arch -${{ matrix.macos-arch }} ./executable/${{ matrix.binary-name }} --help
+        run: |
+          if [[ "${{ matrix.macos-arch }}" == "arm64" ]]; then
+            arch -arm64 ./executable/${{ matrix.binary-name }} --help
+          else
+            ./executable/${{ matrix.binary-name }} --help
+          fi
