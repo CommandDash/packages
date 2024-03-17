@@ -63,8 +63,6 @@ jobs:
       - name: Make binary executable
         if: matrix.os != 'windows-latest'
         run: chmod +x ./executable/${{ matrix.binary-name }}
-      
-      # Execute a basic command or test. In this example "--version" is used,
-      # you should adjust it to fit a simple validation command for your executable.
+
       - name: Test binary
-        run: ./executable/${{ matrix.binary-name }} --version
+        run: ./executable/${{ matrix.binary-name }} --help
