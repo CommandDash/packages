@@ -1,4 +1,4 @@
-name: Publish CommandDash Executables
+name: Build, Test and Verify Executables
 
 on:
   push:
@@ -36,3 +36,45 @@ jobs:
         with:
           name: ${{ matrix.output-name }}  # Dynamically name the artifact based on the OS
           path: commanddash/build/${{ matrix.output-name }}
+  
+  test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            binary-name: commanddash-linux
+          - os: windows-latest
+            binary-name: commanddash-windows.exe
+          - os: macos-latest
+            binary-name: commanddash-mac
+            macos-arch: x64
+          - os: macos-latest
+            binary-name: commanddash-mac
+            macos-arch: arm64
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.binary-name }}
+          path: ./executable
+      
+      # Ensure binary is executable, skipping this for Windows
+      - name: Make binary executable
+        if: matrix.os != 'windows-latest'
+        run: chmod +x ./executable/${{ matrix.binary-name }}
+      
+      # Execute a basic command or test for non-macOS, simplified for demonstration
+      - name: Test binary (Windows and Linux)
+        if: matrix.os != 'macos-latest'
+        run: ./executable/${{ matrix.binary-name }} --help
+      
+      # macOS requires a bit more work due to needing to specify the architecture
+      # IMPORTANT: Modify the execution command to fit your binary's test/validation command
+      - name: Test binary (macOS)
+        if: matrix.os == 'macos-latest'
+        run: arch -${{ matrix.macos-arch }} ./executable/${{ matrix.binary-name }} --help
