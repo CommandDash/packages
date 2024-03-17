@@ -1,21 +1,40 @@
-@Timeout(Duration(seconds: 300))
-import 'dart:convert';
-import 'dart:io';
+import 'dart:async';
+
 import 'package:async/async.dart';
+import 'package:commanddash/server/messages.dart';
+import 'package:commanddash/server/server.dart';
+import 'package:commanddash/server/task_handler.dart';
 import 'package:test/test.dart';
 
+import '../test_utils.dart';
+
 void main() {
-  test('Valid Task Kind with Additional Data', () async {
-    final process = await Process.start(
-        'dart', ['run', 'bin/commanddash.dart', 'process'],
-        runInShell: true);
-    final processOutput = process.stdout.transform(utf8.decoder);
-    final queue = StreamQueue<String>(processOutput);
-    // send a task start message
-    process.stdin.writeln(jsonEncode({
+  late Server server;
+  late TaskHandler handler;
+  late StreamController<IncomingMessage> messageStreamController;
+  late TestOutWrapper outwrapper;
+  setUp(() async {
+    await EnvReader.load();
+    server = Server();
+    messageStreamController = StreamController.broadcast();
+    outwrapper = TestOutWrapper();
+    server.replaceMessageStreamController(messageStreamController);
+    server.stdout = outwrapper;
+    handler = TaskHandler(server);
+  });
+  test('Process a search_in_workspace followed by a prompt_query request',
+      () async {
+    handler.initProcessing();
+
+    messageStreamController.add(IncomingMessage.fromJson({
       "method": "agent-execute",
       "id": 1,
       "params": {
+        "authdetails": {
+          "type": "gemini",
+          "key": EnvReader.get('GEMINI_KEY'),
+          "githubToken": ""
+        },
         "inputs": [
           {
             "id": "736841542",
@@ -23,12 +42,10 @@ void main() {
             "value": "Where is the themeing of the app?"
           }
         ],
-        "outputs": [],
-        "authdetails": {
-          "type": "gemini",
-          "key": "AIzaSyCUgTsTlr_zgfM7eElSYC488j7msF2b948",
-          "githubToken": ""
-        },
+        "outputs": [
+          {"id": "436621806", "type": "default_output"},
+          {"id": "90611917", "type": "default_output"}
+        ],
         "steps": [
           {
             "type": "search_in_workspace",
@@ -48,27 +65,23 @@ void main() {
         ]
       }
     }));
-    // expect the server to ask for additional data
+
+    final queue = StreamQueue<OutgoingMessage>(outwrapper.outputStream.stream);
     var result = await queue.next;
-    expect(
-        jsonDecode(result),
-        equals({
-          "id": 1,
-          "method": "step",
-          "params": {"kind": "cache", "args": {}}
-        }));
-    // send additional data
-    process.stdin.writeln(jsonEncode({
-      "method": "step_response",
-      "id": 1,
-      "kind": "cache_response",
-      "data": {"value": "{}"}
-    }));
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'cache');
+    expect(result.args, {});
+
+    messageStreamController
+        .add(StepResponseMessage(1, 'cache_response', data: {'value': '{}'}));
+
     result = await queue.next;
-    print(result);
-    expect(jsonDecode(result)['method'], equals('result'));
-    // close the process
-    process.stdin.writeln('exit');
-    await expectLater(await process.exitCode, 0);
+
+    expect(result, isA<ResultMessage>());
+    expect(result.id, 1);
+    expect((result as ResultMessage).message, 'TASK_COMPLETE');
+    expect((result as ResultMessage).message, isNotEmpty);
+    expect(result.data, {});
   });
 }

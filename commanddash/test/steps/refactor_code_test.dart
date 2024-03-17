@@ -22,7 +22,7 @@ void main() {
     server.stdout = outwrapper;
     handler = TaskHandler(server);
   });
-  test('Process a search_in_workspace request', () async {
+  test('Refactor query as expected from IDE', () async {
     handler.initProcessing();
 
     messageStreamController.add(IncomingMessage.fromJson({
@@ -38,20 +38,38 @@ void main() {
           {
             "id": "736841542",
             "type": "string_input",
-            "value": "Where is the themeing of the app?"
-          }
+            "value": "Add basic flutter implementaion "
+          },
+          {
+            "id": "422243666",
+            "type": "code_input",
+            "getcontext": true,
+            "filePath":
+                "/Users/keval/Desktop/dev/welltested/projects/dart_files/test_file.dart",
+            "range": {
+              "start": {"line": 1, "character": 0},
+              "end": {"line": 11, "character": 0}
+            },
+            "content":
+                "void main(List<String> args) {\n  print(\"Hello, world!\");\n\n  int a = 5;\n  int b = 10;\n  int sum = a + b;\n  print(\"The sum of \$a and \$b is \$sum.\");\n\n  String name = \"GitHub Copilot\";\n  print(\"My name is \$name.\");\n}\n",
+          },
         ],
         "outputs": [
-          {"id": "436621806", "type": "default_output"}
+          {"id": "90611917", "type": "workspacefiles"},
+          {"id": "436621806", "type": "default_output"},
         ],
         "steps": [
           {
-            "type": "search_in_workspace",
-            "query": "<422243666>",
-            "workspace_object_type": "all",
-            "workspacePath":
-                "/Users/keval/Desktop/dev/welltested/projects/dart_files",
-            "output": "436621806"
+            "type": "prompt_query",
+            "query":
+                "You are a Flutter/Dart assistant helping user modify code within their editor window.refrence: <90611917>\nRefactor the given code according to user instruction. User instruction <736841542>. \n Code: <90611917>",
+            "post_process": {"type": "code"},
+            "output": "436621806",
+          },
+          // replace in file
+          {
+            "type": "replace_in_file",
+            "query": "<436621806>",
           }
         ]
       }
@@ -68,6 +86,7 @@ void main() {
         .add(StepResponseMessage(1, 'cache_response', data: {'value': '{}'}));
 
     result = await queue.next;
+
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');

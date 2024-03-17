@@ -7,6 +7,7 @@ class WorkspaceFile {
   String? content;
   String? codeHash;
   List<double>? embedding;
+  Range? range;
 
   WorkspaceFile.fromPaths(this.path) {
     content = File(path).readAsStringSync();
@@ -23,6 +24,59 @@ class WorkspaceFile {
       "content": content,
       "codeHash": codeHash,
       "embedding": embedding,
+      "range": range?.toJson(),
+    };
+  }
+
+  Map<String, dynamic> getReplaceFileJson(String newContent) {
+    return {
+      "path": path,
+      "content": newContent,
+      "range": range?.toJson(),
+    };
+  }
+}
+
+// Range similar to vscode.Range
+class Position {
+  final int line;
+  final int character;
+
+  Position({required this.line, required this.character});
+
+  // Convert Position to JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'line': line,
+      'character': character,
+    };
+  }
+}
+
+class Range {
+  final Position start;
+  final Position end;
+
+  Range({required this.start, required this.end});
+
+  factory Range.fromJson(Map<String, dynamic> json) {
+    return Range(
+      start: Position(
+        line: json['start']['line'],
+        character: json['start']['character'],
+      ),
+      end: Position(
+        line: json['end']['line'],
+        character: json['end']['character'],
+      ),
+    );
+  }
+
+  // Convert Range to JSON map
+  Map<String, dynamic> toJson() {
+    return {
+      'start': start.toJson(),
+      'end': end.toJson(),
     };
   }
 }

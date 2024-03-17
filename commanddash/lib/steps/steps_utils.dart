@@ -1,7 +1,13 @@
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 
-enum StepType { searchInWorkspace, promptQuery, appendToChat }
+enum StepType {
+  searchInWorkspace,
+  promptQuery,
+  appendToChat,
+  replaceInFile,
+  contextualCode,
+}
 
 enum OutputType { defaultOutput, multiCodeOutput }
 
