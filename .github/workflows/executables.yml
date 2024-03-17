@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - build/executables
-
+##TODO: In future, when m1 runners are publicly supported, compiled and verify seperately for arm architectures.
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -50,10 +50,6 @@ jobs:
             binary-name: commanddash-windows.exe
           - os: macos-latest
             binary-name: commanddash-mac
-            macos-arch: x64
-          - os: macos-latest
-            binary-name: commanddash-mac
-            macos-arch: arm64
     
     steps:
       - uses: actions/checkout@v4
@@ -63,17 +59,12 @@ jobs:
           name: ${{ matrix.binary-name }}
           path: ./executable
       
-      # Ensure binary is executable, skipping this for Windows
+      # Ensure binary is executable (necessary for Unix-based systems)
       - name: Make binary executable
         if: matrix.os != 'windows-latest'
         run: chmod +x ./executable/${{ matrix.binary-name }}
       
-      # Execute a basic command or test for non-macOS, simplified for demonstration
-      - name: Test binary (macOS)
-        if: matrix.os == 'macos-latest'
-        run: |
-          if [[ "${{ matrix.macos-arch }}" == "arm64" ]]; then
-            arch -arm64 ./executable/${{ matrix.binary-name }} --help
-          else
-            ./executable/${{ matrix.binary-name }} --help
-          fi
+      # Execute a basic command or test. In this example "--version" is used,
+      # you should adjust it to fit a simple validation command for your executable.
+      - name: Test binary
+        run: ./executable/${{ matrix.binary-name }} --version
