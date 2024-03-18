@@ -43,19 +43,20 @@ void main() {
           {
             "id": "422243666",
             "type": "code_input",
-            "getcontext": true,
-            "filePath":
-                "/Users/keval/Desktop/dev/welltested/projects/dart_files/test_file.dart",
-            "range": {
-              "start": {"line": 1, "character": 0},
-              "end": {"line": 11, "character": 0}
+            "value": {
+              "filePath":
+                  "/Users/keval/Desktop/dev/welltested/projects/dart_files/test_file.dart",
+              "range": {
+                "start": {"line": 1, "character": 0},
+                "end": {"line": 11, "character": 0}
+              },
+              "content":
+                  "void main(List<String> args) {\n  print(\"Hello, world!\");\n\n  int a = 5;\n  int b = 10;\n  int sum = a + b;\n  print(\"The sum of \$a and \$b is \$sum.\");\n\n  String name = \"GitHub Copilot\";\n  print(\"My name is \$name.\");\n}\n",
             },
-            "content":
-                "void main(List<String> args) {\n  print(\"Hello, world!\");\n\n  int a = 5;\n  int b = 10;\n  int sum = a + b;\n  print(\"The sum of \$a and \$b is \$sum.\");\n\n  String name = \"GitHub Copilot\";\n  print(\"My name is \$name.\");\n}\n",
           },
         ],
         "outputs": [
-          {"id": "90611917", "type": "workspacefiles"},
+          {"id": "90611917", "type": "multi_code_output"},
           {"id": "436621806", "type": "default_output"},
         ],
         "steps": [

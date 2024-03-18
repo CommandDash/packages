@@ -48,9 +48,9 @@ class CodeInput extends Input {
   factory CodeInput.fromJson(Map<String, dynamic> json) {
     return CodeInput(
       json['id'],
-      json['filePath'],
-      Range.fromJson(json['range']),
-      json['content'],
+      json['value']['filePath'],
+      Range.fromJson(json['value']['range']),
+      json['value']['content'],
     );
   }
 

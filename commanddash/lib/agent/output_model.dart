@@ -10,7 +10,9 @@ abstract class Output {
   factory Output.fromJson(Map<String, dynamic> json) {
     final type = json['type'];
     if (type == 'default_output') {
-      return DefaultOutput.fromJson(json);
+      return DefaultOutput();
+    } else if (type == "multi_code_output") {
+      return MultiCodeOutput();
     } else {
       throw UnimplementedError();
     }
@@ -32,12 +34,6 @@ class MultiCodeOutput extends Output {
   List<WorkspaceFile>? value;
   MultiCodeOutput([this.value]) : super(OutputType.multiCodeOutput);
 
-  factory MultiCodeOutput.fromJson(Map<String, dynamic> json) {
-    return MultiCodeOutput(
-      json['id'],
-    );
-  }
-
   @override
   String toString() {
     String code = "";
@@ -57,26 +53,28 @@ class MultiCodeOutput extends Output {
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      "type": type.toString(),
-      "value": value?.map((e) => e.toJson()).toList(),
-    };
+    if (value == null) {
+      throw Exception("Value not assigned to output");
+    } else {
+      return {
+        "type": type.toString(),
+        "value": value?.map((e) => e.toJson()).toList(),
+      };
+    }
   }
 }
 
 class DefaultOutput extends Output {
-  String value;
-  DefaultOutput(this.value) : super(OutputType.defaultOutput);
-
-  factory DefaultOutput.fromJson(Map<String, dynamic> json) {
-    return DefaultOutput(
-      json['type'],
-    );
-  }
+  String? value;
+  DefaultOutput([this.value]) : super(OutputType.defaultOutput);
 
   @override
   String toString() {
-    return value;
+    if (value == null) {
+      throw Exception("Value not assigned to output");
+    } else {
+      return value!;
+    }
   }
 
   @override
