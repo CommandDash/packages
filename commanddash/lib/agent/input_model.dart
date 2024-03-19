@@ -52,7 +52,7 @@ class CodeInput extends Input {
     return CodeInput(
       json['id'],
       value['filePath'],
-      Range.fromJson(value['range']),
+      Range.fromJson(value['referenceData']['selection']),
       value['referenceContent'],
     );
   }
