@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:commanddash/models/workspace_file.dart';
 
 abstract class Input {
@@ -46,11 +48,12 @@ class CodeInput extends Input {
       : super(id, 'code_input');
 
   factory CodeInput.fromJson(Map<String, dynamic> json) {
+    final value = jsonDecode(json['value']);
     return CodeInput(
       json['id'],
-      json['value']['filePath'],
-      Range.fromJson(json['value']['range']),
-      json['value']['content'],
+      value['filePath'],
+      Range.fromJson(value['range']),
+      value['referenceContent'],
     );
   }
 
