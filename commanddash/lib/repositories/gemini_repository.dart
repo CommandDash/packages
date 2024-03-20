@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:google_generative_ai/src/client.dart';
@@ -165,8 +166,24 @@ class GeminiRepository implements GenerationRepository {
   }
 
   @override
-  Future<String> getChatCompletion() {
-    // TODO: implement getChatCompletion
-    throw UnimplementedError();
+  Future<String> getChatCompletion(
+      List<ChatMessage> messages, String lastMessage) async {
+    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+    final Content content = Content.text(lastMessage);
+    final history = messages.map((e) {
+      if (e.role == ChatRole.user) {
+        return Content.text(e.message);
+      } else {
+        return Content.model([TextPart(e.message)]);
+      }
+    }).toList();
+
+    final chat = model.startChat(history: history);
+    var response = await chat.sendMessage(content);
+    if (response.text != null) {
+      return response.text!;
+    } else {
+      throw ModelException("No response recieved from gemini");
+    }
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/models/workspace_file.dart';
 
 abstract class Input {
@@ -14,6 +15,8 @@ abstract class Input {
       return StringInput.fromJson(json);
     } else if (type == "code_input") {
       return CodeInput.fromJson(json);
+    } else if (type == "chat_query_input") {
+      return ChatQueryInput.fromJson(json);
     } else {
       throw UnimplementedError();
     }
@@ -60,5 +63,23 @@ class CodeInput extends Input {
   @override
   String toString() {
     return content;
+  }
+}
+
+class ChatQueryInput extends Input {
+  List<ChatMessage> messages;
+  ChatQueryInput(String id, this.messages) : super(id, 'chat_query_input');
+
+  factory ChatQueryInput.fromJson(Map<String, dynamic> json) {
+    final value = jsonDecode(json['value']);
+    return ChatQueryInput(
+      json['id'],
+      (value as List).map((e) => ChatMessage.fromJson(e)).toList(),
+    );
+  }
+
+  @override
+  String toString() {
+    return messages.map((e) => e.toString()).join('\n');
   }
 }

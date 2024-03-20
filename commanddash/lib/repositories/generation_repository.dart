@@ -1,3 +1,4 @@
+import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/repositories/gemini_repository.dart';
 
 part 'generation_exceptions.dart';
@@ -5,7 +6,8 @@ part 'generation_exceptions.dart';
 //Can be implemented to provide generations.
 abstract class GenerationRepository {
   Future<String> getCompletion(String message);
-  Future<String> getChatCompletion(); // TODO: add proper params here
+  Future<String> getChatCompletion(List<ChatMessage> messages,
+      String lastMessage); // TODO: add proper params here
   // Generates embeddings for the given [code]. This should be using a tasktype of retrievalDocument.
   Future getCodeEmbeddings(String code);
   Future<List<List<double>>> getCodeBatchEmbeddings(List<String> code);
@@ -22,11 +24,3 @@ abstract class GenerationRepository {
     }
   }
 }
-
-// class ApiDetails { 
-//   factory ApiDetails.fromJson(Map<String, dynamic> json) {
-//     if (json['type'] == 'gemini') {
-//       GeminiDetails.fromJson();
-//     }
-//   }
-// }

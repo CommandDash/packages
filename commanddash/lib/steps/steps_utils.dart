@@ -7,6 +7,7 @@ enum StepType {
   appendToChat,
   replaceInFile,
   contextualCode,
+  chat,
 }
 
 enum OutputType { defaultOutput, multiCodeOutput }
