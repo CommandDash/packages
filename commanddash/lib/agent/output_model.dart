@@ -85,3 +85,9 @@ class DefaultOutput extends Output {
     };
   }
 }
+
+class ContinueToNextStepOutput extends Output {
+  bool value;
+
+  ContinueToNextStepOutput(this.value) : super(OutputType.userChoiceOutput);
+}

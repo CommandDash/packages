@@ -48,6 +48,11 @@ class AgentHandler {
       for (Map<String, dynamic> stepJson in steps) {
         final step = Step.fromJson(stepJson, inputs, outputs);
         final output = await step.run(taskAssist, generationRepository);
+        if (output != null &&
+            output is ContinueToNextStepOutput &&
+            !output.value) {
+          break;
+        }
         if (step.outputId != null) {
           if (output == null) {
             taskAssist.sendErrorMessage(

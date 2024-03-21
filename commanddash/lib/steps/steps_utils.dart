@@ -10,7 +10,7 @@ enum StepType {
   chat,
 }
 
-enum OutputType { defaultOutput, multiCodeOutput }
+enum OutputType { defaultOutput, multiCodeOutput, userChoiceOutput }
 
 extension ProcessedQueryExtension on String {
   String replacePlaceholder(

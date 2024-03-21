@@ -28,10 +28,12 @@ class WorkspaceFile {
     };
   }
 
-  Map<String, dynamic> getReplaceFileJson(String newContent) {
+  Map<String, dynamic> getReplaceFileJson(
+      String newContent, String oldContent) {
     return {
       "path": path,
-      "content": newContent,
+      "optimizedCode": newContent,
+      "originalCode": oldContent,
       "range": range?.toJson(),
     };
   }
