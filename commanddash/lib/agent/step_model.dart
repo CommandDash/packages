@@ -61,10 +61,10 @@ abstract class Step {
           throw Exception(
               'Output is not a CodeInput: ${json['replaceInFile']}');
         }
-        final WorkspaceFile file = WorkspaceFile.fromPaths(codeInput.filePath);
         return ReplaceInFileStep.fromJson(
           json,
-          file,
+          codeInput,
+          (json['query'] as String).replacePlaceholder(inputs, outputs),
         );
       default:
         throw Exception('Unknown step type: ${json['type']}');

@@ -1,3 +1,4 @@
+import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/models/workspace_file.dart';
@@ -9,9 +10,9 @@ import 'package:commanddash/steps/steps_utils.dart';
 import '../../agent/step_model.dart';
 
 class ReplaceInFileStep extends Step {
-  WorkspaceFile? file;
+  CodeInput file;
   String newContent;
-  bool continueIfDeclined;
+  bool? continueIfDeclined;
 
   ReplaceInFileStep({
     String? outputId,
@@ -33,7 +34,7 @@ class ReplaceInFileStep extends Step {
     await super.run(taskAssist, generationRepository);
     final response =
         await taskAssist.processStep(kind: 'replace_in_file', args: {
-      'file': file!.getReplaceFileJson(newContent, file!.content!),
+      'file': file.getReplaceFileJson(newContent),
     });
     final userChoice = response['value'] as bool;
     if (userChoice == false && continueIfDeclined == false) {
@@ -44,12 +45,13 @@ class ReplaceInFileStep extends Step {
 
   factory ReplaceInFileStep.fromJson(
     Map<String, dynamic> json,
-    WorkspaceFile file,
+    CodeInput file,
+    String newContent,
   ) {
     return ReplaceInFileStep(
       outputId: json['output'],
       file: file,
-      newContent: json['query'],
+      newContent: newContent,
       continueIfDeclined: json['continue_if_declined'],
     );
   }

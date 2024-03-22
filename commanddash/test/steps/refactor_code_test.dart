@@ -38,31 +38,35 @@ void main() {
             },
             "slug": "/refactor",
             "intent": "Ask me anything",
-            "text_field_layout": "Refactor your code <736841542> <805088184>",
+            "text_field_layout":
+                "\nRemove print statements and give better name for variables<736841542>",
             "inputs": [
               {
                 "id": "736841542",
                 "display_text": "Your query",
                 "type": "string_input",
-                "value": "​Write comments in the following code"
+                "value": "Remove comments"
               },
               {
                 "id": "805088184",
                 "display_text": "Code Attachment",
                 "type": "code_input",
                 "value":
-                    "{\"filePath\":\"/Users/keval/Desktop/dev/welltested/projects/dart_files/test_file.dart\",\"referenceContent\":\"`lib/test/loading_dialog.dart`\\n```\\n  void _popDialog(final BuildContext context, final T? value) {\\n    if (_popEd) {\\n      return;\\n    }\\n    _popEd = true;\\n    // Here we use the root navigator so that we can pop dialog while using multiple navigators.\\n    Navigator.of(context, rootNavigator: true).pop(value);\\n  }\\n```\\n\",\"referenceData\":{\"selection\":{\"start\":{\"line\":112,\"character\":0},\"end\":{\"line\":119,\"character\":0}},\"editor\":\"file:///Users/fisclouds/Documents/smooth-app/packages/smooth_app/lib/test/loading_dialog.dart\"},\"startLineNumber\":112,\"endLineNumber\":119,\"fileName\":\"loading_dialog.dart\",\"chipId\":\"loading_dialog.dart:[112 - 119]\"}"
+                    "{\"filePath\":\"/Users/keval/Desktop/dev/welltested/projects/dart_files/test_file.dart\",\"referenceContent\":\"void main(List<String> args) {\\n  print(\\\"Hello, world!\\\");\\n\\n  int a = 5;\\n  int b = 10;\\n  int sum = a + b;\\n  print(\\\"The sum of \$a and \$b is \$sum.\\\");\\n\\n  String name = \\\"John Doe\\\";\\n  print(\\\"My name is \$name.\\\");\\n}\",\"referenceData\":{\"selection\":{\"start\":{\"line\":2,\"character\":1},\"end\":{\"line\":10,\"character\":1}},\"editor\":\"file:///Users/fisclouds/Documents/smooth-app/packages/smooth_app/lib/test/loading_dialog.dart\"},\"startLineNumber\":112,\"endLineNumber\":119,\"fileName\":\"loading_dialog.dart\",\"generateFullString\":true}"
               }
             ],
             "outputs": [
-              {"id": "90611917", "type": "multi_code_output"},
               {"id": "436621806", "type": "default_output"}
             ],
             "steps": [
               {
                 "type": "prompt_query",
-                "query":
-                    "You are a Flutter/Dart assistant helping user modify code within their editor window.refrence: <90611917>\nRefactor the given code according to user instruction. User instruction <736841542>. \n Code: <90611917>",
+                "query": '''Proceed step by step:
+            1. Describe the selected piece of code.
+            2. What are the possible optimizations?
+            3. How do you plan to achieve that ? [Don't output code yet]
+            4. Output the modified code to be be programatically replaced in the editor in place of the CURSOR_SELECTION.Since this is without human review, you need to output the precise CURSOR_SELECTION''' +
+                    "You are a Flutter/Dart assistant helping user modify code within their editor window.\nRefactor the given code according to user instruction. User instruction <736841542>. \n Code: <805088184>",
                 "post_process": {"type": "code"},
                 "output": "436621806"
               },
@@ -98,6 +102,11 @@ void main() {
     expect(result, isA<StepMessage>());
     expect(result.id, 1);
     expect((result as StepMessage).kind, 'replace_in_file');
+    expect((result).args.containsKey('file'), true);
+    expect((result).args['file']['originalCode'], isNotEmpty);
+    expect((result).args['file']['optimizedCode'], isNotEmpty);
+    print(result.args['file']['originalCode']);
+    print(result.args['file']['optimizedCode']);
 
     messageStreamController
         .add(StepResponseMessage(1, 'replace_in_file', data: {'value': true}));
@@ -107,7 +116,7 @@ void main() {
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect((result as ResultMessage).message, isNotEmpty);
+    expect((result).message, isNotEmpty);
     expect(result.data, {});
   });
 }
