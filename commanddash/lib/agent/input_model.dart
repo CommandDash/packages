@@ -101,7 +101,6 @@ class CodeInput extends Input {
       "path": filePath,
       "optimizedCode": newContent,
       "originalCode": oldContent,
-      "range": range.toJson(),
     };
   }
 
