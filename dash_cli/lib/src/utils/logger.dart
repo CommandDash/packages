@@ -3,63 +3,63 @@ import 'dart:io';
 
 import 'package:ansi_escapes/ansi_escapes.dart';
 
-final wtLog = WelltestedLogger();
-final frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+final WelltestedLogger wtLog = WelltestedLogger();
+final List<String> frames = <String>[
+  '⠋',
+  '⠙',
+  '⠹',
+  '⠸',
+  '⠼',
+  '⠴',
+  '⠦',
+  '⠧',
+  '⠇',
+  '⠏'
+];
 
 enum MessageSeverity { log, info, success, warning, error }
 
 class Terminal {
   static String _ansiColor(String message,
-      {required MessageSeverity severity}) {
-    List<int> hexColor = _severityToHexColor(severity);
+          {required MessageSeverity severity}) =>
+      _severityToHexColor(message, severity);
 
-    int r = hexColor[0];
-    int g = hexColor[1];
-    int b = hexColor[2];
-    return '\x1b[38;2;$r;$g;${b}m$message\x1b[0m';
-  }
-
-  static List<int> _severityToHexColor(MessageSeverity severity) {
+  static String _severityToHexColor(String msg, MessageSeverity severity) {
     switch (severity) {
-      case MessageSeverity.log:
-        return [211, 215, 207]; // Easy on the eyes White
       case MessageSeverity.info:
-        return [0, 255, 255]; // Cyan
+        return msg.cyan; // Cyan
       case MessageSeverity.success:
-        return [2, 185, 106]; // Welltested Green
+        return msg.green; // Welltested Green
       case MessageSeverity.warning:
-        return [255, 255, 0]; // Yellow
+        return msg.yellow; // Yellow
       case MessageSeverity.error:
-        return [255, 0, 0]; // Red
+        return msg.red; // Red
+      case MessageSeverity.log:
       default:
-        return [211, 215, 207]; // (Default) Easy on the eyes White
+        return msg.white; // (Default) Easy on the eyes White
     }
   }
 
-  static writeNormalmessage(String message,
-      {required MessageSeverity severity}) {
-    stdout.writeln(_ansiColor(message, severity: severity));
-  }
+  static void writeNormalmessage(String message,
+          {required MessageSeverity severity}) =>
+      stdout.writeln(_ansiColor(message, severity: severity));
 
-  static writeMessage(String message, List<dynamic> frames, int index,
-      {required MessageSeverity severity}) {
-    stdout.write(
-      '${ansiEscapes.eraseLine}\r${_ansiColor(frames[index], severity: severity)} '
-      '${_ansiColor(message, severity: severity)} ${ansiEscapes.cursorHide}',
-    );
-  }
+  static void writeMessage(String message, List<dynamic> frames, int index,
+          {required MessageSeverity severity}) =>
+      stdout.write(
+        '${ansiEscapes.eraseLine}\r${_ansiColor(frames[index], severity: severity)} '
+        '${_ansiColor(message, severity: severity)} ${ansiEscapes.cursorHide}',
+      );
 
-  static writeFinalMessage(String message,
-      {required MessageSeverity severity}) {
-    stdout.writeln(
-      '${ansiEscapes.eraseLine}\r${_ansiColor(message, severity: severity)} '
-      '${ansiEscapes.cursorShow}',
-    );
-  }
+  static void writeFinalMessage(String message,
+          {required MessageSeverity severity}) =>
+      stdout.writeln(
+        '${ansiEscapes.eraseLine}\r${_ansiColor(message, severity: severity)} '
+        '${ansiEscapes.cursorShow}',
+      );
 
-  static eraseExistingLine() {
-    stdout.write('${ansiEscapes.eraseLine}${ansiEscapes.cursorShow}\r');
-  }
+  static void eraseExistingLine() =>
+      stdout.write('${ansiEscapes.eraseLine}${ansiEscapes.cursorShow}\r');
 }
 
 class Spinner {
@@ -81,13 +81,13 @@ class WelltestedLogger {
 
   bool get verbose => _verbose;
 
-  startSpinner(String message,
+  void startSpinner(String message,
       {MessageSeverity severity = MessageSeverity.log}) {
     if (_spinner != null) stopSpinner();
     _spinner = Spinner(message)
       ..severity = severity
       ..isBusy = true;
-    _timer = Timer.periodic(Duration(milliseconds: 80), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 80), (Timer timer) {
       _updateStatus();
     });
   }
@@ -149,7 +149,7 @@ class WelltestedLogger {
   }
 
   void _resumeSpinner() {
-    _timer = Timer.periodic(Duration(milliseconds: 80), (timer) {
+    _timer = Timer.periodic(const Duration(milliseconds: 80), (Timer timer) {
       _updateStatus();
     });
   }
@@ -160,4 +160,26 @@ class WelltestedLogger {
     Terminal.writeNormalmessage(message, severity: severity);
     if (_spinner?.isBusy ?? false) _resumeSpinner();
   }
+}
+
+extension TerminalColors on String {
+  String Function(String) _colorCodeFormatter(String start, String end) =>
+      (String x) =>
+          !stdout.supportsAnsiEscapes ? x : '\x1B[${start}m$x\x1B[${end}m';
+
+  String get bold => _colorCodeFormatter('1', '22')(this);
+
+  String get red => _colorCodeFormatter('31', '39')(this);
+
+  String get green => _colorCodeFormatter('32', '39')(this);
+
+  String get yellow => _colorCodeFormatter('33', '39')(this);
+
+  String get blue => _colorCodeFormatter('34', '39')(this);
+
+  String get magenta => _colorCodeFormatter('35', '39')(this);
+
+  String get cyan => _colorCodeFormatter('36', '39')(this);
+
+  String get white => _colorCodeFormatter('37', '39')(this);
 }

@@ -1,28 +1,26 @@
-// part of 'auth.dart';
+part of 'auth.dart';
 
+class LogoutCommand extends Command<Object> {
+  @override
+  String get description => 'Logout from welltested';
 
+  @override
+  String get name => 'logout';
 
-// class LogoutCommand extends Command {
-//   @override
-//   String get description => 'Logout from welltested';
-
-//   @override
-//   String get name => 'logout';
-
-//   @override
-//   Future<void> run() async {
-//     var userName = await Auth.userName;
-//     if (userName.isEmpty) {
-//       wtLog.info("You are not logged in");
-//       return;
-//     }
-//     wtLog.startSpinner("Logging out...", severity: MessageSeverity.Info);
-//     var loggedOut = Auth.logout();
-//     loggedOut
-//         ? wtLog.stopSpinner(
-//             message: '✅ Logged out successfully.',
-//             severity: MessageSeverity.Success)
-//         : wtLog.stopSpinner(
-//             message: '❌ Error logging out.', severity: MessageSeverity.Error);
-//   }
-// }
+  @override
+  Future<void> run() async {
+    bool isUserLoggedIn = await Auth.isAuthenticated;
+    if (!isUserLoggedIn) {
+      wtLog.info('You are not logged in');
+      return;
+    }
+    wtLog.startSpinner('Logging out...', severity: MessageSeverity.info);
+    bool loggedOut = Auth.logout();
+    loggedOut
+        ? wtLog.stopSpinner(
+            message: '✅ Logged out successfully.',
+            severity: MessageSeverity.success)
+        : wtLog.stopSpinner(
+            message: '❌ Error logging out.', severity: MessageSeverity.error);
+  }
+}

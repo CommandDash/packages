@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:dash_cli/src/utils/logger.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/io_client.dart';
+
+import '../utils/logger.dart';
 
 class BaseApi extends IOClient {
   BaseApi([this.inner]) : super(inner);
@@ -18,21 +19,21 @@ class BaseApi extends IOClient {
   Future<http.Response> delete(Uri url,
       {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
     wtLog.log('DELETE: $url', verbose: true);
-    var res = await super.delete(url, headers: headers, body: body);
+    http.Response res = await super.delete(url, headers: headers, body: body);
     return res;
   }
 
   @override
   Future<http.Response> get(Uri url, {Map<String, String>? headers}) async {
     wtLog.log('GET: $url', verbose: true);
-    var res = await super.get(url, headers: headers);
+    http.Response res = await super.get(url, headers: headers);
     return res;
   }
 
   @override
   Future<http.Response> head(Uri url, {Map<String, String>? headers}) async {
     wtLog.log('HEAD: $url', verbose: true);
-    var res = await super.head(url, headers: headers);
+    http.Response res = await super.head(url, headers: headers);
     return res;
   }
 
@@ -40,7 +41,7 @@ class BaseApi extends IOClient {
   Future<http.Response> patch(Uri url,
       {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
     wtLog.log('PATCH: $url', verbose: true);
-    var res = await super.patch(url, headers: headers, body: body);
+    http.Response res = await super.patch(url, headers: headers, body: body);
     return res;
   }
 
@@ -48,7 +49,7 @@ class BaseApi extends IOClient {
   Future<http.Response> post(Uri url,
       {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
     wtLog.log('POST: $url', verbose: true);
-    var res = await super.post(url, headers: headers, body: body);
+    http.Response res = await super.post(url, headers: headers, body: body);
     return res;
   }
 
@@ -56,7 +57,7 @@ class BaseApi extends IOClient {
   Future<http.Response> put(Uri url,
       {Map<String, String>? headers, Object? body, Encoding? encoding}) async {
     wtLog.log('PUT: $url', verbose: true);
-    var res = await super.put(url, headers: headers, body: body);
+    http.Response res = await super.put(url, headers: headers, body: body);
     return res;
   }
 

@@ -1,16 +1,19 @@
 import 'package:args/command_runner.dart';
 import 'package:dash_cli/src/commands/auth/auth.dart';
+import 'package:dash_cli/src/core/auth.dart';
+import 'package:dash_cli/src/utils/env.dart';
 import 'package:dash_cli/src/utils/logger.dart';
 
 Future<void> main(List<String> args) async {
-  var runner = CommandRunner("welltested",
-      "Welltested auto generate tests for your code using AI within minutes.")
-    ..addCommand(LoginCommand());
+  CommandRunner<Object> runner = CommandRunner<Object>('welltested',
+      'Welltested auto generate tests for your code using AI within minutes.')
+    ..addCommand(LoginCommand())
+    ..addCommand(LogoutCommand());
   try {
+    WelltestedEnv.instance.load();
+    await Auth.refreshToken();
     await runner.run(args);
   } catch (e, stackTrace) {
-    // wtTelemetry.trackError(
-    //     severity: Severity.critical, error: e, stackTrace: stackTrace);
     if (e is UsageException) {
       wtLog.error(e.message);
       wtLog.log(e.usage);
@@ -18,8 +21,5 @@ Future<void> main(List<String> args) async {
     }
     wtLog.error(e.toString());
     wtLog.info(stackTrace.toString(), verbose: true);
-  } finally {
-    // await wtTelemetry.flush();
-    wtLog.warning('Thank you for using welltested');
   }
 }

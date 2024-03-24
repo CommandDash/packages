@@ -1,10 +1,9 @@
 import 'dart:io';
 
-import 'package:dash_cli/src/core/api.dart';
-import 'package:dash_cli/src/utils/env.dart';
-
+import 'env.dart';
 import 'logger.dart';
 
+/// Open the URL in the default browser.
 Future<ProcessResult> openUrl(String url) {
   String command() {
     if (Platform.isWindows) {
@@ -22,66 +21,67 @@ Future<ProcessResult> openUrl(String url) {
   if (Platform.isWindows) {
     /// This is needed because ampersand has to be escaped with carret on Windows shell,
     /// otherwise opened URL will be trimmed by first ampersand
-    url = url.replaceAllMapped(RegExp('([^^])&'), (m) => '${m[1]}^&');
+    url = url.replaceAllMapped(RegExp('([^^])&'), (Match m) => '${m[1]}^&');
   }
-  return Process.run(command(), [url], runInShell: true);
+  return Process.run(command(), <String>[url], runInShell: true);
 }
 
+/// Create a server to handle the OAuth2 callback.
 Future<void> createServer(String url) async {
-  var file = await BaseApi.getInstance.get(Uri.parse(
-      'https://gist.githubusercontent.com/yahu1031/02cb413fcacb1a0b8a8bcffdfd120ffd/raw/b370eeaa49ff87cd83f6edca6f1798c1e47f4e8e/index.html'));
-  var contents = file.body;
-  final address = InternetAddress.loopbackIPv4;
-  const port = 8092;
-  var server = await HttpServer.bind(address, port);
-  await openUrl(url.toString());
-  await for (var request in server) {
-    print(request.uri.queryParametersAll);
-    var accessToken = request.uri.queryParameters['access_token'];
-    var refreshToken = request.uri.queryParameters['refresh_token'];
-    if (accessToken != null) WelltestedEnv.addNew('access_token', accessToken);
-    if (refreshToken != null) {
-      WelltestedEnv.addNew('refresh_token', refreshToken);
-    }
-    if (request.uri.pathSegments.isEmpty) {
-      // Handle callback
-      var code = request.uri.queryParameters['code'];
-      accessToken = request.uri.queryParameters['access_token'];
-      if (code != null && accessToken != null) {
+  try {
+    InternetAddress address = InternetAddress.loopbackIPv4;
+    const int port = 8080;
+    HttpServer server = await HttpServer.bind(address, port);
+    await openUrl(url.toString());
+    await for (HttpRequest request in server) {
+      String? accessToken = request.uri.queryParameters['access_token'];
+      String? refreshToken = request.uri.queryParameters['refresh_token'];
+      if (accessToken != null) {
         WelltestedEnv.addNew('access_token', accessToken);
-      } else {
-        wtLog.updateSpinnerMessage('Failed to retrieve authorization code.');
       }
-      wtLog.stopSpinner(
-          message: accessToken == null
-              ? 'Failed to Authorize'
-              : 'Authorization successful!',
-          severity: accessToken == null
-              ? MessageSeverity.error
-              : MessageSeverity.success);
-
-      // Respond to the request
-      var a = request.response
-        ..statusCode = accessToken == null ? 404 : 200
-        ..headers.contentType = ContentType.html
-        ..write(contents.replaceAll(
-            '{{{AUTHORIZED_MSG}}}',
-            accessToken == null
+      if (refreshToken != null) {
+        WelltestedEnv.addNew('refresh_token', refreshToken);
+      }
+      if (request.uri.pathSegments.isEmpty) {
+        // Handle callback
+        String? code = request.uri.queryParameters['code'];
+        accessToken = request.uri.queryParameters['access_token'];
+        if (code != null && accessToken != null) {
+          WelltestedEnv.addNew('access_token', accessToken);
+        } else {
+          wtLog.updateSpinnerMessage('Failed to retrieve authorization code.');
+        }
+        wtLog.stopSpinner(
+            message: accessToken == null
                 ? 'Failed to Authorize'
-                : 'Authorized Successfully!'));
-      wtLog.info('closing server...');
-      await a.close();
-      break;
-    } else {
-      // Handle other requests
-      var s = request.response
-        ..statusCode = 404
-        ..write('Not Found');
-      await s.close();
-      break;
+                : 'Authorization successful!',
+            severity: accessToken == null
+                ? MessageSeverity.error
+                : MessageSeverity.success);
+
+        // Respond to the request
+        HttpResponse a = request.response
+          ..statusCode = accessToken == null ? 404 : 200
+          ..headers.contentType = ContentType.html
+          ..write(accessToken == null
+              ? 'Failed to Authorize'
+              : 'Authorized Successfully!');
+        wtLog.info('closing server...', verbose: true);
+        await a.close();
+        break;
+      } else {
+        // Handle other requests
+        HttpResponse s = request.response
+          ..statusCode = 404
+          ..write('Not Found');
+        await s.close();
+        break;
+      }
     }
+    await server.close(force: true);
+    return;
+  } catch (e) {
+    wtLog.error(e.toString());
+    return;
   }
-  wtLog.info('closing server.....');
-  await server.close(force: true);
-  return;
 }
