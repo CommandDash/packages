@@ -13,10 +13,7 @@ dependencies:
   ansi_escapes: ^1.1.0
   args: ^2.4.2
   dart_jsonwebtoken: ^2.13.0
-  dio: ^5.4.1
   http: ^1.2.1
-  interact: ^2.2.0
-  oauth2: ^2.0.2
   path: ^1.9.0
 
 dev_dependencies:
