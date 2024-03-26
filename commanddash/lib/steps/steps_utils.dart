@@ -8,6 +8,7 @@ enum StepType {
   replaceInFile,
   contextualCode,
   chat,
+  searchInSources,
 }
 
 enum OutputType { defaultOutput, multiCodeOutput, userChoiceOutput }

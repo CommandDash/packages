@@ -2,6 +2,7 @@ import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/models/workspace_file.dart';
+import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 
@@ -30,7 +31,8 @@ class ReplaceInFileStep extends Step {
 
   @override
   Future<Output?> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository) async {
+      TaskAssist taskAssist, GenerationRepository generationRepository,
+      [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     final response =
         await taskAssist.processStep(kind: 'replace_in_file', args: {

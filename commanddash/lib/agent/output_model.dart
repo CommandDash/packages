@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/steps/steps_utils.dart';
 
@@ -90,4 +91,23 @@ class ContinueToNextStepOutput extends Output {
   bool value;
 
   ContinueToNextStepOutput(this.value) : super(OutputType.userChoiceOutput);
+}
+
+class DataSourceResultOutput extends Output {
+  DataSource value;
+
+  DataSourceResultOutput(this.value) : super(OutputType.userChoiceOutput);
+
+  @override
+  String toString() {
+    return value.content.toString();
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return {
+      "type": type.toString(),
+      "value": value.toJson(),
+    };
+  }
 }

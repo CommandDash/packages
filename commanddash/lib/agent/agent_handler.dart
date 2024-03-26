@@ -1,6 +1,7 @@
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
+import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 
@@ -9,12 +10,18 @@ class AgentHandler {
   final Map<String, Output> outputs;
   final List<Map<String, dynamic>> steps;
   final GenerationRepository generationRepository;
+  final String? githubAccessToken;
+  final String agentName;
+  final String agentVersion;
 
   AgentHandler({
     required this.inputs,
     required this.outputs,
     required this.steps,
     required this.generationRepository,
+    required this.agentName,
+    required this.agentVersion,
+    this.githubAccessToken,
   });
 
   factory AgentHandler.fromJson(Map<String, dynamic> json) {
@@ -31,23 +38,29 @@ class AgentHandler {
 
     final GenerationRepository generationRepository =
         GenerationRepository.fromJson(json['authdetails']);
+
     return AgentHandler(
       inputs: inputs,
       outputs: outputs,
       steps: steps,
       generationRepository: generationRepository,
+      githubAccessToken: json['authdetails']['github_access_token'],
+      agentName: json['agent_name'] ?? '',
+      agentVersion: json['version'] ?? '',
     );
   }
 
-  // factory AgentHandler.fromJson(Map<String, dynamic> json) {
-  //   // if authDetails are of gemini -> Gemini repo;
-  // }
-
   void runTask(TaskAssist taskAssist) async {
+    DashRepository? dashRepository;
+    if (githubAccessToken != null) {
+      dashRepository = DashRepository.fromKeys(githubAccessToken!, taskAssist);
+    }
     try {
       for (Map<String, dynamic> stepJson in steps) {
-        final step = Step.fromJson(stepJson, inputs, outputs);
-        final output = await step.run(taskAssist, generationRepository);
+        final step =
+            Step.fromJson(stepJson, inputs, outputs, agentName, agentVersion);
+        final output =
+            await step.run(taskAssist, generationRepository, dashRepository);
         if (output != null &&
             output is ContinueToNextStepOutput &&
             !output.value) {

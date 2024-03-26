@@ -12,7 +12,7 @@ class TaskHandler {
   void initProcessing() {
     _server.messagesStream
         .whereType<TaskStartMessage>()
-        .listen((TaskStartMessage message) {
+        .listen((TaskStartMessage message) async {
       final taskAssist = TaskAssist(_server, message.id);
       switch (message.taskKind) {
         case 'random_task_with_step':
@@ -20,6 +20,21 @@ class TaskHandler {
           break;
         case 'random_task_with_side_operation':
           randomFunctionWithSideOperation(taskAssist);
+          break;
+        case 'get-agents':
+          final client = getClient(
+              message.data['auth']['github_access_token'],
+              () async => taskAssist
+                  .processOperation(kind: 'refresh_access_token', args: {}));
+          final repo = DashRepository(client);
+          try {
+            final agents = await repo.getAgents();
+            taskAssist.sendResultMessage(
+                message: "Agent get successful", data: {"agents": agents});
+          } catch (e) {
+            taskAssist
+                .sendErrorMessage(message: "Failed getting agents.", data: {});
+          }
           break;
         case 'refresh_token_test':
           final client = getClient(

@@ -3,10 +3,12 @@ import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/models/workspace_file.dart';
+import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/append_to_chat/append_to_chat_step.dart';
 import 'package:commanddash/steps/chat/chat_step.dart';
+import 'package:commanddash/steps/find_closest_files/search_in_sources_step.dart';
 import 'package:commanddash/steps/find_closest_files/search_in_workspace_step.dart';
 import 'package:commanddash/steps/prompt_query/prompt_query_step.dart';
 import 'package:commanddash/steps/replace_in_file/replace_in_file_step.dart';
@@ -16,16 +18,14 @@ abstract class Step {
   late StepType type;
   final Loader loader;
   String? outputId;
-  List<String>? dataSourceIds;
   Step({
     required this.type,
     required this.loader,
     required this.outputId,
-    this.dataSourceIds,
   });
 
   factory Step.fromJson(Map<String, dynamic> json, Map<String, Input> inputs,
-      Map<String, Output> outputs) {
+      Map<String, Output> outputs, String agentName, String agentVersion) {
     // TODO: handle parsing error
     switch (json['type']) {
       case 'search_in_sources':
@@ -66,13 +66,21 @@ abstract class Step {
           codeInput,
           (json['query'] as String).replacePlaceholder(inputs, outputs),
         );
+      case 'search_in_sources':
+        return SearchInSourceStep.fromJson(
+          json,
+          (json['query'] as String).replacePlaceholder(inputs, outputs),
+          agentName,
+          agentVersion,
+        );
       default:
         throw Exception('Unknown step type: ${json['type']}');
     }
   }
 
   Future<Output?> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository) async {
+      TaskAssist taskAssist, GenerationRepository generationRepository,
+      [DashRepository? dashRepository]) async {
     await taskAssist.processStep(kind: 'loader_update', args: loader.toJson());
     return null;
   }

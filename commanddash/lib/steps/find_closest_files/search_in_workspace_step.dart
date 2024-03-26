@@ -3,6 +3,7 @@ import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
+import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/find_closest_files/embedding_generator.dart';
@@ -39,7 +40,8 @@ class SearchInWorkspaceStep extends Step {
 
   @override
   Future<MultiCodeOutput?> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository) async {
+      TaskAssist taskAssist, GenerationRepository generationRepository,
+      [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     final dartFiles = EmbeddingGenerator.getDartFiles(workspacePath);
     final codeCacheHash = await taskAssist.processStep(kind: 'cache', args: {});
