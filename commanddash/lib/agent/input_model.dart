@@ -105,9 +105,6 @@ class CodeInput extends Input {
   }
 
   int getOffset(int line, int character) {
-    final a = content.split('\n');
-    final b = a.take(line).join('\n');
-    final c = b.length + character;
     return content.split('\n').take(line).join('\n').length + character - 1;
   }
 }
