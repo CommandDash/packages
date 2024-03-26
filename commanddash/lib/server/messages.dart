@@ -1,4 +1,7 @@
-class IncomingMessage {
+import 'package:commanddash/server/operation_message.dart';
+import 'package:equatable/equatable.dart';
+
+class IncomingMessage extends Equatable {
   final int id;
   const IncomingMessage(this.id);
 
@@ -9,33 +12,89 @@ class IncomingMessage {
         final taskKind = json['params']['kind'];
         final taskData = json['params']['data'];
         return TaskStartMessage(taskId, taskKind: taskKind, data: taskData);
-      case 'process_step_response':
+      case 'agent-execute':
         final taskId = json['id'];
-        final responseData = json['params'];
-        return ProcessResponseMessage(taskId, data: responseData);
+        final taskKind = json['method'];
+        final taskData = json['params'];
+        return TaskStartMessage(taskId, taskKind: taskKind, data: taskData);
+      case 'step_response':
+        final taskId = json['id'];
+        final responseData = json['data'];
+        return StepResponseMessage(taskId, json['kind'], data: responseData);
+      case 'operation_response':
+        final responseData = json['data'];
+        return OperationResponseMessage(json['kind'], data: responseData);
       default:
         throw UnimplementedError();
     }
   }
+
+  @override
+  List<Object?> get props => [id];
+}
+
+class GenerationTask extends TaskStartMessage {
+  final String apiKey;
+
+  GenerationTask(int id,
+      {required String taskKind,
+      required Map<String, dynamic> data,
+      required this.apiKey})
+      : super(id, taskKind: taskKind, data: data);
+}
+
+class ClosestFileTask extends GenerationTask {
+  final String query;
+  final String workspacePath;
+
+  ClosestFileTask(
+      {required int id,
+      required this.query,
+      required this.workspacePath,
+      required Map<String, dynamic> data})
+      : super(id, taskKind: 'find-closest-files', data: data, apiKey: '');
+
+  factory ClosestFileTask.fromJson(int id, Map<String, dynamic> json) {
+    return ClosestFileTask(
+        id: id,
+        query: json['query'],
+        workspacePath: json['workspacePath'],
+        data: json['data']);
+  }
 }
 
 class TaskStartMessage extends IncomingMessage {
-  final String taskKind;
+  final String taskKind; // agent-execute
   final Map<String, dynamic> data;
   TaskStartMessage(int id, {required this.taskKind, required this.data})
       : super(id);
+  @override
+  List<Object?> get props => [...super.props, taskKind, data];
+
+  factory TaskStartMessage.fromJson(
+      int id, String taskKind, Map<String, dynamic> data) {
+    return TaskStartMessage(id, taskKind: taskKind, data: data);
+  }
 }
 
-class ProcessResponseMessage extends IncomingMessage {
+class StepResponseMessage extends IncomingMessage {
+  final String kind;
   final Map<String, dynamic> data;
-  ProcessResponseMessage(int id, {required this.data}) : super(id);
+
+  StepResponseMessage(int id, this.kind, {required this.data}) : super(id);
+
+  @override
+  List<Object?> get props => [...super.props, kind, data];
 }
 
-class OutgoingMessage {
+class OutgoingMessage extends Equatable {
   final int id;
   const OutgoingMessage(this.id);
 
   Map<String, dynamic> get toJson => {'id': id};
+
+  @override
+  List<Object?> get props => [id];
 }
 
 class ResultMessage extends OutgoingMessage {
@@ -56,6 +115,9 @@ class ResultMessage extends OutgoingMessage {
     });
     return json;
   }
+
+  @override
+  List<Object?> get props => [...super.props, message, data];
 }
 
 class ErrorMessage extends OutgoingMessage {
@@ -75,8 +137,12 @@ class ErrorMessage extends OutgoingMessage {
     });
     return json;
   }
+
+  @override
+  List<Object?> get props => [...super.props, message, data];
 }
 
+/// Log Message is sent to log something in the client side for debugging purpose.
 class LogMessage extends OutgoingMessage {
   final String message;
   final Map<String, dynamic> data;
@@ -94,19 +160,24 @@ class LogMessage extends OutgoingMessage {
     });
     return json;
   }
+
+  @override
+  List<Object?> get props => [...super.props, message, data];
 }
 
-/// To be used to communicate with client to execute any user facing tasks or fetch data from client.
-class ProcessMessage extends OutgoingMessage {
+/// Step messages are continuous messages sent to client while executing a task.
+/// [id] represents the taskId
+/// Client returns -> [StepResponseMessage]
+class StepMessage extends OutgoingMessage {
   final String kind;
   final Map<String, dynamic> args;
-  ProcessMessage(int id, {required this.kind, required this.args}) : super(id);
+  StepMessage(int id, {required this.kind, required this.args}) : super(id);
 
   @override
   Map<String, dynamic> get toJson {
     final json = super.toJson;
     json.addAll({
-      'method': 'process_step',
+      'method': 'step',
       'params': {
         'kind': kind,
         'args': args,
@@ -114,4 +185,7 @@ class ProcessMessage extends OutgoingMessage {
     });
     return json;
   }
+
+  @override
+  List<Object?> get props => [...super.props, kind, args];
 }
