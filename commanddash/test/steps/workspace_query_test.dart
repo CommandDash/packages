@@ -61,6 +61,11 @@ void main() {
                 "Here are the related references from user's project:\n <436621806>. Answer the user's query. Query: <736841542>",
             "post_process": {"type": "raw"},
             "output": "90611917"
+          },
+          {
+            "type": "append_to_chat",
+            "message": "<90611917>",
+            "post_process": {"type": "raw"},
           }
         ]
       }

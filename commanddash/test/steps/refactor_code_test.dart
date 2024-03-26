@@ -51,6 +51,7 @@ void main() {
                 "id": "805088184",
                 "display_text": "Code Attachment",
                 "type": "code_input",
+                "generate_full_string": true,
                 "value":
                     "{\"filePath\":\"/Users/keval/Desktop/dev/welltested/projects/dart_files/test_file.dart\",\"referenceContent\":\"void main(List<String> args) {\\n  print(\\\"Hello, world!\\\");\\n\\n  int a = 5;\\n  int b = 10;\\n  int sum = a + b;\\n  print(\\\"The sum of \$a and \$b is \$sum.\\\");\\n\\n  String name = \\\"John Doe\\\";\\n  print(\\\"My name is \$name.\\\");\\n}\",\"referenceData\":{\"selection\":{\"start\":{\"line\":2,\"character\":1},\"end\":{\"line\":10,\"character\":1}},\"editor\":\"file:///Users/fisclouds/Documents/smooth-app/packages/smooth_app/lib/test/loading_dialog.dart\"},\"startLineNumber\":112,\"endLineNumber\":119,\"fileName\":\"loading_dialog.dart\",\"generateFullString\":true}"
               }
