@@ -15,6 +15,7 @@ class DefaultOutput extends DashOutput {
     return {
       'id': hashCode.toString(),
       'type': 'default_output',
+      'version': version
     };
   }
 }
@@ -27,6 +28,7 @@ class MultiCodeObject extends DashOutput {
     return {
       'id': hashCode.toString(),
       'type': 'multi_code_object',
+      'version': version
     };
   }
 }

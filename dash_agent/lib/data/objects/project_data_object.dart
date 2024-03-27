@@ -1,4 +1,5 @@
 abstract class ProjectDataObject {
+  String get version;
   const ProjectDataObject();
 
   static TextObject fromText(String text) {
@@ -27,8 +28,12 @@ class TextObject extends ProjectDataObject {
       'id': hashCode.toString(),
       'type': 'text_object',
       'text': text,
+      'version': version
     };
   }
+  
+  @override
+  String get version => '1.0.0';
 }
 
 class JsonObject extends ProjectDataObject {
@@ -42,6 +47,10 @@ class JsonObject extends ProjectDataObject {
       'id': hashCode.toString(),
       'type': 'json_object',
       'json': json,
+      'version': version
     };
   }
+  
+  @override
+  String get version => '1.0.0';
 }

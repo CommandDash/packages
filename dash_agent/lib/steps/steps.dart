@@ -8,6 +8,7 @@ enum PostProcessKind {
 }
 
 abstract class Step {
+  String get version;
   Future<Map<String, dynamic>> process();
 }
 
@@ -30,10 +31,14 @@ class MatchingDocumentStep extends Step {
       'query': query,
       'data_sources': [for (final dataSource in dataSources) '$dataSource'],
       'total_matching_document': totalMatchingDocument ?? 0,
-      'output': '$output'
+      'output': '$output',
+      'version': version
     };
     return processedJson;
   }
+  
+  @override
+  String get version => '1.0.0';
 }
 
 enum WorkspaceObjectType { all, file, classes, methods }
@@ -53,10 +58,14 @@ class WorkspaceQueryStep extends Step {
       'type': 'search_in_workspace',
       'query': query,
       'workspace_object_type': workspaceObjectType.name,
-      'output': '$output'
+      'output': '$output',
+      'version': version
     };
     return processedJson;
   }
+  
+  @override
+  String get version => '1.0.0';
 }
 
 class PromptQueryStep extends Step {
@@ -76,11 +85,15 @@ class PromptQueryStep extends Step {
       'post_process': {
         'type': postProcessKind.name,
       },
-      'output': '$output'
+      'output': '$output',
+      'version': version
     };
 
     return processedJson;
   }
+  
+  @override
+  String get version => '1.0.0';
 }
 
 class AppendToChatStep extends Step {
@@ -91,10 +104,14 @@ class AppendToChatStep extends Step {
   Future<Map<String, dynamic>> process() async {
     final Map<String, dynamic> processedJson = {
       'type': 'append_to_chat',
-      'value': value
+      'value': value,
+      'version': version
     };
     return processedJson;
   }
+  
+  @override
+  String get version => '1.0.0';
 }
 
 class ReplaceCodeStep extends Step {
@@ -106,8 +123,12 @@ class ReplaceCodeStep extends Step {
     final Map<String, dynamic> processedJson = {
       'type': 'replace_code',
       'previous_code': '$previousCode',
-      'updated_code': '$updatedCode'
+      'updated_code': '$updatedCode',
+      'version': version
     };
     return processedJson;
   }
+  
+  @override
+  String get version => '1.0.0';
 }

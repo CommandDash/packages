@@ -14,5 +14,7 @@ Future<Map<String, dynamic>> processAgent(
   for (final command in configuration.registerSupportedCommands) {
     json['supported_commands'].add(await command.process());
   }
+  // TODO: Implement the min version determining logic
+  json['version'] = '1.0.0';
   return json;
 }
