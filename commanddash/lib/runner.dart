@@ -20,3 +20,33 @@ class ProcessCommand extends Command {
     handler.initProcessing();
   }
 }
+
+class VersionCommand extends Command {
+  @override
+  final String name = "version";
+
+  @override
+  final String description = "Print the current version of the CLI.";
+
+  VersionCommand();
+
+  @override
+  void run() {
+    print('0.0.1');
+  }
+}
+
+class MinCLIVersionCommand extends Command {
+  @override
+  final String name = "min_cli_version";
+
+  @override
+  final String description = "Print the current minimum version of the CLI.";
+
+  MinCLIVersionCommand();
+
+  @override
+  void run() {
+    print('0.3.2');
+  }
+}

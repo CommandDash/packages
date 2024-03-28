@@ -4,17 +4,27 @@ version: 0.0.1
 repository: https://github.com/Welltested-AI/commanddash
 
 environment:
-  sdk: '>=2.14.0 <4.0.0'
+  sdk: '>=2.15.0 <4.0.0'
+
+executables:
+  commanddash:
 
 # Add regular dependencies here.
 dependencies:
-  analyzer: ^6.4.1
+  analyzer: ^6.0.0
   args: ^2.4.2
   async: ^2.11.0
   cli_util: ^0.4.1
+  dio: ^5.4.1
+  equatable: ^2.0.5
+  crypto: ^3.0.3
+  google_generative_ai: ^0.2.2
   rxdart: ^0.27.7
   # path: ^1.8.0
 
 dev_dependencies:
   lints: ^2.1.0
+  build_runner: ^2.4.8
+  mockito: ^5.4.4
   test: ^1.24.0
+  

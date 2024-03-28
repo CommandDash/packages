@@ -1,9 +1,10 @@
-name: Publish CommandDash Executables
+name: Build, Test and Verify Executables
 
 on:
   push:
     branches:
       - build/executables
+##TODO: In future, when m1 runners are publicly supported, compiled and verify seperately for arm architectures.
 
 jobs:
   build:
@@ -19,7 +20,6 @@ jobs:
             output-name: commanddash-mac
           - os: windows-latest
             output-name: commanddash-windows.exe
-    
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
@@ -36,3 +36,67 @@ jobs:
         with:
           name: ${{ matrix.output-name }}  # Dynamically name the artifact based on the OS
           path: commanddash/build/${{ matrix.output-name }}
+  
+  test:
+    needs: build
+    runs-on: ${{ matrix.os }}
+    
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            binary-name: commanddash-linux
+          - os: windows-latest
+            binary-name: commanddash-windows.exe
+          - os: macos-latest
+            binary-name: commanddash-mac
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/download-artifact@v4
+        with:
+          name: ${{ matrix.binary-name }}
+          path: ./executable
+      
+      # Ensure binary is executable (necessary for Unix-based systems)
+      - name: Make binary executable
+        if: matrix.os != 'windows-latest'
+        run: chmod +x ./executable/${{ matrix.binary-name }}
+
+      - name: Test binary
+        run: ./executable/${{ matrix.binary-name }} --help
+
+  submit-executables:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/download-artifact@v4
+        with:
+            name: commanddash-linux
+            path: ./executable/commanddash-linux
+
+      - uses: actions/download-artifact@v4
+        with:
+            name: commanddash-mac
+            path: ./executable/commanddash-mac
+
+      - uses: actions/download-artifact@v4
+        with:
+            name: commanddash-windows.exe
+            path: ./executable/commanddash-windows.exe
+
+      - name: Submit Executables
+        run: |
+          chmod +x ./executable/commanddash-linux
+          curl -X POST "https://api.commanddash.dev/executable/add" \
+          -H "Content-Type: multipart/form-data" \
+          -F "secret=${{ secrets.SECRET_KEY }}" \
+          -F "version=$(./executable/commanddash-linux version)" \
+          -F "minimum_client_version=$(./executable/commanddash-linux min_cli_version)" \
+          -F "windows_binary=@executable/commanddash-windows.exe" \
+          -F "macos_binary=@executable/commanddash-mac" \
+          -F "linux_binary=@executable/commanddash-linux"
