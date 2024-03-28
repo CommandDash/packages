@@ -3,7 +3,7 @@ name: Publish CommandDash Executables
 on:
   push:
     branches:
-       - build/executables
+      - build/executables
     
 jobs:
   build:
