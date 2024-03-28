@@ -27,7 +27,7 @@ class TextObject extends ProjectDataObject {
     return {
       'id': hashCode.toString(),
       'type': 'text_object',
-      'text': text,
+      'content': text,
       'version': version
     };
   }
@@ -46,7 +46,7 @@ class JsonObject extends ProjectDataObject {
     return {
       'id': hashCode.toString(),
       'type': 'json_object',
-      'json': json,
+      'content': json,
       'version': version
     };
   }

@@ -1,12 +1,13 @@
+import 'dart:convert';
+
 import 'package:dash_agent/configuration/dash_agent.dart';
 
-Future<Map<String, dynamic>> processAgent(
-    AgentConfiguration configuration) async {
+Future<void> processAgent(AgentConfiguration configuration) async {
   final json = <String, dynamic>{};
 
-  json['datasources'] = [];
+  json['data_sources'] = [];
   for (final source in configuration.registeredDataSources) {
-    json['datasources'].add(await source.process());
+    json['data_sources'].add(await source.process());
   }
 
   json['supported_commands'] = [];
@@ -16,5 +17,6 @@ Future<Map<String, dynamic>> processAgent(
   }
   // TODO: Implement the min version determining logic
   json['version'] = '1.0.0';
-  return json;
+
+  print(jsonEncode(json));
 }
