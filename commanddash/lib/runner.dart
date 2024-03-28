@@ -1,8 +1,8 @@
+import 'dart:io';
+
 import 'package:args/command_runner.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
-import 'dart:io';
-
 import 'package:yaml/yaml.dart';
 
 class ProcessCommand extends Command {
@@ -42,5 +42,20 @@ class VersionCommand extends Command {
 
     final version = pubspec['version'];
     print(version);
+  }
+}
+
+class MinCLIVersionCommand extends Command {
+  @override
+  final String name = "min_cli_version";
+
+  @override
+  final String description = "Print the current minimum version of the CLI.";
+
+  MinCLIVersionCommand();
+
+  @override
+  void run() {
+    print('0.3.2');
   }
 }
