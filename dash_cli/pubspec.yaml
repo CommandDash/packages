@@ -6,7 +6,7 @@ environment:
   sdk: ^3.2.5
 
 executables:
-  dash:
+  dash_cli:
     
 # Add regular dependencies here.
 dependencies:

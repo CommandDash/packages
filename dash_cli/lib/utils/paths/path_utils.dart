@@ -2,8 +2,8 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 class PathUtils {
-
-  static String get currentPath => Directory.current.path;
+  static String get currentPath =>
+      '/Users/yogesh/Development/open-source-projects/sample_agent_3';
   static String get libPath => p.join(currentPath, 'lib');
   static String get testPath => p.join(currentPath, 'test');
 

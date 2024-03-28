@@ -1,11 +1,18 @@
 import 'dart:io';
 
+import 'package:dash/executors/agent_publish_executor.dart';
+import 'package:dash/parsers/pubspec_parser.dart';
+import 'package:dash/repository/agent_repository.dart';
 import 'package:dash/template/simple_agent_template.dart';
 import 'package:dash/utils/logger.dart';
 import 'package:dash/utils/paths/path_utils.dart';
+import 'package:dash/utils/spawn_isolate.dart';
 import 'package:dash/utils/terminal_commands/run_terminal_command.dart';
 
 class AgentOperation {
+  final _agentPublishExecutor = AgentPublishExecutor();
+  final _agentRepository = AgentRepository();
+
   Future<void> createAgentProject(String projectName) async {
     // create a sample dart project
     wtLog.log('\n');
@@ -101,5 +108,37 @@ class AgentOperation {
     wtLog.log('- updated pubspec file.');
     wtLog.stopSpinner();
     wtLog.info('\nSuccessfully created the project $projectName');
+  }
+
+  Future<void> publishAgent() async {
+    wtLog.startSpinner('Fetching agent configuration...');
+    final projectDirectory = PathUtils.currentPath;
+    try {
+      final pubSpecData = await PubspecParser.forPath(projectDirectory);
+
+      final agentJson = await IsolateFunction.getAgentJson(projectDirectory);
+
+      final minCLIVersion = _agentPublishExecutor.getMinCLIVersion(agentJson);
+      final agentName = pubSpecData.packageName;
+      final agentDescription = pubSpecData.packageDescription;
+      final agentVersion = pubSpecData.packageVersion;
+
+      agentJson['agent_name'] = agentName;
+      agentJson['agent_description'] = agentDescription;
+      agentJson['agent_version'] = agentVersion;
+      agentJson['cli_version'] = minCLIVersion;
+
+      wtLog.log('- Agent configuration fetched');
+      wtLog.updateSpinnerMessage('Publishing agent...');
+      final status = await _agentRepository.publishAgent(agentJson);
+
+      wtLog.stopSpinner();
+      wtLog.info(status);
+      return;
+    } catch (error) {
+      wtLog.stopSpinner();
+      wtLog.error(error.toString());
+      return;
+    }
   }
 }

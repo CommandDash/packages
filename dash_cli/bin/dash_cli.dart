@@ -1,11 +1,14 @@
 import 'package:args/command_runner.dart';
 import 'package:dash/utils/commands/agent/create_agent.dart';
+import 'package:dash/utils/commands/agent/publish_agent.dart';
 import 'package:dash/utils/logger.dart';
 
 Future<void> main(List<String> args) async {
-  var runner = CommandRunner(
-      "dash", "Dash enables you to generate your AI assisted developer agents.")
-    ..addCommand(CreateAgentCommand());
+  args = ['publish'];
+  var runner = CommandRunner("dash_cli",
+      "Dash enables you to generate your AI assisted developer agents.")
+    ..addCommand(CreateAgentCommand())
+    ..addCommand(PublishAgentCommand());
   try {
     await runner.run(args);
   } catch (e, stackTrace) {
