@@ -94,8 +94,8 @@ jobs:
             chmod +x ./executable/commanddash-linux
             curl -X POST "https://api.commanddash.dev/executable/add" \
             -H "Content-Type: multipart/form-data" \
-            -F "secret=strongSecretwith#case" \
-            -F "version=$(./executable/commanddash-linux min_cli_version)" \
+            -F "secret=${{ secrets.SECRET_KEY }}" \
+            -F "version=$(./executable/commanddash-linux version)" \
             -F "minimum_client_version=$(./executable/commanddash-linux min_cli_version)" \
             -F "windows_binary=@executable/commanddash-windows.exe" \
             -F "macos_binary=@executable/commanddash-mac" \
