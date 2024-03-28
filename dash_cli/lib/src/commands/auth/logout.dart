@@ -2,7 +2,7 @@ part of 'auth.dart';
 
 class LogoutCommand extends Command<Object> {
   @override
-  String get description => 'Logout from welltested';
+  String get description => 'Logout from dash_cli';
 
   @override
   String get name => 'logout';

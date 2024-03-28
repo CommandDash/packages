@@ -1,6 +1,6 @@
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
-/// .welltested Config file model
+/// .dash_cli Config file model
 class Config {
   /// Refresh token
   String? refreshToken;

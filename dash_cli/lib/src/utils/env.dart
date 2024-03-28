@@ -8,11 +8,11 @@ import 'logger.dart';
 import 'version.dart';
 
 /// Environment variables for the CLI.
-class WelltestedEnv {
-  WelltestedEnv._();
+class DashCliEnv {
+  DashCliEnv._();
 
   /// Singleton instance of the class.
-  static final WelltestedEnv instance = WelltestedEnv._();
+  static final DashCliEnv instance = DashCliEnv._();
 
   /// Version of the CLI.
   final String dashCliVersion = version;
@@ -28,7 +28,7 @@ class WelltestedEnv {
     String? home = Platform.isWindows
         ? Platform.environment['APPDATA']
         : Platform.environment['HOME'];
-    return p.join(home!, '.config', '.welltested');
+    return p.join(home!, '.config', '.dash_cli');
   }
 
   /// Get the Config environment variables.

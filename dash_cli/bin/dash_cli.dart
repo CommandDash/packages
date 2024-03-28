@@ -5,12 +5,12 @@ import 'package:dash_cli/src/utils/env.dart';
 import 'package:dash_cli/src/utils/logger.dart';
 
 Future<void> main(List<String> args) async {
-  CommandRunner<Object> runner = CommandRunner<Object>('welltested',
-      'Welltested auto generate tests for your code using AI within minutes.')
+  CommandRunner<Object> runner = CommandRunner<Object>('dash_cli',
+      'Dash enables you to generate your AI assisted developer agents.')
     ..addCommand(LoginCommand())
     ..addCommand(LogoutCommand());
   try {
-    WelltestedEnv.instance.load();
+    DashCliEnv.instance.load();
     await Auth.refreshToken();
     await runner.run(args);
   } catch (e, stackTrace) {

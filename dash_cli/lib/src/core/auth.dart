@@ -13,10 +13,10 @@ import 'api.dart';
 class Auth {
   /// Check if user is authenticated
   static Future<bool> get isAuthenticated async {
-    bool tokenExists = WelltestedEnv.instance.env.authToken != null &&
-        WelltestedEnv.instance.env.authToken!.isNotEmpty;
+    bool tokenExists = DashCliEnv.instance.env.authToken != null &&
+        DashCliEnv.instance.env.authToken!.isNotEmpty;
     if (tokenExists) {
-      bool tokenExpired = WelltestedEnv.instance.env.isAuthTokenExpired;
+      bool tokenExpired = DashCliEnv.instance.env.isAuthTokenExpired;
       return !tokenExpired;
     }
     return false;
@@ -28,10 +28,10 @@ class Auth {
   /// Refresh the auth token
   static Future<bool> refreshToken() async {
     try {
-      bool tokenExpired = WelltestedEnv.instance.env.isAuthTokenExpired;
+      bool tokenExpired = DashCliEnv.instance.env.isAuthTokenExpired;
       if (!tokenExpired) return true;
       wtLog.info('Refreshing token...');
-      if (WelltestedEnv.instance.env.isRefreshTokenExpired) {
+      if (DashCliEnv.instance.env.isRefreshTokenExpired) {
         wtLog.error('Session expired. Please login again');
         logout();
         return false;
@@ -40,14 +40,14 @@ class Auth {
         Uri.https(CliConstants.baseUrl, CliConstants.refreshTokenPath),
         headers: <String, String>{
           HttpHeaders.authorizationHeader:
-              'Bearer ${WelltestedEnv.instance.env.refreshToken}'
+              'Bearer ${DashCliEnv.instance.env.refreshToken}'
         },
       );
       if (res.statusCode >= 200 && res.statusCode < 300) {
         Map<String, dynamic> data =
             json.decode(res.body) as Map<String, dynamic>;
-        WelltestedEnv.addNew('access_token', data['access_token']);
-        WelltestedEnv.instance.env.authToken = data['access_token'];
+        DashCliEnv.addNew('access_token', data['access_token']);
+        DashCliEnv.instance.env.authToken = data['access_token'];
         wtLog.log('Token refreshed successfully');
         return true;
       }
@@ -95,10 +95,10 @@ class Auth {
   /// Delete the credentials
   static bool deleteCredentials() {
     try {
-      File file = WelltestedEnv.configFile;
+      File file = DashCliEnv.configFile;
       if (file.existsSync()) {
         file.writeAsStringSync('', mode: FileMode.write, encoding: utf8);
-        WelltestedEnv.instance.env
+        DashCliEnv.instance.env
           ..authToken = null
           ..refreshToken = null
           ..username = null

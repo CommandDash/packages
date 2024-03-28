@@ -2,7 +2,7 @@ part of 'auth.dart';
 
 class LoginCommand extends Command<Object> {
   @override
-  String get description => 'Login with welltested account';
+  String get description => 'Login with GitHub account';
 
   @override
   String get name => 'login';

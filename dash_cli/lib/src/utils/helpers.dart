@@ -37,17 +37,17 @@ Future<void> createServer(String url) async {
       String? accessToken = request.uri.queryParameters['access_token'];
       String? refreshToken = request.uri.queryParameters['refresh_token'];
       if (accessToken != null) {
-        WelltestedEnv.addNew('access_token', accessToken);
+        DashCliEnv.addNew('access_token', accessToken);
       }
       if (refreshToken != null) {
-        WelltestedEnv.addNew('refresh_token', refreshToken);
+        DashCliEnv.addNew('refresh_token', refreshToken);
       }
       if (request.uri.pathSegments.isEmpty) {
         // Handle callback
         String? code = request.uri.queryParameters['code'];
         accessToken = request.uri.queryParameters['access_token'];
         if (code != null && accessToken != null) {
-          WelltestedEnv.addNew('access_token', accessToken);
+          DashCliEnv.addNew('access_token', accessToken);
         } else {
           wtLog.updateSpinnerMessage('Failed to retrieve authorization code.');
         }
