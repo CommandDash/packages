@@ -7,7 +7,7 @@ environment:
 
 executables:
   dash_cli:
-
+    
 # Add regular dependencies here.
 dependencies:
   ansi_escapes: ^1.1.0
@@ -16,7 +16,10 @@ dependencies:
   http: ^1.2.1
   interact: ^2.2.0
   path: ^1.9.0
+  oauth2: ^2.0.2
+  yaml: ^3.1.2
 
 dev_dependencies:
   lints: ^2.1.0
   test: ^1.24.0
+  

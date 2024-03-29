@@ -17,6 +17,7 @@ class StringInput extends DashInput {
       'id': hashCode.toString(),
       'display_text': displayText,
       'type': 'string_input',
+      'version': version
     };
   }
 }
@@ -29,7 +30,8 @@ class CodeInput extends DashInput {
     return {
       'id': hashCode.toString(),
       'display_text': displayText,
-      'type': 'code_input'
+      'type': 'code_input',
+      'version': version
     };
   }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path/path.dart' as p;
 
 abstract class SystemDataObject {
+  String get version;
   const SystemDataObject();
 
   static FileObject fromFile(File file,
@@ -37,8 +38,12 @@ class FileObject extends SystemDataObject {
       'type': 'file_object',
       'content': await file.readAsString(),
       ...(includePath ? {'path': p.relative(file.path, from: relativeTo)} : {}),
+      'version': version
     };
   }
+  
+  @override
+  String get version => '1.0.0';
 }
 
 class DirectoryFiles extends SystemDataObject {
@@ -81,6 +86,10 @@ class DirectoryFiles extends SystemDataObject {
       'id': hashCode.toString(),
       'type': 'directory_files',
       'files': files,
+      'version': version
     };
   }
+  
+  @override
+  String get version => '1.0.0';
 }

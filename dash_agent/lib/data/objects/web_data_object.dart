@@ -1,5 +1,6 @@
 // lib/data/objects/web_data_object.dart
 abstract class WebDataObject {
+  String get version;
   const WebDataObject();
 
   static WebPage fromWebPage(String url) {
@@ -23,8 +24,12 @@ class WebPage extends WebDataObject {
       'id': hashCode.toString(),
       'type': 'web_page',
       'url': url,
+      'version': version
     };
   }
+  
+  @override
+  String get version => '1.0.0';
 }
 
 class SiteMap extends WebDataObject {
@@ -37,6 +42,10 @@ class SiteMap extends WebDataObject {
       'id': hashCode.toString(),
       'type': 'site_map',
       'xml': xml,
+      'version': version
     };
   }
+  
+  @override
+  String get version => '1.0.0';
 }

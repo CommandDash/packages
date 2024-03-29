@@ -3,6 +3,7 @@ import 'package:dash_agent/steps/steps.dart';
 import 'package:dash_agent/variables/dash_output.dart';
 
 abstract class Command {
+  String get version => '1.0.0';
   Command();
 
   String get slug;
@@ -21,14 +22,15 @@ abstract class Command {
     for (final input in registerInputs) {
       processedJson['registered_inputs'].add(await input.process());
     }
-    processedJson['registered_output'] = [];
+    processedJson['registered_outputs'] = [];
     for (final output in registerOutputs) {
-      processedJson['registered_output'].add(await output.process());
+      processedJson['registered_outputs'].add(await output.process());
     }
     processedJson['steps'] = [];
     for (final step in steps) {
       processedJson['steps'].add(await step.process());
     }
+    processedJson['version'] = version;
     return processedJson;
   }
 }
