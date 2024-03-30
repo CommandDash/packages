@@ -1,7 +1,7 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:async/async.dart';
+import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
@@ -40,7 +40,7 @@ void main() {
             "id": "736841542",
             "type": "string_input",
             "value":
-                "Where do you think AI is heading in the field of programming? Give a short answer."
+                "Where do you think AI is heading in the field of programming? Give a one line answer."
           }
         ],
         "outputs": [
@@ -49,7 +49,7 @@ void main() {
         "steps": [
           {
             "type": "prompt_query",
-            "query": "736841542",
+            "query": "<736841542>",
             "post_process": {"type": "raw"},
             "output": "90611917"
           },
@@ -59,10 +59,28 @@ void main() {
 
     final queue = StreamQueue<OutgoingMessage>(outwrapper.outputStream.stream);
     var result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'message');
+    expect(result.args['message'], 'Preparing Result');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
     expect((result as ResultMessage).message, isNotEmpty);
-    expect(result.data, {});
+    expect((result as ResultMessage).data.containsKey('90611917'), true);
+    expect((result as ResultMessage).data['90611917'], isA<DefaultOutput>());
+    expect(
+        ((result as ResultMessage).data['90611917'] as DefaultOutput).value !=
+            null,
+        true);
+    expect(
+        ((result as ResultMessage).data['90611917'] as DefaultOutput)
+            .value!
+            .isNotEmpty,
+        true);
   });
 }

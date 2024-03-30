@@ -96,7 +96,7 @@ class ContinueToNextStepOutput extends Output {
 class DataSourceResultOutput extends Output {
   DataSource value;
 
-  DataSourceResultOutput(this.value) : super(OutputType.userChoiceOutput);
+  DataSourceResultOutput(this.value) : super(OutputType.dataSourceOuput);
 
   @override
   String toString() {

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
+import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
@@ -118,6 +119,10 @@ void main() {
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
     expect((result).message, isNotEmpty);
-    expect(result.data, {});
+    expect((result).data.containsKey('436621806'), true);
+    expect((result).data['436621806'], isA<DefaultOutput>());
+    expect(((result).data['436621806'] as DefaultOutput).value != null, true);
+    expect(
+        ((result).data['436621806'] as DefaultOutput).value!.isNotEmpty, true);
   });
 }
