@@ -2,11 +2,11 @@ class SimpleAgentTemplate {
   static const main = r'''
 import 'package:dash_agent/dash_agent.dart';
 
-import 'my_agent.dart';
+import '../lib/my_agent.dart';
 
 // Boiler plate code to processes your agent
-void main() {
-  processAgent(MyAgent());
+Future<void> main() async {
+  await processAgent(MyAgent());
 }
 ''';
 

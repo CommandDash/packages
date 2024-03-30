@@ -15,14 +15,14 @@ class Auth {
   static final _userRepository = UserRepository();
 
   /// Check if user is authenticated
-  static Future<bool> get isAuthenticated async {
+  static Future<AuthStatus> get isAuthenticated async {
     bool tokenExists = DashCliEnv.instance.env.authToken != null &&
         DashCliEnv.instance.env.authToken!.isNotEmpty;
     if (tokenExists) {
       bool tokenExpired = DashCliEnv.instance.env.isAuthTokenExpired;
-      return !tokenExpired;
+      return tokenExpired ? AuthStatus.authenticationExpired: AuthStatus.authenticated;
     }
-    return false;
+    return AuthStatus.notAuthenticated;
   }
 
   /// Logout the user
@@ -99,7 +99,7 @@ class Auth {
     try {
       File file = DashCliEnv.configFile;
       if (file.existsSync()) {
-        file.writeAsStringSync('', mode: FileMode.write, encoding: utf8);
+        file.deleteSync();
         DashCliEnv.instance.env
           ..authToken = null
           ..refreshToken = null

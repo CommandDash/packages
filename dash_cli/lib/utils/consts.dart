@@ -12,3 +12,10 @@ class CliConstants {
   /// Path to update email if not already present
   static String updateEmailPath = '/account/github/update/email';
 }
+
+
+enum AuthStatus {
+  authenticated,
+  authenticationExpired,
+  notAuthenticated
+}

@@ -9,11 +9,13 @@ class LogoutCommand extends Command<Object> {
 
   @override
   Future<void> run() async {
-    bool isUserLoggedIn = await Auth.isAuthenticated;
-    if (!isUserLoggedIn) {
+    AuthStatus isUserLoggedIn = await Auth.isAuthenticated;
+
+    if (isUserLoggedIn == AuthStatus.notAuthenticated) {
       wtLog.info('You are not logged in');
       return;
     }
+    
     wtLog.startSpinner('Logging out...', severity: MessageSeverity.info);
     bool loggedOut = Auth.logout();
     loggedOut

@@ -1,6 +1,5 @@
 import 'package:args/command_runner.dart';
 import 'package:dash_cli/commands/auth/auth.dart';
-import 'package:dash_cli/core/auth.dart';
 import 'package:dash_cli/utils/env.dart';
 import 'package:dash_cli/utils/logger.dart';
 import 'package:dash_cli/commands/agent/create_agent.dart';
@@ -13,10 +12,8 @@ Future<void> main(List<String> args) async {
     ..addCommand(LogoutCommand())
     ..addCommand(CreateAgentCommand())
     ..addCommand(PublishAgentCommand());
-  ;
   try {
     DashCliEnv.instance.load();
-    await Auth.refreshToken();
     await runner.run(args);
   } catch (e, stackTrace) {
     // wtTelemetry.trackError(

@@ -55,8 +55,7 @@ class DashCliEnv {
   void load() {
     File file = configFile;
     if (!file.existsSync()) {
-      wtLog.warning('Config file not found. Creating one for you.');
-      file.createSync(recursive: true);
+      return;
     }
     _env = Config.fromJson(_verify(file));
   }
@@ -68,7 +67,8 @@ class DashCliEnv {
     try {
       if (configFile.existsSync()) {
         String data = configFile.readAsStringSync();
-        Map<String, dynamic> map = json.decode(data.isEmpty ? '{}' : data) as Map<String, dynamic>;
+        Map<String, dynamic> map =
+            json.decode(data.isEmpty ? '{}' : data) as Map<String, dynamic>;
         map.addAll(<String, dynamic>{key: value});
         configFile.writeAsStringSync(json.encode(map));
       } else {
