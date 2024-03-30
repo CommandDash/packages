@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:dash/executors/agent_publish_executor.dart';
-import 'package:dash/parsers/pubspec_parser.dart';
-import 'package:dash/repository/agent_repository.dart';
-import 'package:dash/template/simple_agent_template.dart';
-import 'package:dash/utils/logger.dart';
-import 'package:dash/utils/paths/path_utils.dart';
-import 'package:dash/utils/spawn_isolate.dart';
-import 'package:dash/utils/terminal_commands/run_terminal_command.dart';
+import 'package:dash_cli/executors/agent_publish_executor.dart';
+import 'package:dash_cli/parsers/pubspec_parser.dart';
+import 'package:dash_cli/repository/agent_repository.dart';
+import 'package:dash_cli/template/simple_agent_template.dart';
+import 'package:dash_cli/utils/logger.dart';
+import 'package:dash_cli/utils/paths/path_utils.dart';
+import 'package:dash_cli/utils/spawn_isolate.dart';
+import 'package:dash_cli/utils/terminal_commands/run_terminal_command.dart';
 
 class AgentOperation {
   final _agentPublishExecutor = AgentPublishExecutor();

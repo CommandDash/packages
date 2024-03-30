@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:args/command_runner.dart';
 
-import '../../../cli_operations/agent_operations.dart';
+import '../../cli_operations/agent_operations.dart';
 
-class PublishAgentCommand extends Command{
+class PublishAgentCommand extends Command<Object>{
   @override
   String get description => 'Publish the agent to command dash server';
 

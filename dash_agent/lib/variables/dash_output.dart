@@ -43,3 +43,15 @@ class CodeObject {
     };
   }
 }
+
+class DataSourceResultOutput extends DashOutput {
+  DataSourceResultOutput();
+
+  @override
+  Future<Map<String, dynamic>> process() async {
+    return {
+      'id': hashCode.toString(),
+      'type': 'user_choice_output',
+    };
+  }
+}

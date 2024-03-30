@@ -23,7 +23,8 @@ class StringInput extends DashInput {
 }
 
 class CodeInput extends DashInput {
-  CodeInput(super.displayText);
+  final bool generateFullString;
+  CodeInput(super.displayText, {this.generateFullString = false});
 
   @override
   Future<Map<String, dynamic>> process() async {
@@ -31,6 +32,7 @@ class CodeInput extends DashInput {
       'id': hashCode.toString(),
       'display_text': displayText,
       'type': 'code_input',
+      'generateFullString': generateFullString,
       'version': version
     };
   }

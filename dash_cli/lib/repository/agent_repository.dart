@@ -1,7 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+
+import '../utils/env.dart';
 
 class AgentRepository {
   final baseUrl = 'http://127.0.0.1:5000';
@@ -10,7 +13,8 @@ class AgentRepository {
     agentJson['testing'] = true;
     final response = await http.post(Uri.parse('$baseUrl/agent/deploy-agent'),
         body: jsonEncode(agentJson),
-        headers: {"Content-Type": "application/json"});
+        headers: { HttpHeaders.authorizationHeader:
+              'Bearer ${DashCliEnv.instance.env.authToken}', "Content-Type": "application/json"});
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['status'];

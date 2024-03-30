@@ -4,7 +4,7 @@ import 'package:args/command_runner.dart';
 import 'package:dash_cli/cli_operations/agent_operations.dart';
 import 'package:dash_cli/utils/logger.dart';
 
-class CreateAgentCommand extends Command {
+class CreateAgentCommand extends Command<Object> {
   @override
   String get description => 'Create an agent project';
 
