@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/models/workspace_file.dart';
@@ -48,6 +49,7 @@ class CodeInput extends Input {
   Range range;
   bool generateFullString;
   String content;
+  String fileContent;
 
   CodeInput({
     required String id,
@@ -55,6 +57,7 @@ class CodeInput extends Input {
     required this.range,
     required this.content,
     this.generateFullString = false,
+    required this.fileContent,
   }) : super(id, 'code_input');
 
   factory CodeInput.fromJson(Map<String, dynamic> json) {
@@ -64,7 +67,8 @@ class CodeInput extends Input {
       filePath: value['filePath'],
       range: Range.fromJson(value['referenceData']['selection']),
       content: value['referenceContent'],
-      generateFullString: value['generateFullString'] ?? false,
+      generateFullString: json['generate_full_string'] ?? false,
+      fileContent: File(value['filePath']).readAsStringSync(),
     );
   }
 
@@ -73,14 +77,14 @@ class CodeInput extends Input {
   String getCodeWithCursorSelection() {
     final startOffet = getOffset(range.start.line, range.start.character);
     final endOffset = getOffset(range.end.line, range.end.character);
-    return '${content.substring(0, startOffet)}<CURSOR_SELECTION>${content.substring(startOffet, endOffset)}</CURSOR_SELECTION>${content.substring(endOffset)}';
+    return '${fileContent.substring(0, startOffet)}<CURSOR_SELECTION>${fileContent.substring(startOffet, endOffset)}</CURSOR_SELECTION>${fileContent.substring(endOffset)}';
   }
 
   /// Generates the full string with [newContent].
   String getFileCodeWithReplacedCode(String newContent) {
     final startOffet = getOffset(range.start.line, range.start.character);
     final endOffset = getOffset(range.end.line, range.end.character);
-    return '${content.substring(0, startOffet)}$newContent${content.substring(endOffset)}';
+    return '${fileContent.substring(0, startOffet)}$newContent${fileContent.substring(endOffset)}';
   }
 
   @override
@@ -93,7 +97,7 @@ class CodeInput extends Input {
   }
 
   Map<String, dynamic> getReplaceFileJson(String newContent) {
-    String oldContent = content;
+    String oldContent = fileContent;
     if (generateFullString) {
       newContent = getFileCodeWithReplacedCode(newContent);
     }
@@ -101,11 +105,12 @@ class CodeInput extends Input {
       "path": filePath,
       "optimizedCode": newContent,
       "originalCode": oldContent,
+      "selection": range.toJson(),
     };
   }
 
   int getOffset(int line, int character) {
-    return content.split('\n').take(line).join('\n').length + character - 1;
+    return fileContent.split('\n').take(line).join('\n').length + character;
   }
 }
 
