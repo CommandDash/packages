@@ -12,8 +12,8 @@ abstract class Step {
   Future<Map<String, dynamic>> process();
 }
 
-class MatchingDocumentStep extends Step {
-  MatchingDocumentStep(
+class MatchDocumentStep extends Step {
+  MatchDocumentStep(
       {required this.query,
       required this.dataSources,
       required this.output,
@@ -22,7 +22,7 @@ class MatchingDocumentStep extends Step {
   final String query;
   final List<DataSource> dataSources;
   final int? totalMatchingDocument;
-  final DefaultOutput output;
+  final MatchDocumentOuput output;
 
   @override
   Future<Map<String, dynamic>> process() async {
@@ -36,9 +36,9 @@ class MatchingDocumentStep extends Step {
     };
     return processedJson;
   }
-  
+
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }
 
 enum WorkspaceObjectType { all, file, classes, methods }
@@ -63,9 +63,9 @@ class WorkspaceQueryStep extends Step {
     };
     return processedJson;
   }
-  
+
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }
 
 class PromptQueryStep extends Step {
@@ -91,9 +91,9 @@ class PromptQueryStep extends Step {
 
     return processedJson;
   }
-  
+
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }
 
 class AppendToChatStep extends Step {
@@ -109,9 +109,9 @@ class AppendToChatStep extends Step {
     };
     return processedJson;
   }
-  
+
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }
 
 class ReplaceCodeStep extends Step {
@@ -128,7 +128,7 @@ class ReplaceCodeStep extends Step {
     };
     return processedJson;
   }
-  
+
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }

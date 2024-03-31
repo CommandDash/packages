@@ -2,9 +2,9 @@
 import 'dart:io';
 import 'package:path/path.dart' as p;
 
-abstract class SystemDataObject {
+abstract class FileDataObject {
   String get version;
-  const SystemDataObject();
+  const FileDataObject();
 
   static FileObject fromFile(File file,
       {bool includePath = false, String? relativeTo}) {
@@ -20,7 +20,7 @@ abstract class SystemDataObject {
   Future<Map<String, dynamic>> process();
 }
 
-class FileObject extends SystemDataObject {
+class FileObject extends FileDataObject {
   final File file;
   final bool includePath;
   final String? relativeTo;
@@ -41,12 +41,12 @@ class FileObject extends SystemDataObject {
       'version': version
     };
   }
-  
+
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }
 
-class DirectoryFiles extends SystemDataObject {
+class DirectoryFiles extends FileDataObject {
   final Directory directory;
   final bool includePaths;
   final String? relativeTo;
@@ -89,7 +89,7 @@ class DirectoryFiles extends SystemDataObject {
       'version': version
     };
   }
-  
+
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }

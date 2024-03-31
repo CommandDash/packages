@@ -33,7 +33,7 @@ class TextObject extends ProjectDataObject {
   }
   
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }
 
 class JsonObject extends ProjectDataObject {
@@ -52,5 +52,5 @@ class JsonObject extends ProjectDataObject {
   }
   
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }

@@ -14,9 +14,9 @@ class AskCommand extends Command {
   final codeAttachment = CodeInput('Code Attachment');
 
   // Outputs
-  final matchingDocuments = DefaultOutput();
+  final matchingDocuments = MatchDocumentOuput();
   final matchingCode = MultiCodeObject();
-  final queryOutput = DefaultOutput();
+  final queryOutput = PromptOutput();
 
   @override
   String get slug => '/ask';
@@ -33,7 +33,7 @@ class AskCommand extends Command {
 
   @override
   List<Step> get steps => [
-        MatchingDocumentStep(
+        MatchDocumentStep(
             query: '$userQuery$codeAttachment',
             dataSources: [docsSource],
             output: matchingDocuments),
@@ -47,7 +47,7 @@ class AskCommand extends Command {
             value:
                 'This was your query: $userQuery and here is your output: $queryOutput'),
       ];
-
+  // valid interpolation (distintion between input, output and datasources at right places)
   @override
   String get textFieldLayout =>
       "Hi, I'm here to help you. $userQuery $codeAttachment";

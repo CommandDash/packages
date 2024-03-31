@@ -2,8 +2,9 @@ import 'package:dash_agent/variables/dash_input.dart';
 import 'package:dash_agent/steps/steps.dart';
 import 'package:dash_agent/variables/dash_output.dart';
 
+
 abstract class Command {
-  String get version => '1.0.0';
+  String get version => '0.0.1';
   Command();
 
   String get slug;

@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:dash_agent/configuration/dash_agent.dart';
 
+import 'helpers/min_cli_version_helper.dart';
+
 Future<void> processAgent(AgentConfiguration configuration) async {
   final json = <String, dynamic>{};
 
@@ -15,8 +17,9 @@ Future<void> processAgent(AgentConfiguration configuration) async {
   for (final command in configuration.registerSupportedCommands) {
     json['supported_commands'].add(await command.process());
   }
-  // TODO: Implement the min version determining logic
-  json['version'] = '1.0.0';
 
+  json['version'] = configuration.version;
+
+  json['cli_version'] = getMinCLIVersion(json);
   print(jsonEncode(json));
 }

@@ -5,9 +5,9 @@ import 'package:dash_agent/data/objects/web_data_object.dart';
 /// [DataSource] are lists of all the documents, files, web pages and entire website that you may want to query in your process steps.
 /// You can use them to provide the website documentation, provide your own usage examples, or document techniques of achieveing something.
 abstract class DataSource {
-  String get version => '1.0.0';
+  String get version => '0.0.1';
   List<ProjectDataObject> get projectObjects;
-  List<SystemDataObject> get fileObjects;
+  List<FileDataObject> get fileObjects;
   List<WebDataObject> get webObjects;
 
   Future<Map<String, dynamic>> process() async {

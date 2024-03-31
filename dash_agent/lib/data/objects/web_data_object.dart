@@ -29,7 +29,7 @@ class WebPage extends WebDataObject {
   }
   
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }
 
 class SiteMap extends WebDataObject {
@@ -47,5 +47,5 @@ class SiteMap extends WebDataObject {
   }
   
   @override
-  String get version => '1.0.0';
+  String get version => '0.0.1';
 }

@@ -20,6 +20,19 @@ class DefaultOutput extends DashOutput {
   }
 }
 
+class PromptOutput extends DashOutput {
+  PromptOutput();
+
+  @override
+  Future<Map<String, dynamic>> process() async {
+    return {
+      'id': hashCode.toString(),
+      'type': 'prompt_output',
+      'version': version
+    };
+  }
+}
+
 class MultiCodeObject extends DashOutput {
   MultiCodeObject();
 
@@ -33,25 +46,28 @@ class MultiCodeObject extends DashOutput {
   }
 }
 
-class CodeObject {
+class CodeObject extends DashOutput {
   CodeObject();
-
-  Future<Map<String, dynamic>> process() async {
-    return {
-      'id': hashCode.toString(),
-      'type': 'code_object',
-    };
-  }
-}
-
-class DataSourceResultOutput extends DashOutput {
-  DataSourceResultOutput();
 
   @override
   Future<Map<String, dynamic>> process() async {
     return {
       'id': hashCode.toString(),
-      'type': 'user_choice_output',
+      'type': 'code_object',
+      'version': version
+    };
+  }
+}
+
+class MatchDocumentOuput extends DashOutput {
+  MatchDocumentOuput();
+
+  @override
+  Future<Map<String, dynamic>> process() async {
+    return {
+      'id': hashCode.toString(),
+      'type': 'match_docuement_output',
+      'version': version
     };
   }
 }
