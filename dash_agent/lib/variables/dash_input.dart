@@ -1,3 +1,4 @@
+import 'package:dash_agent/variables/dash_output.dart';
 import 'package:dash_agent/variables/variable.dart';
 
 abstract class DashInput extends Variable {
@@ -23,8 +24,7 @@ class StringInput extends DashInput {
 }
 
 class CodeInput extends DashInput {
-  final bool includeSurroundingCode;
-  CodeInput(super.displayText, {this.includeSurroundingCode = false});
+  CodeInput(super.displayText);
 
   @override
   Future<Map<String, dynamic>> process() async {
@@ -32,8 +32,10 @@ class CodeInput extends DashInput {
       'id': hashCode.toString(),
       'display_text': displayText,
       'type': 'code_input',
-      'generateFullString': includeSurroundingCode,
-      'version': version
+      'version': version,
+      'supporting_code': [contextualCode.process()]
     };
   }
+
+  MultiCodeObject get contextualCode => MultiCodeObject();
 }
