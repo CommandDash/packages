@@ -11,7 +11,12 @@ enum StepType {
   searchInSources,
 }
 
-enum OutputType { defaultOutput, multiCodeOutput, userChoiceOutput }
+enum OutputType {
+  defaultOutput,
+  multiCodeOutput,
+  userChoiceOutput,
+  dataSourceOuput
+}
 
 extension ProcessedQueryExtension on String {
   String replacePlaceholder(

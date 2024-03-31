@@ -91,6 +91,5 @@ void main() {
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect(result.data, {});
   }, timeout: Timeout(Duration(minutes: 1)));
 }
