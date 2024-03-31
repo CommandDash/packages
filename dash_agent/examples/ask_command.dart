@@ -47,7 +47,7 @@ class AskCommand extends Command {
             value:
                 'This was your query: $userQuery and here is your output: $queryOutput'),
       ];
-  // valid interpolation (distintion between input, output and datasources at right places)
+  // valid interpolation (distintion between input, output and datasources at right places) [use it for command strings as well]
   @override
   String get textFieldLayout =>
       "Hi, I'm here to help you. $userQuery $codeAttachment";
