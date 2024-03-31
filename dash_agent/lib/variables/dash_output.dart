@@ -13,7 +13,7 @@ class MatchDocumentOuput extends DashOutput {
   Future<Map<String, dynamic>> process() async {
     return {
       'id': hashCode.toString(),
-      'type': 'match_docuement_output',
+      'type': 'match_document_output',
       'version': version
     };
   }

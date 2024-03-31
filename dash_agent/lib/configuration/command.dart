@@ -15,24 +15,27 @@ abstract class Command {
 
   Future<Map<String, dynamic>> process() async {
     final Map<String, dynamic> processedJson = {};
-    List<DashOutput> registerOutputs =
-        []; //TODO: Populate the list from outputs of each step.
+    List<DashOutput> registerOutputs = [];
     processedJson['slug'] = slug;
     processedJson['intent'] = intent;
     processedJson['text_field_layout'] = textFieldLayout;
+
+    processedJson['steps'] = [];
+    for (final step in steps()) {
+      registerOutputs.addAll(step.dashOutputs.nonNulls);
+      processedJson['steps'].add(await step.process());
+    }
+
     processedJson['registered_inputs'] = [];
     for (final input in registerInputs) {
       processedJson['registered_inputs'].add(await input.process());
     }
+
     processedJson['registered_outputs'] = [];
-    for (final output in registerOutputs) {
+    for (final output in registerOutputs.toSet().toList()) {
       processedJson['registered_outputs'].add(await output.process());
     }
-    processedJson['steps'] = [];
-    for (final step in steps()) {
-      step.version;
-      processedJson['steps'].add(await step.process());
-    }
+
     processedJson['version'] = version;
     return processedJson;
   }
