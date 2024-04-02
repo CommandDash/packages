@@ -10,14 +10,15 @@ class AskCommand extends Command {
   final DataSource docsSource;
 
   /// Inputs
-  final userQuery = StringInput('Your query');
-  final codeAttachment = CodeInput('Code Attachment');
+  final userQuery = StringInput('Your query', optional: false);
+  final codeAttachment = CodeInput(
+    'Primary method',
+  );
 
-  // Outputs
-  final matchingDocuments = MatchDocumentOuput();
-  final matchingCode = MultiCodeObject();
-  final queryOutput = PromptOutput();
-
+  final testMethod = CodeInput(
+    'Test Method',
+  );
+  final references = CodeInput('Existing References', optional: true);
   @override
   String get slug => '/ask';
 
@@ -25,30 +26,32 @@ class AskCommand extends Command {
   String get intent => 'Ask me anything';
 
   @override
+  String get textFieldLayout =>
+      "Hi, I'm here to help you. $userQuery $codeAttachment";
+
+  @override
   List<DashInput> get registerInputs => [userQuery, codeAttachment];
 
   @override
-  List<DashOutput> get registerOutputs =>
-      [matchingDocuments, matchingCode, queryOutput];
-
-  @override
-  List<Step> get steps => [
-        MatchDocumentStep(
-            query: '$userQuery$codeAttachment',
-            dataSources: [docsSource],
-            output: matchingDocuments),
-        WorkspaceQueryStep(query: '$matchingDocuments', output: matchingCode),
-        PromptQueryStep(
-            prompt:
-                '''You are an X agent. Here is the $userQuery, here is the $matchingCode and the document references: $matchingDocuments. Answer the user's query.''',
-            postProcessKind: PostProcessKind.raw,
-            output: queryOutput),
-        AppendToChatStep(
-            value:
-                'This was your query: $userQuery and here is your output: $queryOutput'),
-      ];
-  // valid interpolation (distintion between input, output and datasources at right places)
-  @override
-  String get textFieldLayout =>
-      "Hi, I'm here to help you. $userQuery $codeAttachment";
+  List<Step> get steps {
+    // Outputs
+    final matchingDocuments = MatchDocumentOuput();
+    final matchingCode = MultiCodeObject();
+    final promptOutput = PromptOutput();
+    return [
+      MatchDocumentStep(
+          query: '$userQuery$codeAttachment',
+          dataSources: [docsSource],
+          output: matchingDocuments),
+      WorkspaceQueryStep(query: '$matchingDocuments', output: matchingCode),
+      PromptQueryStep(
+        prompt:
+            '''You are an X agent. Here is the $userQuery, here is the $codeAttachment $matchingCode and the document references: $matchingDocuments. Answer the user's query.''',
+        promptOutput: promptOutput,
+      ),
+      AppendToChatStep(
+          value:
+              'This was your query: $userQuery and here is your output: $promptOutput')
+    ];
+  }
 }
