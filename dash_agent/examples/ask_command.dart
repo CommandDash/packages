@@ -10,9 +10,15 @@ class AskCommand extends Command {
   final DataSource docsSource;
 
   /// Inputs
-  final userQuery = StringInput('Your query');
-  final codeAttachment = CodeInput('Code Attachment');
+  final userQuery = StringInput('Your query', optional: false);
+  final codeAttachment = CodeInput(
+    'Primary method',
+  );
 
+  final testMethod = CodeInput(
+    'Test Method',
+  );
+  final references = CodeInput('Existing References', optional: true);
   @override
   String get slug => '/ask';
 
@@ -27,11 +33,11 @@ class AskCommand extends Command {
   List<DashInput> get registerInputs => [userQuery, codeAttachment];
 
   @override
-  List<Step> steps() {
+  List<Step> get steps {
     // Outputs
     final matchingDocuments = MatchDocumentOuput();
     final matchingCode = MultiCodeObject();
-    final queryOutput = PromptOutput();
+    final promptOutput = PromptOutput();
     return [
       MatchDocumentStep(
           query: '$userQuery$codeAttachment',
@@ -41,11 +47,11 @@ class AskCommand extends Command {
       PromptQueryStep(
         prompt:
             '''You are an X agent. Here is the $userQuery, here is the $codeAttachment $matchingCode and the document references: $matchingDocuments. Answer the user's query.''',
-        promptOutput: queryOutput,
+        promptOutput: promptOutput,
       ),
       AppendToChatStep(
           value:
-              'This was your query: $userQuery and here is your output: $queryOutput'),
+              'This was your query: $userQuery and here is your output: $promptOutput')
     ];
   }
 }
