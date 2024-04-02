@@ -113,7 +113,6 @@ abstract class Command {
   ///
   /// Example, `[StringInput('Your query'), CodeInput('Code Attachment')]`
   List<DashInput> get registerInputs;
-  List<DashOutput> get registerOutputs;
 
   /// Series of operation that needs to be performed for a command finish its
   /// task.
@@ -165,7 +164,7 @@ abstract class Command {
     processedJson['text_field_layout'] = textFieldLayout;
 
     processedJson['steps'] = [];
-    for (final step in steps()) {
+    for (final step in steps) {
       registerOutputs.addAll(step.dashOutputs.nonNulls);
       processedJson['steps'].add(await step.process());
     }
