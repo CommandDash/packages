@@ -20,7 +20,9 @@ class Auth {
         DashCliEnv.instance.env.authToken!.isNotEmpty;
     if (tokenExists) {
       bool tokenExpired = DashCliEnv.instance.env.isAuthTokenExpired;
-      return tokenExpired ? AuthStatus.authenticationExpired: AuthStatus.authenticated;
+      return tokenExpired
+          ? AuthStatus.authenticationExpired
+          : AuthStatus.authenticated;
     }
     return AuthStatus.notAuthenticated;
   }
@@ -125,10 +127,10 @@ class Auth {
     if (refreshToken != null) {
       DashCliEnv.addNew('refresh_token', refreshToken);
     }
-    if (emailFound == null || emailFound == 'False') {
-      final email = _promptForMailId();
-      await _userRepository.updateEmail(email);
-    }
+    // if (emailFound == null || emailFound == 'False') {
+    //   final email = _promptForMailId();
+    //   await _userRepository.updateEmail(email);
+    // }
 
     wtLog.stopSpinner(
         message: accessToken == null
