@@ -85,7 +85,7 @@ class AgentValidation {
     final nonRegisteredPromptIds = _extractNonRegisteredVariablesInStep(
         step['prompt'], registeredVariables);
     final nonRegisteredOutputIds = _extractNonRegisteredVariablesInStep(
-        step['output'], registeredVariables);
+        step['prompt_output'], registeredVariables);
 
     if (nonRegisteredPromptIds.isNotEmpty &&
         nonRegisteredOutputIds.isNotEmpty) {
