@@ -35,7 +35,7 @@ void main() {
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
         },
-        "inputs": [
+        "registered_inputs": [
           {
             "id": "736841542",
             "type": "string_input",
@@ -43,7 +43,7 @@ void main() {
                 "Where do you think AI is heading in the field of programming? Give a one line answer."
           }
         ],
-        "outputs": [
+        "registered_outputs": [
           {"id": "90611917", "type": "default_output"}
         ],
         "steps": [
@@ -96,14 +96,14 @@ void main() {
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
         },
-        "inputs": [
+        "registered_inputs": [
           {
             "id": "736841542",
             "type": "string_input",
             "value": "Give dart function to calculate factorial of a number."
           }
         ],
-        "outputs": [
+        "registered_outputs": [
           {"id": "90611917", "type": "default_output"}
         ],
         "steps": [

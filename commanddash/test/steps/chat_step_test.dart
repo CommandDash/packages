@@ -41,7 +41,7 @@ void main() {
                   "key": EnvReader.get('GEMINI_KEY'),
                   "githubToken": ""
                 },
-                "inputs": [
+                "registered_inputs": [
                   {"id": "736841542", "type": "string_input", "value": "Hello"},
                   // {
                   //   "id": "736841543",
@@ -54,7 +54,7 @@ void main() {
                   //   ],
                   // }
                 ],
-                "outputs": [
+                "registered_outputs": [
                   {"id": "90611917", "type": "default_output"}
                 ],
                 "steps": [
@@ -66,7 +66,7 @@ void main() {
                   },
                   {
                     "type": "append_to_chat",
-                    "message": "<90611917>",
+                    "value": "<90611917>",
                     "post_process": {"type": "raw"},
                   }
                 ]
@@ -120,7 +120,7 @@ void main() {
                   "key": EnvReader.get('GEMINI_KEY'),
                   "githubToken": ""
                 },
-                "inputs": [
+                "registered_inputs": [
                   {
                     "id": "736841542",
                     "type": "string_input",
@@ -134,7 +134,7 @@ void main() {
                         "[\n                      {\n                        \"role\": \"user\",\n                        \"message\":\n                            \"I am researching about AI in medical field.\"\n                      },\n                      {\n                        \"role\": \"agent\",\n                        \"message\": \"That is a good topic to research on.\"\n                      }\n                    ]"
                   }
                 ],
-                "outputs": [
+                "registered_outputs": [
                   {"id": "90611917", "type": "default_output"}
                 ],
                 "steps": [
@@ -146,7 +146,7 @@ void main() {
                   },
                   {
                     "type": "append_to_chat",
-                    "message": "<90611917>",
+                    "value": "<90611917>",
                     "post_process": {"type": "raw"},
                   }
                 ]

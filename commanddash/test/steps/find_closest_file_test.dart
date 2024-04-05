@@ -34,14 +34,14 @@ void main() {
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
         },
-        "inputs": [
+        "registered_inputs": [
           {
             "id": "736841542",
             "type": "string_input",
             "value": "Where is the themeing of the app?"
           }
         ],
-        "outputs": [
+        "registered_outputs": [
           {"id": "436621806", "type": "default_output"}
         ],
         "steps": [
@@ -59,6 +59,14 @@ void main() {
 
     final queue = StreamQueue<OutgoingMessage>(outwrapper.outputStream.stream);
     var result = await queue.next;
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'message');
+    expect(result.args['message'], 'Finding relevant files');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+
     expect(result, isA<StepMessage>());
     expect(result.id, 1);
     expect((result as StepMessage).kind, 'cache');
@@ -72,6 +80,5 @@ void main() {
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
     expect((result as ResultMessage).message, isNotEmpty);
-    expect(result.data, {});
   });
 }

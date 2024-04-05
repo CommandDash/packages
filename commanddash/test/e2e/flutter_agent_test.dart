@@ -1,6 +1,8 @@
+@Timeout(Duration(minutes: 3))
 import 'dart:async';
 
 import 'package:async/async.dart';
+import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
@@ -22,54 +24,68 @@ void main() {
     server.stdout = outwrapper;
     handler = TaskHandler(server);
   });
-  test('Process a search_in_workspace followed by a prompt_query request',
-      () async {
+  test('Flutter agent', () async {
     handler.initProcessing();
 
-    messageStreamController.add(IncomingMessage.fromJson({
-      "method": "agent-execute",
-      "id": 1,
-      "params": {
-        "authdetails": {
-          "type": "gemini",
-          "key": EnvReader.get('GEMINI_KEY'),
-          "githubToken": ""
+    messageStreamController.add(
+      IncomingMessage.fromJson(
+        {
+          "method": "agent-execute",
+          "id": 1,
+          "version": "1.0.0",
+          'params': {
+            "authdetails": {
+              "type": "gemini",
+              "key": EnvReader.get('GEMINI_KEY'),
+              "githubToken": "authtoken",
+            },
+            "agent_name": "flutter",
+            "slug": "/doc",
+            "intent": "Your Flutter doc expert",
+            "text_field_layout":
+                "Hi, I'm here to help you with core flutter queries. Let me know your question: <14340369>",
+            "registered_inputs": [
+              {
+                "id": "14340369",
+                "display_text": "Your query",
+                "type": "string_input",
+                "value": "What is material.dart?"
+              }
+            ],
+            "registered_outputs": [
+              {
+                "id": "897806645",
+                "type": "match_document_output",
+                "version": "0.0.1"
+              },
+              {
+                "id": "81443790",
+                "type": "prompt_output",
+                "version": "0.0.1",
+              }
+            ],
+            "steps": [
+              {
+                "type": "search_in_sources",
+                "query": "<14340369>",
+                "output": "897806645",
+                "data_sources": ["816647033"],
+              },
+              {
+                "type": "prompt_query",
+                "query":
+                    "You are an Flutter expert who answers user's queries related to the framework. \n\n Please find the user query <Query> and relavant references <References> picked from the Flutter docs to assist you: \n\n Query: <14340369>, \nReferences: <897806645>. Please respond to the user's query!",
+                "output": "81443790",
+              },
+              {
+                "type": "append_to_chat",
+                "value": "<81443790>",
+              }
+            ]
+          }
         },
-        "registered_inputs": [
-          {
-            "id": "736841542",
-            "type": "string_input",
-            "value": "Where is the themeing of the app?"
-          }
-        ],
-        "registered_outputs": [
-          {"id": "436621806", "type": "default_output"},
-          {"id": "90611917", "type": "default_output"}
-        ],
-        "steps": [
-          {
-            "type": "search_in_workspace",
-            "query": "<422243666>",
-            "workspace_object_type": "all",
-            "workspacePath":
-                "/Users/keval/Desktop/dev/welltested/projects/dart_files",
-            "output": "436621806"
-          },
-          {
-            "type": "prompt_query",
-            "query":
-                "Here are the related references from user's project:\n <436621806>. Answer the user's query. Query: <736841542>",
-            "post_process": {"type": "raw"},
-            "output": "90611917"
-          },
-          {
-            "type": "append_to_chat",
-            "value": "<90611917>",
-            "post_process": {"type": "raw"},
-          }
-        ]
-      }
-    }));
+      ),
+    );
 
     final queue = StreamQueue<OutgoingMessage>(outwrapper.outputStream.stream);
     var result = await queue.next;
@@ -77,19 +93,9 @@ void main() {
     expect(result.id, 1);
     expect((result as StepMessage).kind, 'loader_update');
     expect(result.args['kind'], 'message');
-    expect(result.args['message'], 'Finding relevant files');
+    expect(result.args['message'], 'Searching in sources');
     messageStreamController
         .add(StepResponseMessage(1, 'loader_update', data: {}));
-    result = await queue.next;
-
-    expect(result, isA<StepMessage>());
-    expect(result.id, 1);
-    expect((result as StepMessage).kind, 'cache');
-    expect(result.args, {});
-
-    messageStreamController
-        .add(StepResponseMessage(1, 'cache_response', data: {'value': '{}'}));
-
     result = await queue.next;
     expect(result, isA<StepMessage>());
     expect(result.id, 1);
@@ -103,6 +109,7 @@ void main() {
     expect(result.id, 1);
     expect((result as StepMessage).kind, 'loader_update');
     expect(result.args['kind'], 'none');
+    expect(result.args.containsKey('message'), false);
     messageStreamController
         .add(StepResponseMessage(1, 'loader_update', data: {}));
     result = await queue.next;
@@ -117,6 +124,5 @@ void main() {
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect((result as ResultMessage).message, isNotEmpty);
-  }, timeout: Timeout(Duration(minutes: 3)));
+  });
 }

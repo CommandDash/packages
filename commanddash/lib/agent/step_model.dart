@@ -28,8 +28,6 @@ abstract class Step {
       Map<String, Output> outputs, String agentName, String agentVersion) {
     // TODO: handle parsing error
     switch (json['type']) {
-      case 'search_in_sources':
-      // return SearchInSourceStep.fromJson(json);
       case 'search_in_workspace':
         return SearchInWorkspaceStep.fromJson(
           json,
@@ -42,7 +40,7 @@ abstract class Step {
         );
       case 'append_to_chat':
         return AppendToChatStep.fromJson(json,
-            (json['message'] as String).replacePlaceholder(inputs, outputs));
+            (json['value'] as String).replacePlaceholder(inputs, outputs));
       case 'chat':
         return ChatStep.fromJson(
             json,
