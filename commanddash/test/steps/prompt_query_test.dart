@@ -104,6 +104,7 @@ void main() {
           }
         ],
         "registered_outputs": [
+
           {"id": "90611917", "type": "default_output"}
         ],
         "steps": [
