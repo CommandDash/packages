@@ -35,7 +35,6 @@ class DashRepository {
         "testing": true,
       });
       return List<Map<String, dynamic>>.from(response.data['data']).map((e) {
-        print(e);
         return DataSource.fromJson(e);
       }).toList();
     } catch (e) {
