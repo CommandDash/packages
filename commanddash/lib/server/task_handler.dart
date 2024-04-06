@@ -31,9 +31,11 @@ class TaskHandler {
             final agents = await repo.getAgents();
             taskAssist.sendResultMessage(
                 message: "Agent get successful", data: {"agents": agents});
-          } catch (e) {
-            taskAssist
-                .sendErrorMessage(message: "Failed getting agents.", data: {});
+          } catch (e, stackTrace) {
+            taskAssist.sendErrorMessage(
+                message: "Failed getting agents.",
+                data: {},
+                stackTrace: stackTrace);
           }
           break;
         case 'refresh_token_test':
@@ -71,7 +73,10 @@ Future<void> randomFunctionWithStep(TaskAssist taskAssist) async {
   if (data['value'] == 'unique_value') {
     taskAssist.sendResultMessage(message: 'TASK_COMPLETED', data: {});
   } else {
-    taskAssist.sendErrorMessage(message: 'TASK_FAILED', data: {});
+    taskAssist.sendErrorMessage(
+      message: 'TASK_FAILED',
+      data: {},
+    );
   }
 }
 

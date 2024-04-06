@@ -24,8 +24,12 @@ class TaskAssist {
   }
 
   void sendErrorMessage(
-      {required message, required Map<String, dynamic> data}) {
-    _server.sendMessage(ErrorMessage(_taskId, message: message, data: data));
+      {required message,
+      required Map<String, dynamic> data,
+      StackTrace? stackTrace}) {
+    _server.sendMessage(ErrorMessage(_taskId,
+        message: message,
+        data: data..addAll({'stack_trace': stackTrace?.toString()})));
   }
 
   /// Only use for debugging purposes. Clients can print the log on their end.
