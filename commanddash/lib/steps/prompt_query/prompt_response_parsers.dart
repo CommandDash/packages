@@ -23,6 +23,15 @@ class RawPromptResponseParser implements PromptResponseParser {
 class CodeExtractPromptResponseParser implements PromptResponseParser {
   @override
   String parse(String response) {
+    final regex = RegExp(r'^```(?:\w+)?\s*\n(.*?)(?=^```)```',
+        multiLine: true, dotAll: true);
+    final match = regex.firstMatch(response);
+
+    if (match == null) {
+      throw Exception('No code block found in response');
+    }
+
+    return match.group(1) ?? '';
     //  extract code from response within ``` and ```
     final start = response.indexOf('```');
     final end = response.lastIndexOf('```');

@@ -8,7 +8,6 @@ import 'package:commanddash/server/task_handler.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import '../steps/chat_test.mocks.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -25,6 +24,7 @@ void main() {
     server.stdout = outwrapper;
     handler = TaskHandler(server);
   });
+
   group(
     'chat request',
     () {
@@ -105,7 +105,6 @@ void main() {
         expect(result, isA<ResultMessage>());
         expect(result.id, 1);
         expect((result as ResultMessage).message, 'TASK_COMPLETE');
-        expect(result.data, {});
       }, timeout: Timeout(Duration(minutes: 1)));
 
       test('chat with history', () async {
@@ -186,7 +185,6 @@ void main() {
         expect(result, isA<ResultMessage>());
         expect(result.id, 1);
         expect((result as ResultMessage).message, 'TASK_COMPLETE');
-        expect(result.data, {});
       });
     },
   );

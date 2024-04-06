@@ -24,7 +24,9 @@ class PromptQueryStep extends Step {
     return PromptQueryStep(
       outputId: json['output'],
       query: query,
-      responseParser: PromptResponseParser.fromJson(json['post_process']),
+      responseParser: json.containsKey('post_process')
+          ? PromptResponseParser.fromJson(json['post_process'])
+          : RawPromptResponseParser(),
     );
   }
 

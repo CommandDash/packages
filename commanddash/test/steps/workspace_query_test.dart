@@ -75,6 +75,15 @@ void main() {
     var result = await queue.next;
     expect(result, isA<StepMessage>());
     expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'message');
+    expect(result.args['message'], 'Finding relevant files');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
     expect((result as StepMessage).kind, 'cache');
     expect(result.args, {});
 
@@ -82,11 +91,32 @@ void main() {
         .add(StepResponseMessage(1, 'cache_response', data: {'value': '{}'}));
 
     result = await queue.next;
-
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'message');
+    expect(result.args['message'], 'Preparing Result');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'none');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'append_to_chat');
+    expect(result.args.containsKey('message'), true);
+    expect(result.args['message'], isA<String>());
+    messageStreamController.add(
+        StepResponseMessage(1, 'append_to_chat', data: {'result': 'success'}));
+    result = await queue.next;
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
     expect((result as ResultMessage).message, isNotEmpty);
-    expect(result.data, {});
-  });
+  }, timeout: Timeout(Duration(minutes: 3)));
 }

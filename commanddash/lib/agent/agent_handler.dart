@@ -77,7 +77,7 @@ class AgentHandler {
           }
         }
       }
-      taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: {});
+      taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: outputs);
     } catch (e) {
       taskAssist.sendErrorMessage(message: e.toString(), data: {});
     }
