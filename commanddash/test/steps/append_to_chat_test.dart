@@ -35,7 +35,7 @@ void main() {
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
         },
-        "inputs": [
+        "registered_inputs": [
           {
             "id": "736841542",
             "type": "string_input",
@@ -43,7 +43,7 @@ void main() {
                 "Where do you think AI is heading in the field of programming? Give a short answer."
           }
         ],
-        "outputs": [
+        "registered_outputs": [
           {"id": "90611917", "type": "default_output"}
         ],
         "steps": [
@@ -55,7 +55,7 @@ void main() {
           },
           {
             "type": "append_to_chat",
-            "message": "<90611917>",
+            "value": "<90611917>",
             "post_process": {"type": "raw"},
           }
         ]

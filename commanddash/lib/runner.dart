@@ -1,9 +1,6 @@
 import 'package:args/command_runner.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
-import 'dart:io';
-
-import 'package:yaml/yaml.dart';
 
 class ProcessCommand extends Command {
   bool dryrun = false;
@@ -35,12 +32,21 @@ class VersionCommand extends Command {
 
   @override
   void run() {
-    final directory = Directory.current;
+    print('0.0.1');
+  }
+}
 
-    final file = File('${directory.path}/pubspec.yaml');
-    final pubspec = loadYaml(file.readAsStringSync());
+class MinCLIVersionCommand extends Command {
+  @override
+  final String name = "min_cli_version";
 
-    final version = pubspec['version'];
-    print(version);
+  @override
+  final String description = "Print the current minimum version of the CLI.";
+
+  MinCLIVersionCommand();
+
+  @override
+  void run() {
+    print('0.3.2');
   }
 }

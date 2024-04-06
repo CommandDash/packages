@@ -7,9 +7,9 @@ import 'package:dash_agent/data/objects/web_data_object.dart';
 
 class DocsDataSource extends DataSource {
   @override
-  List<SystemDataObject> get fileObjects => [
-        SystemDataObject.fromFile(File(
-            '/Users/samyak/Documents/commanddash/commanddash/dash_agent/assets/my-article.txt'))
+  List<FileDataObject> get fileObjects => [
+        FileDataObject.fromFile(File(
+            '/Users/yogesh/Development/org.welltested/commanddash/dash_agent/assets/my-article.txt'))
       ];
 
   @override
@@ -22,12 +22,12 @@ class DocsDataSource extends DataSource {
 
 class BlogsDataSource extends DataSource {
   @override
-  List<SystemDataObject> get fileObjects => [
+  List<FileDataObject> get fileObjects => [
         DirectoryFiles(
             Directory(
-                '/Users/samyak/Documents/commanddash/commanddash/dash_agent/assets/blogs'),
+                '/Users/yogesh/Development/org.welltested/commanddash/dash_agent/assets/blogs'),
             relativeTo:
-                '/Users/samyak/Documents/commanddash/commanddash/dash_agent/assets/blogs')
+                '/Users/yogesh/Development/org.welltested/commanddash/dash_agent/assets/blogs')
       ];
 
   @override

@@ -26,11 +26,11 @@ class AgentHandler {
 
   factory AgentHandler.fromJson(Map<String, dynamic> json) {
     final inputs = <String, Input>{};
-    for (Map<String, dynamic> input in (json['inputs'] as List)) {
+    for (Map<String, dynamic> input in (json['registered_inputs'] as List)) {
       inputs.addAll({input['id']: Input.fromJson(input)});
     }
     final outputs = <String, Output>{};
-    for (Map<String, dynamic> output in (json['outputs'] as List)) {
+    for (Map<String, dynamic> output in (json['registered_outputs'] as List)) {
       outputs.addAll({output['id']: Output.fromJson(output)});
     }
     final List<Map<String, dynamic>> steps =
@@ -44,7 +44,7 @@ class AgentHandler {
       outputs: outputs,
       steps: steps,
       generationRepository: generationRepository,
-      githubAccessToken: json['authdetails']['github_access_token'],
+      githubAccessToken: json['authdetails']['githubToken'],
       agentName: json['agent_name'] ?? '',
       agentVersion: json['version'] ?? '',
     );

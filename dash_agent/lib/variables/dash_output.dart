@@ -1,4 +1,3 @@
-// lib/variables/dash_output.dart
 import 'package:dash_agent/variables/variable.dart';
 
 abstract class DashOutput extends Variable {
@@ -7,14 +6,15 @@ abstract class DashOutput extends Variable {
   Future<Map<String, dynamic>> process();
 }
 
-class DefaultOutput extends DashOutput {
-  DefaultOutput();
+class MatchDocumentOuput extends DashOutput {
+  MatchDocumentOuput();
 
   @override
   Future<Map<String, dynamic>> process() async {
     return {
       'id': hashCode.toString(),
-      'type': 'default_output',
+      'type': 'match_document_output',
+      'version': version
     };
   }
 }
@@ -27,17 +27,46 @@ class MultiCodeObject extends DashOutput {
     return {
       'id': hashCode.toString(),
       'type': 'multi_code_object',
+      'version': version
     };
   }
 }
 
-class CodeObject {
-  CodeObject();
+class PromptOutput extends DashOutput {
+  PromptOutput();
 
+  @override
+  Future<Map<String, dynamic>> process() async {
+    return {
+      'id': hashCode.toString(),
+      'type': 'prompt_output',
+      'version': version,
+    };
+  }
+}
+
+class CodeOutput extends DashOutput {
+  CodeOutput();
+
+  @override
   Future<Map<String, dynamic>> process() async {
     return {
       'id': hashCode.toString(),
       'type': 'code_object',
+      'version': version
+    };
+  }
+}
+
+class BooleanOutput extends DashOutput {
+  BooleanOutput();
+
+  @override
+  Future<Map<String, dynamic>> process() async {
+    return {
+      'id': hashCode.toString(),
+      'type': 'boolean_output',
+      'version': version
     };
   }
 }

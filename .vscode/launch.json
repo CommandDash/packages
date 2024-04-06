@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "name": "Dart",
+            "type": "dart",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/dash_cli",
+            "program": "bin/dash_cli.dart",
+            "args": [
+                "login"
+            ]
+        }
+    ]
+}

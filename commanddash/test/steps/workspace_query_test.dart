@@ -35,14 +35,14 @@ void main() {
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
         },
-        "inputs": [
+        "registered_inputs": [
           {
             "id": "736841542",
             "type": "string_input",
             "value": "Where is the themeing of the app?"
           }
         ],
-        "outputs": [
+        "registered_outputs": [
           {"id": "436621806", "type": "default_output"},
           {"id": "90611917", "type": "default_output"}
         ],
@@ -64,7 +64,7 @@ void main() {
           },
           {
             "type": "append_to_chat",
-            "message": "<90611917>",
+            "value": "<90611917>",
             "post_process": {"type": "raw"},
           }
         ]

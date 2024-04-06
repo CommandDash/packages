@@ -1,18 +1,43 @@
-import 'package:dash_agent/configuration/dash_agent.dart';
+import 'dart:convert';
 
-Future<Map<String, dynamic>> processAgent(
-    AgentConfiguration configuration) async {
+import 'package:dash_agent/configuration/dash_agent.dart';
+import 'package:dash_agent/extension/map_extension.dart';
+import 'package:dash_agent/helpers/agent_validation.dart';
+
+import 'helpers/min_cli_version_helper.dart';
+
+Future<void> processAgent(AgentConfiguration configuration) async {
   final json = <String, dynamic>{};
 
-  json['datasources'] = [];
+  json['data_sources'] = <Map<String, dynamic>>[];
   for (final source in configuration.registeredDataSources) {
-    json['datasources'].add(await source.process());
+    json['data_sources'].add(await source.process());
   }
 
-  json['supported_commands'] = [];
+  json['supported_commands'] = <Map<String, dynamic>>[];
 
   for (final command in configuration.registerSupportedCommands) {
     json['supported_commands'].add(await command.process());
   }
-  return json;
+
+  json['version'] = configuration.version;
+
+  json['cli_version'] = getMinCLIVersion(json);
+
+  // validate the commnads
+  final commandValidationReponse = <Map<String, Map<String, String>>>[];
+  final commands = json['supported_commands'] as List<Map<String, dynamic>>;
+  for (final command in commands) {
+    final validationResponse =
+        AgentValidation.validateDashCommandVariableUsage(command);
+    if (validationResponse != null) {
+      commandValidationReponse.add(validationResponse);
+    }
+  }
+  if (commandValidationReponse.isNotEmpty) {
+    throw {'Issues with Agent Configuration': commandValidationReponse}
+        .humanReadableString();
+  }
+  
+  print(jsonEncode(json));
 }
