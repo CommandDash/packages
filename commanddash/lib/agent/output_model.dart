@@ -99,7 +99,7 @@ class ContinueToNextStepOutput extends Output {
 }
 
 class DataSourceResultOutput extends Output {
-  DataSource? value;
+  List<DataSource>? value;
 
   DataSourceResultOutput([this.value]) : super(OutputType.dataSourceOuput);
 
@@ -108,7 +108,11 @@ class DataSourceResultOutput extends Output {
     if (value == null) {
       throw Exception("DataSource value not assigned");
     }
-    return value!.content.toString();
+    String result = "";
+    for (DataSource ds in value!) {
+      result += "${ds.content}\n";
+    }
+    return result;
   }
 
   @override
@@ -118,7 +122,7 @@ class DataSourceResultOutput extends Output {
     }
     return {
       "type": type.toString(),
-      "value": value!.toJson(),
+      "value": value!.map((e) => e.toJson()).toList(),
     };
   }
 }

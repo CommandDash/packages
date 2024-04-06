@@ -79,7 +79,6 @@ class AgentHandler {
       }
       taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: outputs);
     } catch (e) {
-      rethrow;
       taskAssist.sendErrorMessage(message: e.toString(), data: {});
     }
   }
