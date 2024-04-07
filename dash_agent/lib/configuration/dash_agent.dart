@@ -30,7 +30,6 @@ import 'package:dash_agent/data/datasource.dart';
 /// }
 /// ```
 abstract class AgentConfiguration {
-  String get version => '0.0.1';
 
   /// List of [DataSource]s that will be used by agent commands to perform
   /// designated tasks.

@@ -20,9 +20,7 @@ Future<void> processAgent(AgentConfiguration configuration) async {
     json['supported_commands'].add(await command.process());
   }
 
-  json['version'] = configuration.version;
-
-  json['cli_version'] = getMinCLIVersion(json);
+  json['min_cli_version'] = getMinCLIVersion(json);
 
   // validate the commnads
   final commandValidationReponse = <Map<String, Map<String, String>>>[];
