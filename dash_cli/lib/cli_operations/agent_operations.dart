@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:dash_cli/executors/agent_publish_executor.dart';
 import 'package:dash_cli/parsers/pubspec_parser.dart';
 import 'package:dash_cli/repository/agent_repository.dart';
 import 'package:dash_cli/template/simple_agent_template.dart';
@@ -10,7 +9,6 @@ import 'package:dash_cli/utils/spawn_isolate.dart';
 import 'package:dash_cli/utils/terminal_commands/run_terminal_command.dart';
 
 class AgentOperation {
-  final _agentPublishExecutor = AgentPublishExecutor();
   final _agentRepository = AgentRepository();
 
   Future<void> createAgentProject(String projectName) async {
@@ -117,7 +115,6 @@ class AgentOperation {
 
       final agentJson = await IsolateFunction.getAgentJson(projectDirectory);
 
-      final minCLIVersion = _agentPublishExecutor.getMinCLIVersion(agentJson);
       final agentName = pubSpecData.packageName;
       final agentDescription = pubSpecData.packageDescription;
       final agentVersion = pubSpecData.packageVersion;
@@ -125,7 +122,6 @@ class AgentOperation {
       agentJson['name'] = agentName;
       agentJson['description'] = agentDescription;
       agentJson['version'] = agentVersion;
-      agentJson['cli_version'] = minCLIVersion;
 
       wtLog.log('- Agent configuration fetched');
       wtLog.updateSpinnerMessage('Publishing agent...');
