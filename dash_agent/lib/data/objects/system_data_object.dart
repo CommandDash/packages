@@ -7,7 +7,7 @@ import 'package:path/path.dart' as p;
 /// This class should not be directly used to add data as this is a `abstract` class.
 /// Instead its derivative classes should be used: [FileObject], [DirectoryFiles]
 abstract class FileDataObject {
-  String get version;
+  String get minCliVersion;
   const FileDataObject();
 
   /// static method to create and return [FileObject]. It takes following argument:
@@ -105,12 +105,12 @@ class FileObject extends FileDataObject {
       'type': 'file_object',
       'content': await file.readAsString(),
       ...(includePath ? {'path': p.relative(file.path, from: relativeTo)} : {}),
-      'version': version
+      'version': minCliVersion
     };
   }
 
   @override
-  String get version => '0.0.1';
+  String get minCliVersion => '0.0.1';
 }
 
 /// [DirectoryFiles] is used to add files from a directory to [DataSource] which can
@@ -186,10 +186,10 @@ class DirectoryFiles extends FileDataObject {
       'id': hashCode.toString(),
       'type': 'directory_files',
       'files': files,
-      'version': version
+      'version': minCliVersion
     };
   }
 
   @override
-  String get version => '0.0.1';
+  String get minCliVersion => '0.0.1';
 }

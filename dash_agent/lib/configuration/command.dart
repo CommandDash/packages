@@ -68,7 +68,7 @@ import 'package:dash_agent/variables/dash_output.dart';
 /// }
 /// ```
 abstract class Command {
-  String get version => '0.0.1';
+  String get minCliVersion => '0.0.1';
   Command();
 
   /// Unique identifier of the command. For an agent having multiple commands
@@ -179,7 +179,7 @@ abstract class Command {
       processedJson['registered_outputs'].add(await output.process());
     }
 
-    processedJson['version'] = version;
+    processedJson['version'] = minCliVersion;
     return processedJson;
   }
 }

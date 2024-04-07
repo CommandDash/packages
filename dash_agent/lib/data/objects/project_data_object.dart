@@ -4,7 +4,7 @@
 /// This class should not be directly used to add data as this is a `abstract` class.
 /// Instead its derivative classes should be used: [TextObject], [JsonObject]
 abstract class ProjectDataObject {
-  String get version;
+  String get minCliVersion;
   const ProjectDataObject();
 
   /// static method to create and return [TextObject]. It takes `String` object
@@ -66,12 +66,12 @@ class TextObject extends ProjectDataObject {
       'id': hashCode.toString(),
       'type': 'text_object',
       'content': text,
-      'version': version
+      'version': minCliVersion
     };
   }
 
   @override
-  String get version => '0.0.1';
+  String get minCliVersion => '0.0.1';
 }
 
 /// [JsonObject] is used to add json data to [DataSource] which can be later used
@@ -101,10 +101,10 @@ class JsonObject extends ProjectDataObject {
       'id': hashCode.toString(),
       'type': 'json_object',
       'content': json,
-      'version': version
+      'version': minCliVersion
     };
   }
 
   @override
-  String get version => '0.0.1';
+  String get minCliVersion => '0.0.1';
 }

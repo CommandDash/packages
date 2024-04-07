@@ -51,7 +51,7 @@ import 'package:dash_agent/data/objects/web_data_object.dart';
 /// }
 /// ```
 abstract class DataSource {
-  String get version => '0.0.1';
+  String get minCliVersion => '0.0.1';
 
   /// List of [ProjectDataObject]s that can be used to pass data
   /// from the project itself.
@@ -127,7 +127,7 @@ abstract class DataSource {
   Future<Map<String, dynamic>> process() async {
     final Map<String, dynamic> processedJson = {'id': hashCode.toString()};
 
-    processedJson['version'] = version;
+    processedJson['version'] = minCliVersion;
     processedJson['project_objects'] = [];
     for (final projectObject in projectObjects) {
       processedJson['project_objects'].add(await projectObject.process());

@@ -3,7 +3,7 @@
 /// This class should not be directly used to add data as this is a `abstract` class.
 /// Instead its derivative classes should be used: [WebPage], [SiteMap]
 abstract class WebDataObject {
-  String get version;
+  String get minCliVersion;
   const WebDataObject();
 
   /// static method to create and return [WebPage]. It takes `url` of web page as
@@ -59,12 +59,12 @@ class WebPage extends WebDataObject {
       'id': hashCode.toString(),
       'type': 'web_page',
       'url': url,
-      'version': version
+      'version': minCliVersion
     };
   }
 
   @override
-  String get version => '0.0.1';
+  String get minCliVersion => '0.0.1';
 }
 
 /// [SiteMap] is used to add web pages containing the relevant content to the [DataSource]
@@ -96,10 +96,10 @@ class SiteMap extends WebDataObject {
       'id': hashCode.toString(),
       'type': 'site_map',
       'xml': xml,
-      'version': version
+      'version': minCliVersion
     };
   }
 
   @override
-  String get version => '0.0.1';
+  String get minCliVersion => '0.0.1';
 }

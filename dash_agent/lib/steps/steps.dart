@@ -11,7 +11,7 @@ abstract class Step {
 
   Future<Map<String, dynamic>> process();
 
-  List<DashOutput?> get dashOutputs;
+  List<DashOutput> get dashOutputs;
 }
 
 /// Find matching documents from provided datasources.
@@ -58,7 +58,7 @@ class MatchDocumentStep extends Step {
       'type': 'search_in_sources',
       'query': query,
       'data_sources': [for (final dataSource in dataSources) '$dataSource'],
-      'output': '$output',
+      'outputs': '$dashOutputs',
       'version': version
     };
     return processedJson;
@@ -68,7 +68,7 @@ class MatchDocumentStep extends Step {
   String get version => '0.0.1';
 
   @override
-  List<DashOutput?> get dashOutputs => [output];
+  List<DashOutput> get dashOutputs => [output];
 }
 
 /// Find matching code snippets from user's workspace.
@@ -100,7 +100,7 @@ class WorkspaceQueryStep extends Step {
     final Map<String, dynamic> processedJson = {
       'type': 'search_in_workspace',
       'query': query,
-      'output': '$output',
+      'outputs': '$dashOutputs',
       'version': version
     };
     return processedJson;
@@ -110,7 +110,7 @@ class WorkspaceQueryStep extends Step {
   String get version => '0.0.1';
 
   @override
-  List<DashOutput?> get dashOutputs => [output];
+  List<DashOutput> get dashOutputs => [output];
 }
 
 /// Perform a message request to the model with your customized prompt.
@@ -159,8 +159,7 @@ class PromptQueryStep extends Step {
     final Map<String, dynamic> processedJson = {
       'type': 'prompt_query',
       'prompt': prompt,
-      'prompt_output': '$promptOutput',
-      'code_output': '$codeOutput',
+      'outputs': '$dashOutputs',
       'version': version
     };
 
@@ -171,7 +170,7 @@ class PromptQueryStep extends Step {
   String get version => '0.0.1';
 
   @override
-  List<DashOutput?> get dashOutputs => [promptOutput, codeOutput];
+  List<DashOutput> get dashOutputs => [promptOutput, codeOutput].nonNulls.toList();
 }
 
 /// Appends the value to the chat.
@@ -206,7 +205,7 @@ class AppendToChatStep extends Step {
   String get version => '0.0.1';
 
   @override
-  List<DashOutput?> get dashOutputs => [];
+  List<DashOutput> get dashOutputs => [];
 }
 
 /// [ReplaceCodeStep] is experimental and is not adviced for usage. 🚨
@@ -239,7 +238,7 @@ class ReplaceCodeStep extends Step {
   String get version => '0.0.1';
 
   @override
-  List<DashOutput?> get dashOutputs => [userAcceptDecision];
+  List<DashOutput> get dashOutputs => [userAcceptDecision];
 }
 
 /// [ContinueDecisionStep] is experimental and is not adviced for usage. 🚨
@@ -262,7 +261,7 @@ class ContinueDecisionStep extends Step {
   }
 
   @override
-  List<DashOutput?> get dashOutputs => [];
+  List<DashOutput> get dashOutputs => [];
 
   @override
   String get version => '0.0.1';
