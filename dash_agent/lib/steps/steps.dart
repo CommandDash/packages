@@ -58,7 +58,7 @@ class MatchDocumentStep extends Step {
       'type': 'search_in_sources',
       'query': query,
       'data_sources': [for (final dataSource in dataSources) '$dataSource'],
-      'output': '$output',
+      'outputs': '$dashOutputs',
       'version': version
     };
     return processedJson;
@@ -100,7 +100,7 @@ class WorkspaceQueryStep extends Step {
     final Map<String, dynamic> processedJson = {
       'type': 'search_in_workspace',
       'query': query,
-      'output': '$output',
+      'outputs': '$dashOutputs',
       'version': version
     };
     return processedJson;
@@ -159,8 +159,7 @@ class PromptQueryStep extends Step {
     final Map<String, dynamic> processedJson = {
       'type': 'prompt_query',
       'prompt': prompt,
-      'prompt_output': '$promptOutput',
-      'code_output': '$codeOutput',
+      'outputs': '$dashOutputs',
       'version': version
     };
 
