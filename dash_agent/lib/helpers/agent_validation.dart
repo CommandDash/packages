@@ -85,13 +85,13 @@ class AgentValidation {
     final nonRegisteredPromptIds = _extractNonRegisteredVariablesInStep(
         step['prompt'], registeredVariables);
     final nonRegisteredOutputIds = _extractNonRegisteredVariablesInStep(
-        step['prompt_output'], registeredVariables);
+        step['outputs'], registeredVariables);
 
     if (nonRegisteredPromptIds.isNotEmpty &&
         nonRegisteredOutputIds.isNotEmpty) {
-      return _invalidDashVariableMessage(['prompt', 'output']);
+      return _invalidDashVariableMessage(['prompt', 'outputs']);
     } else if (nonRegisteredOutputIds.isNotEmpty) {
-      return _invalidDashVariableMessage(['output']);
+      return _invalidDashVariableMessage(['outputs']);
     } else if (nonRegisteredPromptIds.isNotEmpty) {
       return _invalidDashVariableMessage(['prompt']);
     }
@@ -103,12 +103,12 @@ class AgentValidation {
     final nonRegisteredQueryIds = _extractNonRegisteredVariablesInStep(
         step['query'], registeredVariables);
     final nonRegisteredOutputIds = _extractNonRegisteredVariablesInStep(
-        step['output'], registeredVariables);
+        step['outputs'], registeredVariables);
 
     if (nonRegisteredQueryIds.isNotEmpty && nonRegisteredOutputIds.isNotEmpty) {
-      return _invalidDashVariableMessage(['query', 'output']);
+      return _invalidDashVariableMessage(['query', 'outputs']);
     } else if (nonRegisteredOutputIds.isNotEmpty) {
-      return _invalidDashVariableMessage(['output']);
+      return _invalidDashVariableMessage(['outputs']);
     } else if (nonRegisteredQueryIds.isNotEmpty) {
       return _invalidDashVariableMessage(['query']);
     }
@@ -120,12 +120,12 @@ class AgentValidation {
     final nonRegisteredQueryIds = _extractNonRegisteredVariablesInStep(
         step['query'], registeredVariables);
     final nonRegisteredOutputIds = _extractNonRegisteredVariablesInStep(
-        step['output'], registeredVariables);
+        step['outputs'], registeredVariables);
 
     if (nonRegisteredQueryIds.isNotEmpty && nonRegisteredOutputIds.isNotEmpty) {
-      return _invalidDashVariableMessage(['query', 'output']);
+      return _invalidDashVariableMessage(['query', 'outputs']);
     } else if (nonRegisteredOutputIds.isNotEmpty) {
-      return _invalidDashVariableMessage(['output']);
+      return _invalidDashVariableMessage(['outputs']);
     } else if (nonRegisteredQueryIds.isNotEmpty) {
       return _invalidDashVariableMessage(['query']);
     }
