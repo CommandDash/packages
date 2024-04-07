@@ -15,7 +15,6 @@ class AgentOperation {
 
   Future<void> createAgentProject(String projectName) async {
     // create a sample dart project
-    wtLog.log('\n');
     wtLog.startSpinner('creating dart project...');
 
     try {
@@ -132,6 +131,7 @@ class AgentOperation {
       wtLog.updateSpinnerMessage('Publishing agent...');
       final status = await _agentRepository.publishAgent(agentJson);
 
+      wtLog.log('- Published agent');
       wtLog.stopSpinner();
       wtLog.info(status);
       return;
