@@ -123,9 +123,9 @@ class AgentOperation {
       final agentDescription = pubSpecData.packageDescription;
       final agentVersion = pubSpecData.packageVersion;
 
-      agentJson['agent_name'] = agentName;
-      agentJson['agent_description'] = agentDescription;
-      agentJson['agent_version'] = agentVersion;
+      agentJson['name'] = agentName;
+      agentJson['description'] = agentDescription;
+      agentJson['version'] = agentVersion;
       agentJson['cli_version'] = minCLIVersion;
 
       wtLog.log('- Agent configuration fetched');
