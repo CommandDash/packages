@@ -53,14 +53,14 @@ void main() {
             "workspace_object_type": "all",
             "workspacePath":
                 "/Users/keval/Desktop/dev/welltested/projects/dart_files",
-            "output": "436621806"
+            "outputs": ["436621806"]
           },
           {
             "type": "prompt_query",
             "query":
                 "Here are the related references from user's project:\n <436621806>. Answer the user's query. Query: <736841542>",
             "post_process": {"type": "raw"},
-            "output": "90611917"
+            "outputs": ["90611917"]
           },
           {
             "type": "append_to_chat",

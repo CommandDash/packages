@@ -11,11 +11,11 @@ class ChatStep extends Step {
   final List<ChatMessage> messages;
   final String lastMessage;
   ChatStep(
-      {required String outputId,
+      {required List<String> outputIds,
       required this.messages,
       required this.lastMessage,
       Loader loader = const MessageLoader('Preparing Result')})
-      : super(outputId: outputId, type: StepType.chat, loader: loader);
+      : super(outputIds: outputIds, type: StepType.chat, loader: loader);
 
   factory ChatStep.fromJson(
     Map<String, dynamic> json,
@@ -23,19 +23,19 @@ class ChatStep extends Step {
     String lastMessage,
   ) {
     return ChatStep(
-      outputId: json['output'],
+      outputIds: json['outputs'],
       messages: chatMessages,
       lastMessage: lastMessage,
     );
   }
 
   @override
-  Future<DefaultOutput> run(
+  Future<List<DefaultOutput>> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     final response =
         await generationRepository.getChatCompletion(messages, lastMessage);
-    return DefaultOutput(response);
+    return [DefaultOutput(response)];
   }
 }

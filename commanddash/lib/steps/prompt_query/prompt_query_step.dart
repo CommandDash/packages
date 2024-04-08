@@ -11,18 +11,18 @@ class PromptQueryStep extends Step {
   final String query;
   final PromptResponseParser responseParser;
   PromptQueryStep(
-      {required String outputId,
+      {required List<String>? outputIds,
       required this.query,
       required this.responseParser,
       Loader loader = const MessageLoader('Preparing Result')})
-      : super(outputId: outputId, type: StepType.promptQuery, loader: loader);
+      : super(outputIds: outputIds, type: StepType.promptQuery, loader: loader);
 
   factory PromptQueryStep.fromJson(
     Map<String, dynamic> json,
     String query,
   ) {
     return PromptQueryStep(
-      outputId: json['output'],
+      outputIds: json['outputs'],
       query: query,
       responseParser: json.containsKey('post_process')
           ? PromptResponseParser.fromJson(json['post_process'])
@@ -31,12 +31,12 @@ class PromptQueryStep extends Step {
   }
 
   @override
-  Future<DefaultOutput> run(
+  Future<List<DefaultOutput>> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     final response = await generationRepository.getCompletion(query);
     final parsedResponse = responseParser.parse(response);
-    return DefaultOutput(parsedResponse);
+    return [DefaultOutput(parsedResponse)];
   }
 }

@@ -17,11 +17,13 @@ import 'package:commanddash/steps/steps_utils.dart';
 abstract class Step {
   late StepType type;
   final Loader loader;
-  String? outputId;
+  List<String>? outputIds;
+  // List<Output> outputs;
   Step({
     required this.type,
     required this.loader,
-    required this.outputId,
+    required this.outputIds,
+    // required this.outputs,
   });
 
   factory Step.fromJson(Map<String, dynamic> json, Map<String, Input> inputs,
@@ -46,8 +48,9 @@ abstract class Step {
             json,
             (json['messages'] != null && inputs[json['messages']] != null)
                 ? ChatQueryInput.fromJson(
-                        inputs[json['messages']] as Map<String, dynamic>)
-                    .messages
+                            inputs[json['messages']] as Map<String, dynamic>)
+                        .messages ??
+                    []
                 : [],
             (json['query'] as String).replacePlaceholder(inputs, outputs));
       case 'replace_in_file':
@@ -76,7 +79,7 @@ abstract class Step {
     }
   }
 
-  Future<Output?> run(
+  Future<List<Output>?> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await taskAssist.processStep(kind: 'loader_update', args: loader.toJson());
