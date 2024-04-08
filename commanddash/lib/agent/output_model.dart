@@ -19,6 +19,8 @@ abstract class Output {
       return MultiCodeOutput();
     } else if (type == "match_document_output") {
       return DataSourceResultOutput();
+    } else if (type == "code_object") {
+      return CodeOutput();
     } else {
       throw UnimplementedError();
     }
@@ -124,5 +126,18 @@ class DataSourceResultOutput extends Output {
       "type": type.toString(),
       "value": value!.map((e) => e.toJson()).toList(),
     };
+  }
+}
+
+class CodeOutput extends Output {
+  String? code;
+  CodeOutput([this.code]) : super(OutputType.codeOutput);
+
+  @override
+  String toString() {
+    if (code == null) {
+      return "NA";
+    }
+    return code!;
   }
 }

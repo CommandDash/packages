@@ -51,7 +51,7 @@ void main() {
             "workspace_object_type": "all",
             "workspacePath":
                 "/Users/keval/Desktop/dev/welltested/projects/dart_files",
-            "output": "436621806"
+            "outputs": ["436621806"]
           }
         ]
       }
