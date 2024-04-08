@@ -15,6 +15,8 @@ class TaskHandler {
         .listen((TaskStartMessage message) async {
       final taskAssist = TaskAssist(_server, message.id);
       switch (message.taskKind) {
+        case 'random_task_global_error':
+          throw Exception('Some unhandled exception not tracked to a task.');
         case 'random_task_with_step':
           try {
             await randomFunctionWithStep(taskAssist);
