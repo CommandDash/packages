@@ -15,6 +15,9 @@ class TaskAssist {
         .whereType<StepResponseMessage>()
         .where((event) => event.id == _taskId)
         .first;
+    if (dataResponse.data['result'] == 'error') {
+      throw Exception(dataResponse.data['message']);
+    }
     return dataResponse.data;
   }
 

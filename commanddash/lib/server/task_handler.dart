@@ -49,17 +49,16 @@ class TaskHandler {
           ///Pass this to the agent.
           break;
         case 'agent-execute':
-          final handler = AgentHandler.fromJson(message.data);
-          handler.runTask(taskAssist);
+          try {
+            final handler = AgentHandler.fromJson(message.data);
+            await handler.runTask(taskAssist);
+          } catch (e, stackTrace) {
+            taskAssist.sendErrorMessage(
+                message: 'Error processing request: ${e.toString()}',
+                data: {},
+                stackTrace: stackTrace);
+          }
           break;
-        // case 'find_closest_files':
-        //   EmbeddingGenerator().findClosesResults(
-        //     taskAssist,
-        //     message.data['query'],
-        //     message.data['workspacePath'],
-        //     GeminiRepository(message.data['apiKey']),
-        //   );
-        // break;
         default:
           taskAssist.sendErrorMessage(message: 'INVALID_TASK_KIND', data: {});
       }

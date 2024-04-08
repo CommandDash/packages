@@ -50,37 +50,47 @@ class AgentHandler {
     );
   }
 
-  void runTask(TaskAssist taskAssist) async {
+  Future<void> runTask(TaskAssist taskAssist) async {
     DashRepository? dashRepository;
     if (githubAccessToken != null) {
       dashRepository = DashRepository.fromKeys(githubAccessToken!, taskAssist);
     }
     try {
       for (Map<String, dynamic> stepJson in steps) {
-        final step =
-            Step.fromJson(stepJson, inputs, outputs, agentName, agentVersion);
-        final output =
-            await step.run(taskAssist, generationRepository, dashRepository);
-        if (output != null &&
-            output is ContinueToNextStepOutput &&
-            !output.value) {
-          break;
-        }
-        if (step.outputId != null) {
-          if (output == null) {
-            taskAssist.sendErrorMessage(
-                message:
-                    'No output received from the step where output was expected.',
-                data: {});
-          } else {
-            outputs[step.outputId!] = output;
+        try {
+          final step =
+              Step.fromJson(stepJson, inputs, outputs, agentName, agentVersion);
+          final output =
+              await step.run(taskAssist, generationRepository, dashRepository);
+          if (output != null &&
+              output is ContinueToNextStepOutput &&
+              !output.value) {
+            break;
           }
+          if (step.outputId != null) {
+            if (output == null) {
+              taskAssist.sendErrorMessage(
+                  message:
+                      'No output received from the step where output was expected.',
+                  data: {});
+            } else {
+              outputs[step.outputId!] = output;
+            }
+          }
+        } catch (e, stackTrace) {
+          taskAssist.sendErrorMessage(
+              message:
+                  'Error processing step ${stepJson['type']}: ${e.toString()}',
+              data: {},
+              stackTrace: stackTrace);
         }
       }
-      taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: outputs);
+      taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: {});
     } catch (e, stackTrace) {
       taskAssist.sendErrorMessage(
-          message: e.toString(), data: {}, stackTrace: stackTrace);
+          message: 'Error processing request: ${e.toString()}',
+          data: {},
+          stackTrace: stackTrace);
     }
   }
 }
