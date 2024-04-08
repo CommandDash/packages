@@ -16,14 +16,14 @@ class SearchInSourceStep extends Step {
   final String agentVersion;
 
   SearchInSourceStep({
-    required String outputId,
+    required List<String> outputIds,
     required this.query,
     required this.dataSource,
     required this.agentName,
     required this.agentVersion,
     Loader loader = const MessageLoader('Searching in sources'),
   }) : super(
-          outputId: outputId,
+          outputIds: outputIds,
           type: StepType.promptQuery,
           loader: loader,
         );
@@ -35,7 +35,8 @@ class SearchInSourceStep extends Step {
     String agentVersion,
   ) {
     return SearchInSourceStep(
-      outputId: json['output'],
+      outputIds:
+          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
       query: query,
       agentName: agentName,
       agentVersion: agentVersion,
@@ -45,7 +46,7 @@ class SearchInSourceStep extends Step {
   }
 
   @override
-  Future<DataSourceResultOutput> run(
+  Future<List<DataSourceResultOutput>> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
@@ -53,10 +54,10 @@ class SearchInSourceStep extends Step {
       throw Exception('DashRepository is not provided');
     }
     final response = await dashRepository.getDatasource(
-      query: query,
-      agentName: agentName,
-      agentVersion: agentVersion,
-    );
-    return DataSourceResultOutput(response);
+        query: query,
+        agentName: agentName,
+        agentVersion: agentVersion,
+        datasources: dataSource);
+    return [DataSourceResultOutput(response)];
   }
 }

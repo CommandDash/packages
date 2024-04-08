@@ -84,8 +84,11 @@ class AgentValidation {
       Map<String, dynamic> step, List<String> registeredVariables) {
     final nonRegisteredPromptIds = _extractNonRegisteredVariablesInStep(
         step['prompt'], registeredVariables);
-    final nonRegisteredOutputIds = _extractNonRegisteredVariablesInStep(
-        step['outputs'], registeredVariables);
+    final stepOutputs = step['outputs'] as List<String>;
+    final nonRegisteredOutputIds = [
+      for (final output in stepOutputs)
+        ..._extractNonRegisteredVariablesInStep(output, registeredVariables)
+    ];
 
     if (nonRegisteredPromptIds.isNotEmpty &&
         nonRegisteredOutputIds.isNotEmpty) {
@@ -102,8 +105,11 @@ class AgentValidation {
       Map<String, dynamic> step, List<String> registeredVariables) {
     final nonRegisteredQueryIds = _extractNonRegisteredVariablesInStep(
         step['query'], registeredVariables);
-    final nonRegisteredOutputIds = _extractNonRegisteredVariablesInStep(
-        step['outputs'], registeredVariables);
+    final stepOutputs = step['outputs'] as List<String>;
+    final nonRegisteredOutputIds = [
+      for (final output in stepOutputs)
+        ..._extractNonRegisteredVariablesInStep(output, registeredVariables)
+    ];
 
     if (nonRegisteredQueryIds.isNotEmpty && nonRegisteredOutputIds.isNotEmpty) {
       return _invalidDashVariableMessage(['query', 'outputs']);
@@ -119,8 +125,11 @@ class AgentValidation {
       Map<String, dynamic> step, List<String> registeredVariables) {
     final nonRegisteredQueryIds = _extractNonRegisteredVariablesInStep(
         step['query'], registeredVariables);
-    final nonRegisteredOutputIds = _extractNonRegisteredVariablesInStep(
-        step['outputs'], registeredVariables);
+    final stepOutputs = step['outputs'] as List<String>;
+    final nonRegisteredOutputIds = [
+      for (final output in stepOutputs)
+        ..._extractNonRegisteredVariablesInStep(output, registeredVariables)
+    ];
 
     if (nonRegisteredQueryIds.isNotEmpty && nonRegisteredOutputIds.isNotEmpty) {
       return _invalidDashVariableMessage(['query', 'outputs']);

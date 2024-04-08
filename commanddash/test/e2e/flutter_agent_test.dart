@@ -1,8 +1,7 @@
-@Timeout(Duration(minutes: 3))
+@Timeout(Duration(minutes: 4))
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
@@ -68,14 +67,14 @@ void main() {
               {
                 "type": "search_in_sources",
                 "query": "<14340369>",
-                "output": "897806645",
+                "outputs": ["897806645"],
                 "data_sources": ["816647033"],
               },
               {
                 "type": "prompt_query",
                 "query":
                     "You are an Flutter expert who answers user's queries related to the framework. \n\n Please find the user query <Query> and relavant references <References> picked from the Flutter docs to assist you: \n\n Query: <14340369>, \nReferences: <897806645>. Please respond to the user's query!",
-                "output": "81443790",
+                "outputs": ["81443790"],
               },
               {
                 "type": "append_to_chat",

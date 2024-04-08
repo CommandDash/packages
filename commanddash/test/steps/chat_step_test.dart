@@ -1,11 +1,9 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
-import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
@@ -62,7 +60,7 @@ void main() {
                     "type": "chat",
                     "query": "<736841542>",
                     // "messages": "736841543",
-                    "output": "90611917",
+                    "outputs": ["90611917"],
                   },
                   {
                     "type": "append_to_chat",
@@ -142,7 +140,7 @@ void main() {
                     "type": "chat",
                     "query": "<736841542>",
                     "messages": "<736841543>",
-                    "output": "90611917",
+                    "outputs": ["90611917"],
                   },
                   {
                     "type": "append_to_chat",

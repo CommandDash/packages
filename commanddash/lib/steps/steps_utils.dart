@@ -15,7 +15,9 @@ enum OutputType {
   defaultOutput,
   multiCodeOutput,
   userChoiceOutput,
-  dataSourceOuput
+  dataSourceOuput,
+  codeOutput,
+  promptOutput,
 }
 
 extension ProcessedQueryExtension on String {

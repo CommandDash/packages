@@ -14,13 +14,13 @@ class SearchInWorkspaceStep extends Step {
       query; // QueryInput -> Find similar to [code] -> references from it -> embedding
 
   SearchInWorkspaceStep(
-      {required String outputId,
+      {required List<String> outputIds,
       required this.workspaceObjectType,
       required this.workspacePath,
       required this.query,
       Loader loader = const MessageLoader('Finding relevant files')})
       : super(
-            outputId: outputId,
+            outputIds: outputIds,
             type: StepType.searchInWorkspace,
             loader: loader);
 
@@ -29,7 +29,8 @@ class SearchInWorkspaceStep extends Step {
     String query,
   ) {
     return SearchInWorkspaceStep(
-      outputId: json['output'],
+      outputIds:
+          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
       workspaceObjectType: json['workspace_object_type'],
       workspacePath: json['workspacePath'],
       query: query,
@@ -37,7 +38,7 @@ class SearchInWorkspaceStep extends Step {
   }
 
   @override
-  Future<MultiCodeOutput?> run(
+  Future<List<MultiCodeOutput>?> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
@@ -59,6 +60,6 @@ class SearchInWorkspaceStep extends Step {
     //       "result": top3Files.map((e) => e.path).toList()
     //     });
 
-    return MultiCodeOutput(top3Files);
+    return [MultiCodeOutput(top3Files)];
   }
 }

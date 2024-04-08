@@ -58,7 +58,7 @@ class MatchDocumentStep extends Step {
       'type': 'search_in_sources',
       'query': query,
       'data_sources': [for (final dataSource in dataSources) '$dataSource'],
-      'outputs': '$dashOutputs',
+      'outputs': [for (final dashOutput in dashOutputs) '$dashOutput'],
       'version': version
     };
     return processedJson;
@@ -100,7 +100,7 @@ class WorkspaceQueryStep extends Step {
     final Map<String, dynamic> processedJson = {
       'type': 'search_in_workspace',
       'query': query,
-      'outputs': '$dashOutputs',
+      'outputs': [for (final dashOutput in dashOutputs) '$dashOutput'],
       'version': version
     };
     return processedJson;
@@ -159,7 +159,7 @@ class PromptQueryStep extends Step {
     final Map<String, dynamic> processedJson = {
       'type': 'prompt_query',
       'prompt': prompt,
-      'outputs': '$dashOutputs',
+      'outputs': [for (final dashOutput in dashOutputs) '$dashOutput'],
       'version': version
     };
 
@@ -170,7 +170,8 @@ class PromptQueryStep extends Step {
   String get version => '0.0.1';
 
   @override
-  List<DashOutput> get dashOutputs => [promptOutput, codeOutput].nonNulls.toList();
+  List<DashOutput> get dashOutputs =>
+      [promptOutput, codeOutput].nonNulls.toList();
 }
 
 /// Appends the value to the chat.

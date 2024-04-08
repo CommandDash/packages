@@ -17,18 +17,22 @@ void main() {
     setUp(() {
       taskAssist = MockTaskAssist();
       generationRepository = MockGenerationRepository();
-      step = AppendToChatStep(outputId: 'output-id', message: 'message');
+      step = AppendToChatStep(outputIds: ['output-id'], message: 'message');
     });
 
     test('constructor works correctly', () {
-      expect(step.outputId, 'output-id');
+      expect(step.outputIds, ['output-id']);
       expect(step.message, 'message');
     });
 
     test('fromJson works correctly', () {
-      final json = {'output': 'output-id', 'message': 'message'};
+      final json = {
+        'outputs': ['output-id'],
+        'value': 'message',
+      };
       final step = AppendToChatStep.fromJson(json, 'message');
-      expect(step.outputId, 'output-id');
+      expect(step.outputIds,
+          null); //Append to chat is not supposed to return any output
       expect(step.message, 'message');
     });
 

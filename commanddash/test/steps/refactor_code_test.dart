@@ -71,7 +71,7 @@ void main() {
             3. How do you plan to achieve that ? [Don't output code yet]
             4. Output the modified code to be be programatically replaced in the editor in place of the CURSOR_SELECTION.Since this is without human review, you need to output the precise CURSOR_SELECTION''',
                 "post_process": {"type": "code"},
-                "output": "436621806"
+                "outputs": ["436621806"]
               },
               {
                 "type": "replace_in_file",

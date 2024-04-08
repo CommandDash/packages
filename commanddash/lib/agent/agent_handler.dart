@@ -60,21 +60,23 @@ class AgentHandler {
         try {
           final step =
               Step.fromJson(stepJson, inputs, outputs, agentName, agentVersion);
-          final output =
-              await step.run(taskAssist, generationRepository, dashRepository);
-          if (output != null &&
-              output is ContinueToNextStepOutput &&
-              !output.value) {
-            break;
-          }
-          if (step.outputId != null) {
-            if (output == null) {
+          final results = await step.run(
+                  taskAssist, generationRepository, dashRepository) ??
+              [];
+          if (step.outputIds != null) {
+            if (results.isEmpty) {
               taskAssist.sendErrorMessage(
                   message:
                       'No output received from the step where output was expected.',
                   data: {});
-            } else {
-              outputs[step.outputId!] = output;
+            }
+            for (int i = 0; i < results.length; i++) {
+              final output = results[i];
+              if (output is ContinueToNextStepOutput && !output.value) {
+                break;
+              } else {
+                outputs[step.outputIds![i]] = output;
+              }
             }
           }
         } catch (e, stackTrace) {
