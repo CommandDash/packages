@@ -19,18 +19,30 @@ class TaskHandler {
           randomFunctionWithStep(taskAssist);
           break;
         case 'random_task_with_side_operation':
-          randomFunctionWithSideOperation(taskAssist);
+          try {
+            await randomFunctionWithSideOperation(taskAssist);
+          } catch (e, stackTrace) {
+            taskAssist.sendErrorMessage(
+                message: 'Error processing request: ${e.toString()}',
+                data: {},
+                stackTrace: stackTrace);
+          }
+
           break;
         case 'get-agents':
           final client = getClient(
               message.data['auth']['github_access_token'],
-              () async => taskAssist
-                  .processOperation(kind: 'refresh_access_token', args: {}));
+              () async => taskAssist.processOperation(
+                    kind: 'refresh_access_token',
+                    args: {},
+                  ));
           final repo = DashRepository(client);
           try {
             final agents = await repo.getAgents();
             taskAssist.sendResultMessage(
-                message: "Agent get successful", data: {"agents": agents});
+              message: "Agent get successful",
+              data: {"agents": agents},
+            );
           } catch (e, stackTrace) {
             taskAssist.sendErrorMessage(
                 message: "Failed getting agents.",
@@ -41,8 +53,10 @@ class TaskHandler {
         case 'refresh_token_test':
           final client = getClient(
               message.data['auth']['github_access_token'],
-              () async => taskAssist
-                  .processOperation(kind: 'refresh_access_token', args: {}));
+              () async => taskAssist.processOperation(
+                    kind: 'refresh_access_token',
+                    args: {},
+                  ));
           DashRepository(client);
 
           ///Other repositories using the backend client
@@ -81,6 +95,9 @@ Future<void> randomFunctionWithStep(TaskAssist taskAssist) async {
 
 /// Function for Integration Test of the side operation communication
 Future<void> randomFunctionWithSideOperation(TaskAssist taskAssist) async {
-  await taskAssist.processOperation(kind: 'operation_data_kind', args: {});
-  taskAssist.sendResultMessage(message: 'TASK_COMPLETED', data: {});
+  await taskAssist.processOperation(
+      kind: 'operation_data_kind', args: {}, timeoutKind: TimeoutKind.sync);
+  taskAssist.sendLogMessage(message: 'response received', data: {});
+  taskAssist
+      .sendResultMessage(message: 'TASK_COMPLETED', data: {'success': true});
 }
