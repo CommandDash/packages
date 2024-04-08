@@ -50,7 +50,7 @@ void main() {
             "type": "prompt_query",
             "query": "736841542",
             "post_process": {"type": "raw"},
-            "output": "90611917"
+            "outputs": ["90611917"]
           },
           {
             "type": "append_to_chat",

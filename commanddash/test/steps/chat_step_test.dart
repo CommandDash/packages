@@ -60,7 +60,7 @@ void main() {
                     "type": "chat",
                     "query": "<736841542>",
                     // "messages": "736841543",
-                    "output": "90611917",
+                    "outputs": ["90611917"],
                   },
                   {
                     "type": "append_to_chat",
@@ -140,7 +140,7 @@ void main() {
                     "type": "chat",
                     "query": "<736841542>",
                     "messages": "<736841543>",
-                    "output": "90611917",
+                    "outputs": ["90611917"],
                   },
                   {
                     "type": "append_to_chat",

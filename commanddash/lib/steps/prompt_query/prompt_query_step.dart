@@ -42,7 +42,7 @@ class PromptQueryStep extends Step {
             CodeExtractPromptResponseParser().parse(response);
         result.add(CodeOutput(parsedResponse));
       } else if (output is DefaultOutput) {
-        final parsedResponse = PromptOutputParser().parse(response);
+        final parsedResponse = RawPromptResponseParser().parse(response);
         result.add(DefaultOutput(parsedResponse));
       }
     }
