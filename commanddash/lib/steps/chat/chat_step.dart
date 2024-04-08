@@ -23,7 +23,8 @@ class ChatStep extends Step {
     String lastMessage,
   ) {
     return ChatStep(
-      outputIds: json['outputs'],
+      outputIds:
+          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
       messages: chatMessages,
       lastMessage: lastMessage,
     );

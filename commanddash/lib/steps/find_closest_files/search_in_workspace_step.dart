@@ -29,7 +29,8 @@ class SearchInWorkspaceStep extends Step {
     String query,
   ) {
     return SearchInWorkspaceStep(
-      outputIds: json['outputs'],
+      outputIds:
+          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
       workspaceObjectType: json['workspace_object_type'],
       workspacePath: json['workspacePath'],
       query: query,

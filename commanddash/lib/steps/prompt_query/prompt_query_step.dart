@@ -23,7 +23,8 @@ class PromptQueryStep extends Step {
     List<Output> outputs,
   ) {
     return PromptQueryStep(
-      outputIds: json['outputs'],
+      outputIds:
+          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
       outputs: outputs,
       query: query,
     );

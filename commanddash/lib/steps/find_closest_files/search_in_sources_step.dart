@@ -35,7 +35,8 @@ class SearchInSourceStep extends Step {
     String agentVersion,
   ) {
     return SearchInSourceStep(
-      outputIds: json['outputs'],
+      outputIds:
+          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
       query: query,
       agentName: agentName,
       agentVersion: agentVersion,
