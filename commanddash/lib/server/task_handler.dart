@@ -16,7 +16,14 @@ class TaskHandler {
       final taskAssist = TaskAssist(_server, message.id);
       switch (message.taskKind) {
         case 'random_task_with_step':
-          randomFunctionWithStep(taskAssist);
+          try {
+            await randomFunctionWithStep(taskAssist);
+          } catch (e, stackTrace) {
+            taskAssist.sendErrorMessage(
+                message: 'Error processing request: ${e.toString()}',
+                data: {},
+                stackTrace: stackTrace);
+          }
           break;
         case 'random_task_with_side_operation':
           try {
@@ -82,7 +89,8 @@ class TaskHandler {
 
 /// Function for Integration Test of the step communication
 Future<void> randomFunctionWithStep(TaskAssist taskAssist) async {
-  final data = await taskAssist.processStep(kind: 'step_data_kind', args: {});
+  final data = await taskAssist.processStep(
+      kind: 'step_data_kind', args: {}, timeoutKind: TimeoutKind.sync);
   if (data['value'] == 'unique_value') {
     taskAssist.sendResultMessage(message: 'TASK_COMPLETED', data: {});
   } else {

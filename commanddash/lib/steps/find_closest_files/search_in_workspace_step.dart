@@ -1,5 +1,3 @@
-import 'package:commanddash/agent/agent_exceptions.dart';
-import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
@@ -44,7 +42,8 @@ class SearchInWorkspaceStep extends Step {
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     final dartFiles = EmbeddingGenerator.getDartFiles(workspacePath);
-    final codeCacheHash = await taskAssist.processStep(kind: 'cache', args: {});
+    final codeCacheHash = await taskAssist.processStep(
+        kind: 'cache', args: {}, timeoutKind: TimeoutKind.sync);
     final filesToUpdate =
         EmbeddingGenerator.getFilesToUpdate(dartFiles, codeCacheHash);
     final embeddedFiles = await EmbeddingGenerator.updateEmbeddings(

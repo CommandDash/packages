@@ -26,7 +26,6 @@ abstract class Step {
 
   factory Step.fromJson(Map<String, dynamic> json, Map<String, Input> inputs,
       Map<String, Output> outputs, String agentName, String agentVersion) {
-    // TODO: handle parsing error
     switch (json['type']) {
       case 'search_in_workspace':
         return SearchInWorkspaceStep.fromJson(
@@ -79,7 +78,10 @@ abstract class Step {
   Future<Output?> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
-    await taskAssist.processStep(kind: 'loader_update', args: loader.toJson());
+    await taskAssist.processStep(
+        kind: 'loader_update',
+        args: loader.toJson(),
+        timeoutKind: TimeoutKind.sync);
     return null;
   }
 }

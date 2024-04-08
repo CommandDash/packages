@@ -34,7 +34,9 @@ void main() {
 
     test('run throws an exception if the response contains an error', () async {
       when(taskAssist.processStep(
-              kind: 'append_to_chat', args: {'message': 'message'}))
+              kind: 'append_to_chat',
+              args: {'message': 'message'},
+              timeoutKind: TimeoutKind.sync))
           .thenAnswer((_) async => {
                 'error': {'message': 'error message'}
               });
@@ -47,8 +49,10 @@ void main() {
     test('run returns null if the response does not contain an error',
         () async {
       when(taskAssist.processStep(
-          kind: 'append_to_chat',
-          args: {'message': 'message'})).thenAnswer((_) async => {});
+              kind: 'append_to_chat',
+              args: {'message': 'message'},
+              timeoutKind: TimeoutKind.sync))
+          .thenAnswer((_) async => {});
 
       expect(await step.run(taskAssist, generationRepository), isNull);
     });

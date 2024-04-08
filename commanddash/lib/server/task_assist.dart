@@ -32,13 +32,21 @@ class TaskAssist {
   final Server _server;
   final int _taskId;
 
-  Future<Map<String, dynamic>> processStep(
-      {required String kind, required Map<String, dynamic> args}) async {
+  /// [timeoutKind] should be suitably added depending upon what is expected from the operation
+  Future<Map<String, dynamic>> processStep({
+    required String kind,
+    required Map<String, dynamic> args,
+    required TimeoutKind timeoutKind,
+  }) async {
     _server.sendMessage(StepMessage(_taskId, kind: kind, args: args));
     final dataResponse = await _server.messagesStream
         .whereType<StepResponseMessage>()
         .where((event) => event.id == _taskId)
-        .first;
+        .first
+        .timeout(durationFromTimeoutKind(timeoutKind), onTimeout: () {
+      throw TimeoutException('Step timed out fetching $kind');
+    });
+
     if (dataResponse.data['result'] == 'error') {
       throw Exception(dataResponse.data['message']);
     }

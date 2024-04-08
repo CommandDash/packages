@@ -34,10 +34,12 @@ class ReplaceInFileStep extends Step {
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
-    final response =
-        await taskAssist.processStep(kind: 'replace_in_file', args: {
-      'file': file.getReplaceFileJson(newContent),
-    });
+    final response = await taskAssist.processStep(
+        kind: 'replace_in_file',
+        args: {
+          'file': file.getReplaceFileJson(newContent),
+        },
+        timeoutKind: TimeoutKind.stretched);
     final userChoice = response['value'] as bool;
     if (userChoice == false && continueIfDeclined == false) {
       return ContinueToNextStepOutput(false);
