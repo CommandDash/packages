@@ -12,7 +12,6 @@ void main() {
       '2': StringInput('1', 'Input2'),
     };
     final Map<String, Output> outputs = {};
-    final output = testString.replacePlaceholder(inputs, outputs);
 
     expect(testString.replacePlaceholder(inputs, outputs), 'Input1 and Input2');
   });

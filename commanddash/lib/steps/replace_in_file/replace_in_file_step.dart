@@ -1,7 +1,6 @@
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
-import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
@@ -23,12 +22,6 @@ class ReplaceInFileStep extends Step {
     Loader loader = const NoneLoader(),
   }) : super(
             outputIds: outputIds, type: StepType.replaceInFile, loader: loader);
-
-  @override
-  String get name => 'replace_in_file';
-
-  @override
-  String get description => 'Replace a string in a file';
 
   @override
   Future<List<Output>?> run(
