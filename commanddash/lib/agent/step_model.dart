@@ -42,7 +42,7 @@ abstract class Step {
         }).toList();
         return PromptQueryStep.fromJson(
           json,
-          (json['query'] as String).replacePlaceholder(inputs, outputs),
+          (json['prompt'] as String).replacePlaceholder(inputs, outputs),
           outputsList,
         );
       case 'append_to_chat':
