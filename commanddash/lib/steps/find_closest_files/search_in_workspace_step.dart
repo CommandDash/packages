@@ -43,7 +43,8 @@ class SearchInWorkspaceStep extends Step {
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     final dartFiles = EmbeddingGenerator.getDartFiles(workspacePath);
-    final codeCacheHash = await taskAssist.processStep(kind: 'cache', args: {});
+    final codeCacheHash = await taskAssist.processStep(
+        kind: 'cache', args: {}, timeoutKind: TimeoutKind.sync);
     final filesToUpdate =
         EmbeddingGenerator.getFilesToUpdate(dartFiles, codeCacheHash);
     final embeddedFiles = await EmbeddingGenerator.updateEmbeddings(
