@@ -33,8 +33,7 @@ abstract class Step {
           (json['query'] as String).replacePlaceholder(inputs, outputs),
         );
       case 'prompt_query':
-        final outputsList =
-            ((json['outputs'] ?? <String>[]) as List<String>).map((e) {
+        final outputsList = (json['outputs'] as List<dynamic>).map((e) {
           if (!outputs.containsKey(e)) {
             throw Exception("Output with outputId $e is not registered");
           }
@@ -42,7 +41,7 @@ abstract class Step {
         }).toList();
         return PromptQueryStep.fromJson(
           json,
-          (json['query'] as String).replacePlaceholder(inputs, outputs),
+          (json['prompt'] as String).replacePlaceholder(inputs, outputs),
           outputsList,
         );
       case 'append_to_chat':
