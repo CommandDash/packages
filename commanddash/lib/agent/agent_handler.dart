@@ -50,39 +50,49 @@ class AgentHandler {
     );
   }
 
-  void runTask(TaskAssist taskAssist) async {
+  Future<void> runTask(TaskAssist taskAssist) async {
     DashRepository? dashRepository;
     if (githubAccessToken != null) {
       dashRepository = DashRepository.fromKeys(githubAccessToken!, taskAssist);
     }
     try {
       for (Map<String, dynamic> stepJson in steps) {
-        final step =
-            Step.fromJson(stepJson, inputs, outputs, agentName, agentVersion);
-        final results =
-            await step.run(taskAssist, generationRepository, dashRepository) ??
-                [];
-        if (step.outputIds != null) {
-          if (results.isEmpty) {
-            taskAssist.sendErrorMessage(
-                message:
-                    'No output received from the step where output was expected.',
-                data: {});
-          }
-          for (int i = 0; i < results.length; i++) {
-            final output = results[i];
-            if (output is ContinueToNextStepOutput && !output.value) {
-              break;
-            } else {
-              outputs[step.outputIds![i]] = output;
+        try {
+          final step =
+              Step.fromJson(stepJson, inputs, outputs, agentName, agentVersion);
+          final results = await step.run(
+                  taskAssist, generationRepository, dashRepository) ??
+              [];
+          if (step.outputIds != null) {
+            if (results.isEmpty) {
+              taskAssist.sendErrorMessage(
+                  message:
+                      'No output received from the step where output was expected.',
+                  data: {});
+            }
+            for (int i = 0; i < results.length; i++) {
+              final output = results[i];
+              if (output is ContinueToNextStepOutput && !output.value) {
+                break;
+              } else {
+                outputs[step.outputIds![i]] = output;
+              }
             }
           }
+        } catch (e, stackTrace) {
+          taskAssist.sendErrorMessage(
+              message:
+                  'Error processing step ${stepJson['type']}: ${e.toString()}',
+              data: {},
+              stackTrace: stackTrace);
         }
       }
-      taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: outputs);
+      taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: {});
     } catch (e, stackTrace) {
       taskAssist.sendErrorMessage(
-          message: e.toString(), data: {}, stackTrace: stackTrace);
+          message: 'Error processing request: ${e.toString()}',
+          data: {},
+          stackTrace: stackTrace);
     }
   }
 }

@@ -30,8 +30,10 @@ class AppendToChatStep extends Step {
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
-    final response = await taskAssist
-        .processStep(kind: 'append_to_chat', args: {'message': message});
+    final response = await taskAssist.processStep(
+        kind: 'append_to_chat',
+        args: {'message': message},
+        timeoutKind: TimeoutKind.sync);
     if (response['error'] != null) {
       throw Exception(response['error']['message']);
     }
