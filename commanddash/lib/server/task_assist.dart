@@ -31,6 +31,12 @@ class TaskAssist {
   TaskAssist(this._server, this._taskId);
   final Server _server;
   final int _taskId;
+  bool _taskKilled =
+      false; // Do not allow to send result/error messages if already sent once.
+
+  _markTaskAsKilled() {
+    _taskKilled = true;
+  }
 
   /// [timeoutKind] should be suitably added depending upon what is expected from the operation
   Future<Map<String, dynamic>> processStep({
@@ -41,7 +47,7 @@ class TaskAssist {
     _server.sendMessage(StepMessage(_taskId, kind: kind, args: args));
     final dataResponse = await _server.messagesStream
         .whereType<StepResponseMessage>()
-        .where((event) => event.id == _taskId)
+        .where((event) => event.id == _taskId && event.kind == kind)
         .first
         .timeout(durationFromTimeoutKind(timeoutKind), onTimeout: () {
       throw TimeoutException('Step timed out fetching $kind');
@@ -55,16 +61,20 @@ class TaskAssist {
 
   void sendResultMessage(
       {required String message, required Map<String, dynamic> data}) {
+    if (_taskKilled) return;
     _server.sendMessage(ResultMessage(_taskId, message: message, data: data));
+    _markTaskAsKilled();
   }
 
   void sendErrorMessage(
       {required message,
       required Map<String, dynamic> data,
       StackTrace? stackTrace}) {
+    if (_taskKilled) return;
     _server.sendMessage(ErrorMessage(_taskId,
         message: message,
         data: data..addAll({'stack_trace': stackTrace?.toString()})));
+    _markTaskAsKilled();
   }
 
   /// Only use for debugging purposes. Clients can print the log on their end.

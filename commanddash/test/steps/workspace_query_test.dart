@@ -51,13 +51,11 @@ void main() {
             "type": "search_in_workspace",
             "query": "<422243666>",
             "workspace_object_type": "all",
-            "workspacePath":
-                "/Users/keval/Desktop/dev/welltested/projects/dart_files",
             "outputs": ["436621806"]
           },
           {
             "type": "prompt_query",
-            "query":
+            "prompt":
                 "Here are the related references from user's project:\n <436621806>. Answer the user's query. Query: <736841542>",
             "post_process": {"type": "raw"},
             "outputs": ["90611917"]
@@ -80,6 +78,14 @@ void main() {
     expect(result.args['message'], 'Finding relevant files');
     messageStreamController
         .add(StepResponseMessage(1, 'loader_update', data: {}));
+
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'workspace_details');
+    expect(result.args, {});
+    messageStreamController.add(StepResponseMessage(1, 'workspace_details',
+        data: {'path': EnvReader.get('OPEN_WORKSPACE_PATH')}));
     result = await queue.next;
 
     expect(result, isA<StepMessage>());
@@ -88,7 +94,7 @@ void main() {
     expect(result.args, {});
 
     messageStreamController
-        .add(StepResponseMessage(1, 'cache_response', data: {'value': '{}'}));
+        .add(StepResponseMessage(1, 'cache', data: {'value': '{}'}));
 
     result = await queue.next;
     expect(result, isA<StepMessage>());
