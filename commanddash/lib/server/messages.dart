@@ -33,36 +33,6 @@ class IncomingMessage extends Equatable {
   List<Object?> get props => [id];
 }
 
-class GenerationTask extends TaskStartMessage {
-  final String apiKey;
-
-  GenerationTask(int id,
-      {required String taskKind,
-      required Map<String, dynamic> data,
-      required this.apiKey})
-      : super(id, taskKind: taskKind, data: data);
-}
-
-class ClosestFileTask extends GenerationTask {
-  final String query;
-  final String workspacePath;
-
-  ClosestFileTask(
-      {required int id,
-      required this.query,
-      required this.workspacePath,
-      required Map<String, dynamic> data})
-      : super(id, taskKind: 'find-closest-files', data: data, apiKey: '');
-
-  factory ClosestFileTask.fromJson(int id, Map<String, dynamic> json) {
-    return ClosestFileTask(
-        id: id,
-        query: json['query'],
-        workspacePath: json['workspacePath'],
-        data: json['data']);
-  }
-}
-
 class TaskStartMessage extends IncomingMessage {
   final String taskKind; // agent-execute
   final Map<String, dynamic> data;
