@@ -56,14 +56,19 @@ class CodeInput extends Input {
 
   CodeInput({
     required String id,
-    required this.filePath,
-    required this.range,
-    required this.content,
+    this.filePath,
+    this.range,
+    this.content,
     this.generateFullString = false,
-    required this.fileContent,
+    this.fileContent,
   }) : super(id, 'code_input');
 
   factory CodeInput.fromJson(Map<String, dynamic> json) {
+    if (json['value'] == null) {
+      return CodeInput(
+        id: json['id'],
+      );
+    }
     final value = jsonDecode(json['value']);
     return CodeInput(
       id: json['id'],
@@ -101,11 +106,7 @@ class CodeInput extends Input {
     if (content == null) {
       return 'NA';
     }
-    String finalString = content!;
-    if (generateFullString) {
-      finalString = getCodeWithCursorSelection();
-    }
-    return 'filepath:$filePath\n\n$finalString';
+    return 'filepath:$filePath\n\n$content';
   }
 
   Map<String, dynamic> getReplaceFileJson(String newContent) {

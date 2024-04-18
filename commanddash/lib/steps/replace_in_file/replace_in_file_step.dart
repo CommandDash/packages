@@ -47,8 +47,6 @@ class ReplaceInFileStep extends Step {
     String newContent,
   ) {
     return ReplaceInFileStep(
-      outputIds:
-          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
       file: file,
       newContent: newContent,
       continueIfDeclined: json['continue_if_declined'],
