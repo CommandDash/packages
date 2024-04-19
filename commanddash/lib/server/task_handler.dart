@@ -15,49 +15,73 @@ class TaskHandler {
         .listen((TaskStartMessage message) async {
       final taskAssist = TaskAssist(_server, message.id);
       switch (message.taskKind) {
+        case 'random_task_global_error':
+          throw Exception('Some unhandled exception not tracked to a task.');
         case 'random_task_with_step':
-          randomFunctionWithStep(taskAssist);
+          try {
+            await randomFunctionWithStep(taskAssist);
+          } catch (e, stackTrace) {
+            taskAssist.sendErrorMessage(
+                message: 'Error processing request: ${e.toString()}',
+                data: {},
+                stackTrace: stackTrace);
+          }
           break;
         case 'random_task_with_side_operation':
-          randomFunctionWithSideOperation(taskAssist);
+          try {
+            await randomFunctionWithSideOperation(taskAssist);
+          } catch (e, stackTrace) {
+            taskAssist.sendErrorMessage(
+                message: 'Error processing request: ${e.toString()}',
+                data: {},
+                stackTrace: stackTrace);
+          }
+
           break;
         case 'get-agents':
           final client = getClient(
               message.data['auth']['github_access_token'],
-              () async => taskAssist
-                  .processOperation(kind: 'refresh_access_token', args: {}));
+              () async => taskAssist.processOperation(
+                    kind: 'refresh_access_token',
+                    args: {},
+                  ));
           final repo = DashRepository(client);
           try {
             final agents = await repo.getAgents();
             taskAssist.sendResultMessage(
-                message: "Agent get successful", data: {"agents": agents});
-          } catch (e) {
-            taskAssist
-                .sendErrorMessage(message: "Failed getting agents.", data: {});
+              message: "Agent get successful",
+              data: {"agents": agents},
+            );
+          } catch (e, stackTrace) {
+            taskAssist.sendErrorMessage(
+                message: "Failed getting agents.",
+                data: {},
+                stackTrace: stackTrace);
           }
           break;
         case 'refresh_token_test':
           final client = getClient(
               message.data['auth']['github_access_token'],
-              () async => taskAssist
-                  .processOperation(kind: 'refresh_access_token', args: {}));
+              () async => taskAssist.processOperation(
+                    kind: 'refresh_access_token',
+                    args: {},
+                  ));
           DashRepository(client);
 
           ///Other repositories using the backend client
           ///Pass this to the agent.
           break;
         case 'agent-execute':
-          final handler = AgentHandler.fromJson(message.data);
-          handler.runTask(taskAssist);
+          try {
+            final handler = AgentHandler.fromJson(message.data);
+            await handler.runTask(taskAssist);
+          } catch (e, stackTrace) {
+            taskAssist.sendErrorMessage(
+                message: 'Error processing request: ${e.toString()}',
+                data: {},
+                stackTrace: stackTrace);
+          }
           break;
-        // case 'find_closest_files':
-        //   EmbeddingGenerator().findClosesResults(
-        //     taskAssist,
-        //     message.data['query'],
-        //     message.data['workspacePath'],
-        //     GeminiRepository(message.data['apiKey']),
-        //   );
-        // break;
         default:
           taskAssist.sendErrorMessage(message: 'INVALID_TASK_KIND', data: {});
       }
@@ -67,16 +91,23 @@ class TaskHandler {
 
 /// Function for Integration Test of the step communication
 Future<void> randomFunctionWithStep(TaskAssist taskAssist) async {
-  final data = await taskAssist.processStep(kind: 'step_data_kind', args: {});
+  final data = await taskAssist.processStep(
+      kind: 'step_data_kind', args: {}, timeoutKind: TimeoutKind.sync);
   if (data['value'] == 'unique_value') {
     taskAssist.sendResultMessage(message: 'TASK_COMPLETED', data: {});
   } else {
-    taskAssist.sendErrorMessage(message: 'TASK_FAILED', data: {});
+    taskAssist.sendErrorMessage(
+      message: 'TASK_FAILED',
+      data: {},
+    );
   }
 }
 
 /// Function for Integration Test of the side operation communication
 Future<void> randomFunctionWithSideOperation(TaskAssist taskAssist) async {
-  await taskAssist.processOperation(kind: 'operation_data_kind', args: {});
-  taskAssist.sendResultMessage(message: 'TASK_COMPLETED', data: {});
+  await taskAssist.processOperation(
+      kind: 'operation_data_kind', args: {}, timeoutKind: TimeoutKind.sync);
+  taskAssist.sendLogMessage(message: 'response received', data: {});
+  taskAssist
+      .sendResultMessage(message: 'TASK_COMPLETED', data: {'success': true});
 }

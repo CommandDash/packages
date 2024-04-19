@@ -1,14 +1,11 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
-import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import '../steps/chat_test.mocks.dart';
 import '../test_utils.dart';
 
 void main() {
@@ -25,6 +22,7 @@ void main() {
     server.stdout = outwrapper;
     handler = TaskHandler(server);
   });
+
   group(
     'chat request',
     () {
@@ -41,7 +39,7 @@ void main() {
                   "key": EnvReader.get('GEMINI_KEY'),
                   "githubToken": ""
                 },
-                "inputs": [
+                "registered_inputs": [
                   {"id": "736841542", "type": "string_input", "value": "Hello"},
                   // {
                   //   "id": "736841543",
@@ -54,7 +52,7 @@ void main() {
                   //   ],
                   // }
                 ],
-                "outputs": [
+                "registered_outputs": [
                   {"id": "90611917", "type": "default_output"}
                 ],
                 "steps": [
@@ -62,11 +60,11 @@ void main() {
                     "type": "chat",
                     "query": "<736841542>",
                     // "messages": "736841543",
-                    "output": "90611917",
+                    "outputs": ["90611917"],
                   },
                   {
                     "type": "append_to_chat",
-                    "message": "<90611917>",
+                    "value": "<90611917>",
                     "post_process": {"type": "raw"},
                   }
                 ]
@@ -105,7 +103,6 @@ void main() {
         expect(result, isA<ResultMessage>());
         expect(result.id, 1);
         expect((result as ResultMessage).message, 'TASK_COMPLETE');
-        expect(result.data, {});
       }, timeout: Timeout(Duration(minutes: 1)));
 
       test('chat with history', () async {
@@ -121,7 +118,7 @@ void main() {
                   "key": EnvReader.get('GEMINI_KEY'),
                   "githubToken": ""
                 },
-                "inputs": [
+                "registered_inputs": [
                   {
                     "id": "736841542",
                     "type": "string_input",
@@ -135,7 +132,7 @@ void main() {
                         "[\n                      {\n                        \"role\": \"user\",\n                        \"message\":\n                            \"I am researching about AI in medical field.\"\n                      },\n                      {\n                        \"role\": \"agent\",\n                        \"message\": \"That is a good topic to research on.\"\n                      }\n                    ]"
                   }
                 ],
-                "outputs": [
+                "registered_outputs": [
                   {"id": "90611917", "type": "default_output"}
                 ],
                 "steps": [
@@ -143,11 +140,11 @@ void main() {
                     "type": "chat",
                     "query": "<736841542>",
                     "messages": "<736841543>",
-                    "output": "90611917",
+                    "outputs": ["90611917"],
                   },
                   {
                     "type": "append_to_chat",
-                    "message": "<90611917>",
+                    "value": "<90611917>",
                     "post_process": {"type": "raw"},
                   }
                 ]
@@ -186,7 +183,6 @@ void main() {
         expect(result, isA<ResultMessage>());
         expect(result.id, 1);
         expect((result as ResultMessage).message, 'TASK_COMPLETE');
-        expect(result.data, {});
       });
     },
   );

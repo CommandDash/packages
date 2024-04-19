@@ -4,7 +4,7 @@ import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
-import '../steps/chat_test.mocks.dart';
+import '../embedding_generator_test.mocks.dart';
 
 @GenerateMocks([GenerationRepository])
 void main() {

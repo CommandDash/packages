@@ -9,32 +9,44 @@ import 'package:commanddash/steps/steps_utils.dart';
 
 class PromptQueryStep extends Step {
   final String query;
-  final PromptResponseParser responseParser;
+  final List<Output> outputs;
   PromptQueryStep(
-      {required String outputId,
+      {required List<String>? outputIds,
+      required this.outputs,
       required this.query,
-      required this.responseParser,
       Loader loader = const MessageLoader('Preparing Result')})
-      : super(outputId: outputId, type: StepType.promptQuery, loader: loader);
+      : super(outputIds: outputIds, type: StepType.promptQuery, loader: loader);
 
   factory PromptQueryStep.fromJson(
     Map<String, dynamic> json,
     String query,
+    List<Output> outputs,
   ) {
     return PromptQueryStep(
-      outputId: json['output'],
+      outputIds:
+          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
+      outputs: outputs,
       query: query,
-      responseParser: PromptResponseParser.fromJson(json['post_process']),
     );
   }
 
   @override
-  Future<DefaultOutput> run(
+  Future<List<Output>> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     final response = await generationRepository.getCompletion(query);
-    final parsedResponse = responseParser.parse(response);
-    return DefaultOutput(parsedResponse);
+    final result = <Output>[];
+    for (Output output in outputs) {
+      if (output is CodeOutput) {
+        final parsedResponse =
+            CodeExtractPromptResponseParser().parse(response);
+        result.add(CodeOutput(parsedResponse));
+      } else if (output is DefaultOutput) {
+        final parsedResponse = RawPromptResponseParser().parse(response);
+        result.add(DefaultOutput(parsedResponse));
+      }
+    }
+    return result;
   }
 }

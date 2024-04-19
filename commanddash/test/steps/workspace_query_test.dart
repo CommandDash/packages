@@ -35,14 +35,14 @@ void main() {
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
         },
-        "inputs": [
+        "registered_inputs": [
           {
             "id": "736841542",
             "type": "string_input",
             "value": "Where is the themeing of the app?"
           }
         ],
-        "outputs": [
+        "registered_outputs": [
           {"id": "436621806", "type": "default_output"},
           {"id": "90611917", "type": "default_output"}
         ],
@@ -51,20 +51,18 @@ void main() {
             "type": "search_in_workspace",
             "query": "<422243666>",
             "workspace_object_type": "all",
-            "workspacePath":
-                "/Users/keval/Desktop/dev/welltested/projects/dart_files",
-            "output": "436621806"
+            "outputs": ["436621806"]
           },
           {
             "type": "prompt_query",
-            "query":
+            "prompt":
                 "Here are the related references from user's project:\n <436621806>. Answer the user's query. Query: <736841542>",
             "post_process": {"type": "raw"},
-            "output": "90611917"
+            "outputs": ["90611917"]
           },
           {
             "type": "append_to_chat",
-            "message": "<90611917>",
+            "value": "<90611917>",
             "post_process": {"type": "raw"},
           }
         ]
@@ -75,18 +73,56 @@ void main() {
     var result = await queue.next;
     expect(result, isA<StepMessage>());
     expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'message');
+    expect(result.args['message'], 'Finding relevant files');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'workspace_details');
+    expect(result.args, {});
+    messageStreamController.add(StepResponseMessage(1, 'workspace_details',
+        data: {'path': EnvReader.get('OPEN_WORKSPACE_PATH')}));
+    result = await queue.next;
+
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
     expect((result as StepMessage).kind, 'cache');
     expect(result.args, {});
 
     messageStreamController
-        .add(StepResponseMessage(1, 'cache_response', data: {'value': '{}'}));
+        .add(StepResponseMessage(1, 'cache', data: {'value': '{}'}));
 
     result = await queue.next;
-
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'message');
+    expect(result.args['message'], 'Preparing Result');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'none');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'append_to_chat');
+    expect(result.args.containsKey('message'), true);
+    expect(result.args['message'], isA<String>());
+    messageStreamController.add(
+        StepResponseMessage(1, 'append_to_chat', data: {'result': 'success'}));
+    result = await queue.next;
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
     expect((result as ResultMessage).message, isNotEmpty);
-    expect(result.data, {});
-  });
+  }, timeout: Timeout(Duration(minutes: 3)));
 }

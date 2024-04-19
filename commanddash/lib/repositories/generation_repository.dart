@@ -6,8 +6,8 @@ part 'generation_exceptions.dart';
 //Can be implemented to provide generations.
 abstract class GenerationRepository {
   Future<String> getCompletion(String message);
-  Future<String> getChatCompletion(List<ChatMessage> messages,
-      String lastMessage); // TODO: add proper params here
+  Future<String> getChatCompletion(
+      List<ChatMessage> messages, String lastMessage);
   // Generates embeddings for the given [code]. This should be using a tasktype of retrievalDocument.
   Future getCodeEmbeddings(String code);
   Future<List<List<double>>> getCodeBatchEmbeddings(List<String> code);

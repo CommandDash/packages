@@ -10,28 +10,30 @@ class AppendToChatStep extends Step {
   final String message;
 
   AppendToChatStep({
-    String? outputId,
+    List<String>? outputIds,
     required this.message,
     Loader loader = const NoneLoader(),
-  }) : super(outputId: outputId, type: StepType.appendToChat, loader: loader);
+  }) : super(outputIds: outputIds, type: StepType.appendToChat, loader: loader);
 
   factory AppendToChatStep.fromJson(
     Map<String, dynamic> json,
     String message,
   ) {
     return AppendToChatStep(
-      outputId: null,
+      outputIds: null,
       message: message,
     );
   }
 
   @override
-  Future<Output?> run(
+  Future<List<Output>?> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
-    final response = await taskAssist
-        .processStep(kind: 'append_to_chat', args: {'message': message});
+    final response = await taskAssist.processStep(
+        kind: 'append_to_chat',
+        args: {'message': message},
+        timeoutKind: TimeoutKind.sync);
     if (response['error'] != null) {
       throw Exception(response['error']['message']);
     }

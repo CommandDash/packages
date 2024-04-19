@@ -17,24 +17,30 @@ void main() {
     setUp(() {
       taskAssist = MockTaskAssist();
       generationRepository = MockGenerationRepository();
-      step = AppendToChatStep(outputId: 'output-id', message: 'message');
+      step = AppendToChatStep(outputIds: ['output-id'], message: 'message');
     });
 
     test('constructor works correctly', () {
-      expect(step.outputId, 'output-id');
+      expect(step.outputIds, ['output-id']);
       expect(step.message, 'message');
     });
 
     test('fromJson works correctly', () {
-      final json = {'output': 'output-id', 'message': 'message'};
+      final json = {
+        'outputs': ['output-id'],
+        'value': 'message',
+      };
       final step = AppendToChatStep.fromJson(json, 'message');
-      expect(step.outputId, 'output-id');
+      expect(step.outputIds,
+          null); //Append to chat is not supposed to return any output
       expect(step.message, 'message');
     });
 
     test('run throws an exception if the response contains an error', () async {
       when(taskAssist.processStep(
-              kind: 'append_to_chat', args: {'message': 'message'}))
+              kind: 'append_to_chat',
+              args: {'message': 'message'},
+              timeoutKind: TimeoutKind.sync))
           .thenAnswer((_) async => {
                 'error': {'message': 'error message'}
               });
@@ -47,8 +53,10 @@ void main() {
     test('run returns null if the response does not contain an error',
         () async {
       when(taskAssist.processStep(
-          kind: 'append_to_chat',
-          args: {'message': 'message'})).thenAnswer((_) async => {});
+              kind: 'append_to_chat',
+              args: {'message': 'message'},
+              timeoutKind: TimeoutKind.sync))
+          .thenAnswer((_) async => {});
 
       expect(await step.run(taskAssist, generationRepository), isNull);
     });

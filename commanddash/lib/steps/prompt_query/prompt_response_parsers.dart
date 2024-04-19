@@ -13,6 +13,14 @@ abstract class PromptResponseParser {
   }
 }
 
+class PromptOutputParser implements PromptResponseParser {
+  @override
+  String parse(String response) {
+    RegExp exp = RegExp(r"```([\s\S]*?)```");
+    return response.replaceAll(exp, '').trim();
+  }
+}
+
 class RawPromptResponseParser implements PromptResponseParser {
   @override
   String parse(String response) {
@@ -23,16 +31,22 @@ class RawPromptResponseParser implements PromptResponseParser {
 class CodeExtractPromptResponseParser implements PromptResponseParser {
   @override
   String parse(String response) {
-    //  extract code from response within ``` and ```
-    final start = response.indexOf('```');
-    final end = response.lastIndexOf('```');
-    if (start == -1 || end == -1) {
-      throw Exception('Invalid response');
+    RegExp exp = RegExp(r"```([\s\S]*?)```");
+    Iterable<Match> matches = exp.allMatches(response);
+    if (matches.isEmpty) {
+      return '';
     }
-    final code = response.substring(start + 3, end);
-    if (code.isEmpty) {
-      throw Exception('No code found in response');
-    }
-    return code;
+    final match = matches.last;
+    String block = match.group(1) ?? "";
+    // Remove language tags
+    String cleanedBlock = block.replaceAllMapped(
+        RegExp(r"^(python|dart|ts|code|javascript|java)\s*:\s*",
+            caseSensitive: false),
+        (match) => "");
+    cleanedBlock = cleanedBlock.replaceAllMapped(
+        RegExp(r"^(python|dart|ts|code|javascript|java)\s*\s*",
+            caseSensitive: false),
+        (match) => "");
+    return cleanedBlock;
   }
 }

@@ -8,8 +8,8 @@ class DataSource {
   factory DataSource.fromJson(Map<String, dynamic> json) {
     return DataSource(
       content: json['content'],
-      publisher: json['publisher'],
-      id: json['pk'],
+      // publisher: json['publisher'],
+      id: json['pebble_id'],
     );
   }
 

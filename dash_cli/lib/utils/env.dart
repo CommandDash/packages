@@ -8,11 +8,11 @@ import 'logger.dart';
 import 'version.dart';
 
 /// Environment variables for the CLI.
-class WelltestedEnv {
-  WelltestedEnv._();
+class DashCliEnv {
+  DashCliEnv._();
 
   /// Singleton instance of the class.
-  static final WelltestedEnv instance = WelltestedEnv._();
+  static final DashCliEnv instance = DashCliEnv._();
 
   /// Version of the CLI.
   final String dashCliVersion = version;
@@ -28,7 +28,7 @@ class WelltestedEnv {
     String? home = Platform.isWindows
         ? Platform.environment['APPDATA']
         : Platform.environment['HOME'];
-    return p.join(home!, '.config', '.welltested');
+    return p.join(home!, '.config', '.dash_cli');
   }
 
   /// Get the Config environment variables.
@@ -55,8 +55,7 @@ class WelltestedEnv {
   void load() {
     File file = configFile;
     if (!file.existsSync()) {
-      wtLog.warning('Config file not found. Creating one for you.');
-      file.createSync(recursive: true);
+      return;
     }
     _env = Config.fromJson(_verify(file));
   }
@@ -68,7 +67,8 @@ class WelltestedEnv {
     try {
       if (configFile.existsSync()) {
         String data = configFile.readAsStringSync();
-        Map<String, dynamic> map = json.decode(data.isEmpty ? '{}' : data) as Map<String, dynamic>;
+        Map<String, dynamic> map =
+            json.decode(data.isEmpty ? '{}' : data) as Map<String, dynamic>;
         map.addAll(<String, dynamic>{key: value});
         configFile.writeAsStringSync(json.encode(map));
       } else {

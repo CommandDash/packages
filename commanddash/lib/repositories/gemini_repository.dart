@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -42,7 +40,7 @@ class GeminiRepository implements GenerationRepository {
             .retrievalDocument, //TODO: let's later think if we can improve this in a general way and make a single API for both string and code.
       );
       return result.embedding.values;
-    } on InvalidApiKey catch (e) {
+    } on InvalidApiKey {
       throw InvalidApiKeyException();
     } on ServerException catch (e) {
       throw ModelException(e.message);
@@ -108,7 +106,7 @@ class GeminiRepository implements GenerationRepository {
         taskType: TaskType.retrievalQuery,
       );
       return result.embedding.values;
-    } on InvalidApiKey catch (e) {
+    } on InvalidApiKey {
       throw InvalidApiKeyException();
     } on ServerException catch (e) {
       throw ModelException(e.message);

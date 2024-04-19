@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-
 import 'package:http/http.dart';
+import 'package:interact/interact.dart';
 
+import '../repository/user_repository.dart';
 import '../utils/consts.dart';
 import '../utils/env.dart';
 import '../utils/helpers.dart';
@@ -11,15 +12,19 @@ import 'api.dart';
 
 /// Auth class to handle authentication
 class Auth {
+  static final _userRepository = UserRepository();
+
   /// Check if user is authenticated
-  static Future<bool> get isAuthenticated async {
-    bool tokenExists = WelltestedEnv.instance.env.authToken != null &&
-        WelltestedEnv.instance.env.authToken!.isNotEmpty;
+  static Future<AuthStatus> get isAuthenticated async {
+    bool tokenExists = DashCliEnv.instance.env.authToken != null &&
+        DashCliEnv.instance.env.authToken!.isNotEmpty;
     if (tokenExists) {
-      bool tokenExpired = WelltestedEnv.instance.env.isAuthTokenExpired;
-      return !tokenExpired;
+      bool tokenExpired = DashCliEnv.instance.env.isAuthTokenExpired;
+      return tokenExpired
+          ? AuthStatus.authenticationExpired
+          : AuthStatus.authenticated;
     }
-    return false;
+    return AuthStatus.notAuthenticated;
   }
 
   /// Logout the user
@@ -28,10 +33,10 @@ class Auth {
   /// Refresh the auth token
   static Future<bool> refreshToken() async {
     try {
-      bool tokenExpired = WelltestedEnv.instance.env.isAuthTokenExpired;
+      bool tokenExpired = DashCliEnv.instance.env.isAuthTokenExpired;
       if (!tokenExpired) return true;
       wtLog.info('Refreshing token...');
-      if (WelltestedEnv.instance.env.isRefreshTokenExpired) {
+      if (DashCliEnv.instance.env.isRefreshTokenExpired) {
         wtLog.error('Session expired. Please login again');
         logout();
         return false;
@@ -40,14 +45,14 @@ class Auth {
         Uri.https(CliConstants.baseUrl, CliConstants.refreshTokenPath),
         headers: <String, String>{
           HttpHeaders.authorizationHeader:
-              'Bearer ${WelltestedEnv.instance.env.refreshToken}'
+              'Bearer ${DashCliEnv.instance.env.refreshToken}'
         },
       );
       if (res.statusCode >= 200 && res.statusCode < 300) {
         Map<String, dynamic> data =
             json.decode(res.body) as Map<String, dynamic>;
-        WelltestedEnv.addNew('access_token', data['access_token']);
-        WelltestedEnv.instance.env.authToken = data['access_token'];
+        DashCliEnv.addNew('access_token', data['access_token']);
+        DashCliEnv.instance.env.authToken = data['access_token'];
         wtLog.log('Token refreshed successfully');
         return true;
       }
@@ -64,8 +69,7 @@ class Auth {
       required Function(String) onFailure}) async {
     Uri? url = await getLoginUrl(onSuccess: onSuccess, onFailure: onFailure);
     if (url != null) {
-      await createServer(url.toString());
-      wtLog.stopSpinner();
+      await createServer(url.toString(), _updateAuthData);
       wtLog.updateSpinnerMessage('Logged-in successfully!');
     } else {
       wtLog.stopSpinner();
@@ -95,10 +99,10 @@ class Auth {
   /// Delete the credentials
   static bool deleteCredentials() {
     try {
-      File file = WelltestedEnv.configFile;
+      File file = DashCliEnv.configFile;
       if (file.existsSync()) {
-        file.writeAsStringSync('', mode: FileMode.write, encoding: utf8);
-        WelltestedEnv.instance.env
+        file.deleteSync();
+        DashCliEnv.instance.env
           ..authToken = null
           ..refreshToken = null
           ..username = null
@@ -110,5 +114,45 @@ class Auth {
     } catch (e) {
       rethrow;
     }
+  }
+
+  /// Update the accessToken(local cache), refreshToken (local cache), email(commanddash backend)
+  static Future<void> _updateAuthData(
+      {required String? accessToken,
+      required String? refreshToken,
+      required String? emailFound}) async {
+    if (accessToken != null) {
+      DashCliEnv.addNew('access_token', accessToken);
+    }
+    if (refreshToken != null) {
+      DashCliEnv.addNew('refresh_token', refreshToken);
+    }
+    // if (emailFound == null || emailFound == 'False') {
+    //   final email = _promptForMailId();
+    //   await _userRepository.updateEmail(email);
+    // }
+
+    wtLog.stopSpinner(
+        message: accessToken == null
+            ? 'Failed to Authorize'
+            : 'Authorization successful!',
+        severity: accessToken == null
+            ? MessageSeverity.error
+            : MessageSeverity.success);
+  }
+
+  static String _promptForMailId() {
+    final email = Input(
+      prompt:
+          'Unable to Fetch mail id from GitHub. Please provide your mail id manually:',
+      validator: (String x) {
+        // Regular expression pattern for a valid email address
+        final emailRegex = RegExp(
+          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+        );
+        return emailRegex.hasMatch(x);
+      },
+    ).interact();
+    return email;
   }
 }

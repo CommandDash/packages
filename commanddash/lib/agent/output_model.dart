@@ -12,8 +12,15 @@ abstract class Output {
     final type = json['type'];
     if (type == 'default_output') {
       return DefaultOutput();
+    } else if (type == 'prompt_output') {
+      // TODO: handle code ouput and raw output
+      return DefaultOutput();
     } else if (type == "multi_code_output") {
       return MultiCodeOutput();
+    } else if (type == "match_document_output") {
+      return DataSourceResultOutput();
+    } else if (type == "code_object") {
+      return CodeOutput();
     } else {
       throw UnimplementedError();
     }
@@ -94,20 +101,43 @@ class ContinueToNextStepOutput extends Output {
 }
 
 class DataSourceResultOutput extends Output {
-  DataSource value;
+  List<DataSource>? value;
 
-  DataSourceResultOutput(this.value) : super(OutputType.userChoiceOutput);
+  DataSourceResultOutput([this.value]) : super(OutputType.dataSourceOuput);
 
   @override
   String toString() {
-    return value.content.toString();
+    if (value == null) {
+      throw Exception("DataSource value not assigned");
+    }
+    String result = "";
+    for (DataSource ds in value!) {
+      result += "${ds.content}\n";
+    }
+    return result;
   }
 
   @override
   Map<String, dynamic> toJson() {
+    if (value == null) {
+      throw Exception("DataSource value not assigned");
+    }
     return {
       "type": type.toString(),
-      "value": value.toJson(),
+      "value": value!.map((e) => e.toJson()).toList(),
     };
+  }
+}
+
+class CodeOutput extends Output {
+  String? code;
+  CodeOutput([this.code]) : super(OutputType.codeOutput);
+
+  @override
+  String toString() {
+    if (code == null) {
+      return "NA";
+    }
+    return code!;
   }
 }

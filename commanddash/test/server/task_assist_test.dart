@@ -1,13 +1,16 @@
 import 'dart:async';
 
+import 'package:async/async.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/operation_message.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_assist.dart';
+import 'package:commanddash/server/task_handler.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
+import '../test_utils.dart';
 import 'task_assist_test.mocks.dart';
 
 @GenerateMocks([Server])
@@ -67,4 +70,50 @@ void main() {
       },
     );
   }, timeout: Timeout(Duration(milliseconds: 100)));
+
+  group('Task Assist E2E Tests', () {
+    late Server server;
+    late TaskHandler handler;
+    late StreamController<IncomingMessage> messageStreamController;
+    late TestOutWrapper outwrapper;
+    setUp(() async {
+      await EnvReader.load();
+      server = Server();
+      messageStreamController = StreamController.broadcast();
+      outwrapper = TestOutWrapper();
+      server.replaceMessageStreamController(messageStreamController);
+      server.stdout = outwrapper;
+      handler = TaskHandler(server);
+    });
+    test('Flutter agent', () async {
+      handler.initProcessing();
+
+      messageStreamController.add(
+        IncomingMessage.fromJson({
+          "method": "task_start",
+          "params": {
+            "kind": "random_task_with_side_operation",
+            "data": <String, dynamic>{}
+          },
+          "id": 1
+        }),
+      );
+
+      final queue =
+          StreamQueue<OutgoingMessage>(outwrapper.outputStream.stream);
+      var result = await queue.next;
+      expect(result, isA<OperationMessage>());
+      expect(result.id, -1);
+      expect((result as OperationMessage).kind, 'operation_data_kind');
+
+      messageStreamController.add(IncomingMessage.fromJson({
+        "method": "operation_response",
+        "kind": "operation_data_kind",
+        "data": {"result": "success", "value": "unique_value"}
+      }));
+      result = await queue.next;
+      expect(result, isA<ResultMessage>());
+      expect(result.id, 1);
+    });
+  });
 }

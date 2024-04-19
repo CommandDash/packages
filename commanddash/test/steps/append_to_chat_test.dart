@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:async/async.dart';
 import 'package:commanddash/server/messages.dart';
@@ -35,7 +34,7 @@ void main() {
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
         },
-        "inputs": [
+        "registered_inputs": [
           {
             "id": "736841542",
             "type": "string_input",
@@ -43,7 +42,7 @@ void main() {
                 "Where do you think AI is heading in the field of programming? Give a short answer."
           }
         ],
-        "outputs": [
+        "registered_outputs": [
           {"id": "90611917", "type": "default_output"}
         ],
         "steps": [
@@ -51,11 +50,11 @@ void main() {
             "type": "prompt_query",
             "query": "736841542",
             "post_process": {"type": "raw"},
-            "output": "90611917"
+            "outputs": ["90611917"]
           },
           {
             "type": "append_to_chat",
-            "message": "<90611917>",
+            "value": "<90611917>",
             "post_process": {"type": "raw"},
           }
         ]
@@ -91,6 +90,5 @@ void main() {
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect(result.data, {});
   }, timeout: Timeout(Duration(minutes: 1)));
 }

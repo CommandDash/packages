@@ -1,8 +1,6 @@
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
-import 'package:commanddash/models/chat_message.dart';
-import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
@@ -17,39 +15,46 @@ import 'package:commanddash/steps/steps_utils.dart';
 abstract class Step {
   late StepType type;
   final Loader loader;
-  String? outputId;
+  List<String>? outputIds;
+  // List<Output> outputs;
   Step({
     required this.type,
     required this.loader,
-    required this.outputId,
+    required this.outputIds,
+    // required this.outputs,
   });
 
   factory Step.fromJson(Map<String, dynamic> json, Map<String, Input> inputs,
       Map<String, Output> outputs, String agentName, String agentVersion) {
-    // TODO: handle parsing error
     switch (json['type']) {
-      case 'search_in_sources':
-      // return SearchInSourceStep.fromJson(json);
       case 'search_in_workspace':
         return SearchInWorkspaceStep.fromJson(
           json,
           (json['query'] as String).replacePlaceholder(inputs, outputs),
         );
       case 'prompt_query':
+        final outputsList = (json['outputs'] as List<dynamic>).map((e) {
+          if (!outputs.containsKey(e)) {
+            throw Exception("Output with outputId $e is not registered");
+          }
+          return outputs[e]!;
+        }).toList();
         return PromptQueryStep.fromJson(
           json,
-          (json['query'] as String).replacePlaceholder(inputs, outputs),
+          (json['prompt'] as String).replacePlaceholder(inputs, outputs),
+          outputsList,
         );
       case 'append_to_chat':
         return AppendToChatStep.fromJson(json,
-            (json['message'] as String).replacePlaceholder(inputs, outputs));
+            (json['value'] as String).replacePlaceholder(inputs, outputs));
       case 'chat':
         return ChatStep.fromJson(
             json,
             (json['messages'] != null && inputs[json['messages']] != null)
                 ? ChatQueryInput.fromJson(
-                        inputs[json['messages']] as Map<String, dynamic>)
-                    .messages
+                            inputs[json['messages']] as Map<String, dynamic>)
+                        .messages ??
+                    []
                 : [],
             (json['query'] as String).replacePlaceholder(inputs, outputs));
       case 'replace_in_file':
@@ -78,10 +83,13 @@ abstract class Step {
     }
   }
 
-  Future<Output?> run(
+  Future<List<Output>?> run(
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
-    await taskAssist.processStep(kind: 'loader_update', args: loader.toJson());
+    await taskAssist.processStep(
+        kind: 'loader_update',
+        args: loader.toJson(),
+        timeoutKind: TimeoutKind.sync);
     return null;
   }
 }
