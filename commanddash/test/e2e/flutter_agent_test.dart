@@ -33,7 +33,7 @@ void main() {
           "id": 1,
           "version": "1.0.0",
           'params': {
-            "authdetails": {
+            "auth_details": {
               "type": "gemini",
               "key": EnvReader.get('GEMINI_KEY'),
               "githubToken": "authtoken",

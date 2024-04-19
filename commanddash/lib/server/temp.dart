@@ -8,7 +8,7 @@
 //     {"id": "436621806", "type": "multi_code_object"},
 //     {"id": "90611917", "type": "default_output"}
 //   ],
-//   "authdetails": {
+//   "auth_details": {
 //     "type": "gemini" | "dash",
 //     "key": "aisjoaisj",
 //     "githubToken": "",
