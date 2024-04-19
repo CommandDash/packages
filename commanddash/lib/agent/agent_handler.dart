@@ -45,8 +45,8 @@ class AgentHandler {
       steps: steps,
       generationRepository: generationRepository,
       githubAccessToken: json['authdetails']['githubToken'],
-      agentName: json['agent_name'],
-      agentVersion: json['agent_version'],
+      agentName: json['name'] ?? '',
+      agentVersion: json['version'] ?? '',
     );
   }
 

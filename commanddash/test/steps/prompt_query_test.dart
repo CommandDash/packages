@@ -162,13 +162,12 @@ void main() {
             {
               "id": "736841542",
               "type": "string_input",
-              "value":
-                  "Where do you think AI is heading in the field of programming? Give a one line answer."
+              "value": "Explain this code"
             },
             {
               "id": "736841543",
               "type": "string_input",
-              "value": null,
+              // "value": null,
             }
           ],
           "registered_outputs": [
@@ -177,7 +176,7 @@ void main() {
           "steps": [
             {
               "type": "prompt_query",
-              "query": "<736841542>. Extra info: <736841543>",
+              "prompt": "<736841542>. Extra info: <736841543>",
               "post_process": {"type": "raw"},
               "outputs": ["90611917"]
             },

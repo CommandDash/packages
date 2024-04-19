@@ -43,6 +43,7 @@ abstract class Step {
           json,
           (json['prompt'] as String).replacePlaceholder(inputs, outputs),
           outputsList,
+          inputs.values.toList(),
         );
       case 'append_to_chat':
         return AppendToChatStep.fromJson(json,
