@@ -34,7 +34,7 @@ void main() {
           'params': {
             "agent_name": "",
             "agent_version": "1.0.0",
-            "authdetails": {
+            "auth_details": {
               "type": "gemini",
               "key": EnvReader.get('GEMINI_KEY'),
               "githubToken": ""

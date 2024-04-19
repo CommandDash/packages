@@ -37,14 +37,14 @@ class AgentHandler {
         (json['steps'] as List).cast<Map<String, dynamic>>();
 
     final GenerationRepository generationRepository =
-        GenerationRepository.fromJson(json['authdetails']);
+        GenerationRepository.fromJson(json['auth_details']);
 
     return AgentHandler(
       inputs: inputs,
       outputs: outputs,
       steps: steps,
       generationRepository: generationRepository,
-      githubAccessToken: json['authdetails']['githubToken'],
+      githubAccessToken: json['auth_details']['github_token'],
       agentName: json['agent_name'],
       agentVersion: json['agent_version'],
     );
