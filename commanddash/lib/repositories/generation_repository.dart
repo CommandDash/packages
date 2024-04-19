@@ -10,7 +10,8 @@ abstract class GenerationRepository {
       List<ChatMessage> messages, String lastMessage);
   // Generates embeddings for the given [code]. This should be using a tasktype of retrievalDocument.
   Future getCodeEmbeddings(String code);
-  Future<List<List<double>>> getCodeBatchEmbeddings(List<String> code);
+  Future<List<List<double>>> getCodeBatchEmbeddings(
+      List<Map<String, dynamic>> code);
   // Generates embeddings for the given [value]. This should be using a tasktype of retrievalQuery.
   Future getStringEmbeddings(String value);
   Future<List<List<double>>> getStringBatchEmbeddings(List<String> value);

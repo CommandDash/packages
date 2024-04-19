@@ -34,6 +34,7 @@ class GeminiRepository implements GenerationRepository {
     try {
       final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey);
       final content = Content.text(value);
+
       final result = await model.embedContent(
         content,
         taskType: TaskType
@@ -54,34 +55,16 @@ class GeminiRepository implements GenerationRepository {
   }
 
   @override
-  Future<List<List<double>>> getCodeBatchEmbeddings(List<String> code) async {
+  Future<List<List<double>>> getCodeBatchEmbeddings(
+      List<Map<String, dynamic>> code) async {
     try {
-      final response = await HttpApiClient(apiKey: apiKey).makeRequest(
-          Uri.https('generativelanguage.googleapis.com').resolveUri(Uri(
-              pathSegments: [
-                'v1',
-                'models',
-                'embedding-001:batchEmbedContents'
-              ])),
-          {
-            'requests': code
-                .map((e) => <String, Object?>{
-                      'model': 'models/embedding-001',
-                      'content': Content.text(e).toJson(),
-                      'taskType': TaskType.retrievalDocument.toJson(),
-                    })
-                .toList()
-          });
-      try {
-        return (response['embeddings'] as List)
-            .map((e) => List<double>.from(e['values']))
-            .toList();
-      } catch (e) {
-        if (response.containsKey('error')) {
-          throw parseError(response['error']!);
-        }
-        rethrow;
-      }
+      final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey);
+      final embedRequest = code
+          .map((value) => EmbedContentRequest(Content.text(value['content']),
+              title: value['title'], taskType: TaskType.retrievalDocument))
+          .toList();
+      final response = await model.batchEmbedContents(embedRequest);
+      return response.embeddings.map((e) => e.values).toList();
     } on InvalidApiKey catch (_) {
       //Note: this exeception are not thrown anyway by the embedAPIs
       throw InvalidApiKeyException();
@@ -122,6 +105,7 @@ class GeminiRepository implements GenerationRepository {
   @override
   Future<List<List<double>>> getStringBatchEmbeddings(
       List<String> values) async {
+    //TODO: update to batch embed
     try {
       final response = await HttpApiClient(apiKey: apiKey).makeRequest(
           Uri.https('generativelanguage.googleapis.com').resolveUri(Uri(

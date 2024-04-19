@@ -43,7 +43,9 @@ class EmbeddingGenerator {
 
     // Use the batches API to update the embeddings
     final embeddings = await Future.wait(batches.map((batch) async {
-      final code = batch.map((file) => file.content!).toList();
+      final code = batch
+          .map((file) => {'content': file.content!, 'title': file.path})
+          .toList();
       final embeddings =
           await generationRepository.getCodeBatchEmbeddings(code);
       return embeddings;
