@@ -29,6 +29,8 @@ void main() {
       "method": "agent-execute",
       "id": 1,
       "params": {
+        "agent_name": "",
+        "agent_version": "1.0.0",
         "authdetails": {
           "type": "gemini",
           "key": EnvReader.get('GEMINI_KEY'),
@@ -48,7 +50,7 @@ void main() {
         "steps": [
           {
             "type": "prompt_query",
-            "query": "736841542",
+            "prompt": "736841542",
             "post_process": {"type": "raw"},
             "outputs": ["90611917"]
           },
