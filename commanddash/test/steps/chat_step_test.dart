@@ -34,6 +34,8 @@ void main() {
               "method": "agent-execute",
               "id": 1,
               "params": {
+                "agent_name": "",
+                "agent_version": "1.0.0",
                 "auth_details": {
                   "type": "gemini",
                   "key": EnvReader.get('GEMINI_KEY'),
@@ -113,6 +115,8 @@ void main() {
               "method": "agent-execute",
               "id": 1,
               "params": {
+                "agent_name": "",
+                "agent_version": "1.0.0",
                 "auth_details": {
                   "type": "gemini",
                   "key": EnvReader.get('GEMINI_KEY'),

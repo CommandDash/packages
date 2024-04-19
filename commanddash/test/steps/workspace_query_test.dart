@@ -30,6 +30,8 @@ void main() {
       "method": "agent-execute",
       "id": 1,
       "params": {
+        "agent_name": "workspace",
+        "agent_version": "1.0.0",
         "auth_details": {
           "type": "gemini",
           "key": EnvReader.get('GEMINI_KEY'),
@@ -123,6 +125,5 @@ void main() {
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect((result as ResultMessage).message, isNotEmpty);
   }, timeout: Timeout(Duration(minutes: 3)));
 }
