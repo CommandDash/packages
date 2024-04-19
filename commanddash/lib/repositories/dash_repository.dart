@@ -37,7 +37,7 @@ class DashRepository {
           "query": query,
           "version": agentVersion,
           "matching_doc_data_source_ids": datasources.map((e) => e.id).toList(),
-          "testing": true,
+          "testing": false,
         },
       );
       return List<Map<String, dynamic>>.from(response.data['data']).map((e) {
@@ -52,7 +52,7 @@ class DashRepository {
   Future<List<Map<String, dynamic>>> getAgents() async {
     try {
       final response = await dio.post('/agent/get-general-agents', data: {
-        "testing": true,
+        "testing": false,
         "min_cli_version": "1.0.0",
       });
       return response.data;

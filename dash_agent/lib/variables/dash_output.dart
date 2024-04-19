@@ -26,7 +26,7 @@ class MultiCodeObject extends DashOutput {
   Future<Map<String, dynamic>> process() async {
     return {
       'id': hashCode.toString(),
-      'type': 'multi_code_object',
+      'type': 'multi_code_output',
       'version': version
     };
   }
@@ -52,7 +52,7 @@ class CodeOutput extends DashOutput {
   Future<Map<String, dynamic>> process() async {
     return {
       'id': hashCode.toString(),
-      'type': 'code_object',
+      'type': 'code_output',
       'version': version
     };
   }
