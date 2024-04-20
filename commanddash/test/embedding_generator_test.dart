@@ -22,8 +22,9 @@ void main() {
             content: 'content of file $i');
       });
 
-      when(mockGenerationRepository
-              .getCodeBatchEmbeddings(files.map((e) => e.content!).toList()))
+      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+              .map((file) => {'content': file.content!, 'title': file.path})
+              .toList()))
           .thenAnswer((_) async =>
               files.map((e) => getMockEmbeddingForString(e.content!)).toList());
 
@@ -41,14 +42,18 @@ void main() {
             content: 'content of file $i');
       });
 
-      when(mockGenerationRepository.getCodeBatchEmbeddings(
-              files.sublist(0, 100).map((e) => e.content!).toList()))
+      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+              .sublist(0, 100)
+              .map((file) => {'content': file.content!, 'title': file.path})
+              .toList()))
           .thenAnswer((_) async => files
               .sublist(0, 100)
               .map((e) => getMockEmbeddingForString(e.content!))
               .toList());
-      when(mockGenerationRepository.getCodeBatchEmbeddings(
-              files.sublist(100).map((e) => e.content!).toList()))
+      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+              .sublist(100)
+              .map((file) => {'content': file.content!, 'title': file.path})
+              .toList()))
           .thenAnswer((_) async => files
               .sublist(100)
               .map((e) => getMockEmbeddingForString(e.content!))
@@ -68,20 +73,26 @@ void main() {
             content: 'content of file $i');
       });
 
-      when(mockGenerationRepository.getCodeBatchEmbeddings(
-              files.sublist(0, 100).map((e) => e.content!).toList()))
+      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+              .sublist(0, 100)
+              .map((file) => {'content': file.content!, 'title': file.path})
+              .toList()))
           .thenAnswer((_) async => files
               .sublist(0, 100)
               .map((e) => getMockEmbeddingForString(e.content!))
               .toList());
-      when(mockGenerationRepository.getCodeBatchEmbeddings(
-              files.sublist(100, 200).map((e) => e.content!).toList()))
+      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+              .sublist(100, 200)
+              .map((file) => {'content': file.content!, 'title': file.path})
+              .toList()))
           .thenAnswer((_) async => files
               .sublist(100, 200)
               .map((e) => getMockEmbeddingForString(e.content!))
               .toList());
-      when(mockGenerationRepository.getCodeBatchEmbeddings(
-              files.sublist(200).map((e) => e.content!).toList()))
+      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+              .sublist(200)
+              .map((file) => {'content': file.content!, 'title': file.path})
+              .toList()))
           .thenAnswer((_) async => files
               .sublist(200)
               .map((e) => getMockEmbeddingForString(e.content!))
