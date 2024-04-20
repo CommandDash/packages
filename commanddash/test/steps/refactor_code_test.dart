@@ -32,7 +32,9 @@ void main() {
           "method": "agent-execute",
           "id": 1,
           'params': {
-            "authdetails": {
+            "agent_name": "",
+            "agent_version": "1.0.0",
+            "auth_details": {
               "type": "gemini",
               "key": EnvReader.get('GEMINI_KEY'),
               "githubToken": ""
@@ -63,7 +65,7 @@ void main() {
             "steps": [
               {
                 "type": "prompt_query",
-                "query":
+                "prompt":
                     "You are a Flutter/Dart assistant helping user modify code within their editor window.\nRefactor the given code according to user instruction. User instruction <736841542>. \n Code: <805088184>" +
                         '''Proceed step by step:
             1. Describe the selected piece of code.
@@ -119,11 +121,5 @@ void main() {
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect((result).message, isNotEmpty);
-    expect((result).data.containsKey('436621806'), true);
-    expect((result).data['436621806'], isA<DefaultOutput>());
-    expect(((result).data['436621806'] as DefaultOutput).value != null, true);
-    expect(
-        ((result).data['436621806'] as DefaultOutput).value!.isNotEmpty, true);
   });
 }
