@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:commanddash/utils/embedding_utils.dart';
@@ -25,6 +26,17 @@ class WorkspaceFile {
       "codeHash": codeHash,
       "embedding": embedding,
       "range": range?.toJson(),
+    };
+  }
+
+  Map<String, Map<String, dynamic>> getCacheMap() {
+    return {
+      path: {
+        "codeHash": codeHash,
+        "embedding": {
+          "values": embedding?.map((e) => e.toString()).toList(),
+        },
+      }
     };
   }
 
