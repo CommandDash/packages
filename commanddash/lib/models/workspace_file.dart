@@ -11,9 +11,13 @@ class WorkspaceFile {
   Range? range;
 
   WorkspaceFile.fromPaths(this.path) {
-    content = File(path).readAsStringSync();
-    if (File(path).existsSync() && content != null) {
-      codeHash = computeCodeHash(content!);
+    try {
+      content = File(path).readAsStringSync();
+      if (File(path).existsSync() && content != null) {
+        codeHash = computeCodeHash(content!);
+      }
+    } catch (e) {
+      content = '';
     }
   }
 

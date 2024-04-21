@@ -14,8 +14,10 @@ class EmbeddingGenerator {
         .where((file) {
       return !RegExp(excludePattern).hasMatch(file.path);
     }).toList();
-    final fileContents =
-        dartFiles.map((file) => WorkspaceFile.fromPaths(file.path)).toList();
+    final fileContents = dartFiles.map((file) {
+      return WorkspaceFile.fromPaths(file.path);
+    }).toList();
+    fileContents.removeWhere((element) => (element.content ?? '').isEmpty);
     return fileContents;
   }
 
