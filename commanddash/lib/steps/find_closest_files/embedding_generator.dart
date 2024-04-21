@@ -14,8 +14,10 @@ class EmbeddingGenerator {
         .where((file) {
       return !RegExp(excludePattern).hasMatch(file.path);
     }).toList();
-    final fileContents =
-        dartFiles.map((file) => WorkspaceFile.fromPaths(file.path)).toList();
+    final fileContents = dartFiles.map((file) {
+      return WorkspaceFile.fromPaths(file.path);
+    }).toList();
+    fileContents.removeWhere((element) => (element.content ?? '').isEmpty);
     return fileContents;
   }
 
@@ -26,7 +28,7 @@ class EmbeddingGenerator {
       if (cacheEntry == null) {
         return true; // File not in cache, update required
       }
-      return cacheEntry['codehash'] != element.codeHash;
+      return cacheEntry['codeHash'] != element.codeHash;
     }).toList();
     return filesToUpdate;
   }
