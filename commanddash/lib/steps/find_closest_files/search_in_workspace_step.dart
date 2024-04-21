@@ -5,6 +5,7 @@ import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/find_closest_files/embedding_generator.dart';
 import 'package:commanddash/steps/steps_utils.dart';
@@ -50,31 +51,42 @@ class SearchInWorkspaceStep extends Step {
       throw Exception("No open workspace found");
     }
     final dartFiles = EmbeddingGenerator.getDartFiles(workspacePath);
-    final codeCacheHash = await taskAssist.processStep(
-        kind: 'cache',
-        args: {},
-        timeoutKind: TimeoutKind
-            .stretched); // TODO: cahnge to sync (streched is to avoid timout while debug)
-    taskAssist.sendLogMessage(message: "cache", data: codeCacheHash);
+    final codeCacheHash = jsonDecode((await taskAssist.processStep(
+        kind: 'cache', args: {}, timeoutKind: TimeoutKind.sync))['value']);
     final filesToUpdate =
         EmbeddingGenerator.getFilesToUpdate(dartFiles, codeCacheHash);
-    taskAssist.sendLogMessage(message: "files-to-update", data: {
-      "files": jsonEncode(filesToUpdate.map((e) => e.toJson()).toList()),
-    }); // TODO: remove when prod
+
     final embeddedFiles = await EmbeddingGenerator.updateEmbeddings(
         filesToUpdate, generationRepository);
+
     final queryEmbeddings =
         await EmbeddingGenerator.getQueryEmbedding(query, generationRepository);
-    final storeCache = await taskAssist.processOperation(
+
+    taskAssist.processStep(
         kind: "update_cache",
         args: {
           "embeddings":
               json.encode(embeddedFiles.map((e) => e.getCacheMap()).toList()),
         },
-        timeoutKind: TimeoutKind
-            .stretched); // TODO: cahnge to sync (streched is to avoid timout while debug)
+        timeoutKind: TimeoutKind.stretched);
+
+    // This logic is include the newly generated embeddings in the embedding matching
+    for (var file in dartFiles) {
+      var newEmbeddings =
+          embeddedFiles.where((element) => element.path == file.path);
+      if (newEmbeddings.isNotEmpty) {
+        file.embedding = newEmbeddings.first.embedding;
+      } else {
+        file.embedding =
+            ((codeCacheHash[file.path]['embedding']['values']) as List)
+                .map<double>((dynamic value) => double.parse(value))
+                .toList();
+      }
+    }
+
     final top3Files = EmbeddingGenerator.getTop3NearestFiles(
-        embeddedFiles, queryEmbeddings, generationRepository);
+        dartFiles, queryEmbeddings, generationRepository);
+
     return [MultiCodeOutput(top3Files)];
   }
 }
