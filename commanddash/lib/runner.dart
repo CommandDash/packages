@@ -32,7 +32,7 @@ class VersionCommand extends Command {
 
   @override
   void run() {
-    print('0.0.1');
+    print('0.0.2');
   }
 }
 
