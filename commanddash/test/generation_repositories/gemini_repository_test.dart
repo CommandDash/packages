@@ -30,13 +30,16 @@ void main() {
       expect(
           () async => await geminiRepository.getCodeEmbeddings(testString),
           throwsA(isA<
-              UnknownException>())); // SDK gives format exception for incorrect key
+              InvalidApiKeyException>())); // SDK gives format exception for incorrect key
     });
 
     test('getCodeBatchEmbeddings [custom api implementation]', () async {
       final geminiRepository = GeminiRepository(apiKey!);
       final result = await geminiRepository.getCodeBatchEmbeddings(
-        ['Hello', 'World'],
+        [
+          {'content': 'Hello', 'title': 'Hello'},
+          {'content': 'World', 'title': 'World'}
+        ],
       );
       expect(result, isA<List<List<double>>>());
     });
@@ -45,14 +48,20 @@ void main() {
       final geminiRepository = GeminiRepository('AIzaSyCGXM9N6U9LkUoNou4KX-');
       expect(
           () async => await geminiRepository.getCodeBatchEmbeddings(
-                ['Hello', 'World'],
+                [
+                  {'content': 'Hello', 'title': 'Hello'},
+                  {'content': 'World', 'title': 'World'}
+                ],
               ),
           throwsA(isA<InvalidApiKeyException>()));
     });
     test('getStringBatchEmbeddings [custom api implementation]', () async {
       final geminiRepository = GeminiRepository(apiKey!);
       final result = await geminiRepository.getCodeBatchEmbeddings(
-        ['Hello', 'World'],
+        [
+          {'content': 'Hello', 'title': 'Hello'},
+          {'content': 'World', 'title': 'World'}
+        ],
       );
       expect(result, isA<List<List<double>>>());
     });
@@ -61,7 +70,10 @@ void main() {
       final geminiRepository = GeminiRepository('AIzaSyCGXM9N6U9LkUoNou4KX-');
       expect(
           () async => await geminiRepository.getCodeBatchEmbeddings(
-                ['Hello', 'World'],
+                [
+                  {'content': 'Hello', 'title': 'Hello'},
+                  {'content': 'World', 'title': 'World'}
+                ],
               ),
           throwsA(isA<InvalidApiKeyException>()));
     });

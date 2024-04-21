@@ -50,3 +50,11 @@ class StdOutWrapper implements OutWrapper {
 abstract class OutWrapper {
   void writeOutgoingMessage(OutgoingMessage message);
 }
+
+/// Use this method to print logs on the IDE when debugging
+///
+/// The benefit is that it does not require [TaskAssist]. Do not ship with [sendDebugMessage] active in code.
+sendDebugMessage(Map<String, dynamic> data) {
+  print(jsonEncode(
+      {'id': 'independent', 'method': 'debug_message', 'params': data}));
+}
