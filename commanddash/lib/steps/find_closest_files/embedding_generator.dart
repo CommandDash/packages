@@ -69,8 +69,8 @@ class EmbeddingGenerator {
           calculateCosineSimilarity(queryEmbeddings, a.embedding!);
       final distanceB =
           calculateCosineSimilarity(queryEmbeddings, b.embedding!);
-      return distanceA.compareTo(distanceB);
+      return distanceB.compareTo(distanceA);
     }));
-    return files;
+    return files.sublist(0, 3);
   }
 }
