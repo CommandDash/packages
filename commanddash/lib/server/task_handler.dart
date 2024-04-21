@@ -9,34 +9,25 @@ import 'package:rxdart/rxdart.dart';
 class TaskHandler {
   TaskHandler(this._server);
   final Server _server;
+
   void initProcessing() {
     _server.messagesStream
         .whereType<TaskStartMessage>()
-        .listen((TaskStartMessage message) async {
-      final taskAssist = TaskAssist(_server, message.id);
+        .listen((message) => _processMessage(message));
+  }
+
+  void _processMessage(TaskStartMessage message) async {
+    final taskAssist = TaskAssist(_server, message.id);
+
+    try {
       switch (message.taskKind) {
         case 'random_task_global_error':
           throw Exception('Some unhandled exception not tracked to a task.');
         case 'random_task_with_step':
-          try {
-            await randomFunctionWithStep(taskAssist);
-          } catch (e, stackTrace) {
-            taskAssist.sendErrorMessage(
-                message: 'Error processing request: ${e.toString()}',
-                data: {},
-                stackTrace: stackTrace);
-          }
+          await randomFunctionWithStep(taskAssist);
           break;
         case 'random_task_with_side_operation':
-          try {
-            await randomFunctionWithSideOperation(taskAssist);
-          } catch (e, stackTrace) {
-            taskAssist.sendErrorMessage(
-                message: 'Error processing request: ${e.toString()}',
-                data: {},
-                stackTrace: stackTrace);
-          }
-
+          await randomFunctionWithSideOperation(taskAssist);
           break;
         case 'get-agents':
           final client = getClient(
@@ -46,18 +37,11 @@ class TaskHandler {
                     args: {},
                   ));
           final repo = DashRepository(client);
-          try {
-            final agents = await repo.getAgents();
-            taskAssist.sendResultMessage(
-              message: "Agent get successful",
-              data: {"agents": agents},
-            );
-          } catch (e, stackTrace) {
-            taskAssist.sendErrorMessage(
-                message: "Failed getting agents.",
-                data: {},
-                stackTrace: stackTrace);
-          }
+          final agents = await repo.getAgents();
+          taskAssist.sendResultMessage(
+            message: "Agent get successful",
+            data: {"agents": agents},
+          );
           break;
         case 'refresh_token_test':
           final client = getClient(
@@ -68,24 +52,22 @@ class TaskHandler {
                   ));
           DashRepository(client);
 
-          ///Other repositories using the backend client
-          ///Pass this to the agent.
+          /// Other repositories using the backend client
+          /// Pass this to the agent.
           break;
         case 'agent-execute':
-          try {
-            final handler = AgentHandler.fromJson(message.data);
-            await handler.runTask(taskAssist);
-          } catch (e, stackTrace) {
-            taskAssist.sendErrorMessage(
-                message: 'Error processing request: ${e.toString()}',
-                data: {},
-                stackTrace: stackTrace);
-          }
+          final handler = AgentHandler.fromJson(message.data);
+          await handler.runTask(taskAssist);
           break;
         default:
           taskAssist.sendErrorMessage(message: 'INVALID_TASK_KIND', data: {});
       }
-    });
+    } catch (e, stackTrace) {
+      taskAssist.sendErrorMessage(
+          message: 'Error processing request: ${e.toString()}',
+          data: {},
+          stackTrace: stackTrace);
+    }
   }
 }
 
