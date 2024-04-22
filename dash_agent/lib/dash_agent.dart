@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:dash_agent/configuration/dash_agent.dart';
 import 'package:dash_agent/extension/map_extension.dart';
@@ -37,5 +38,5 @@ Future<void> processAgent(AgentConfiguration configuration) async {
         .humanReadableString();
   }
   
-  print(jsonEncode(json));
+  stdout.writeln(jsonEncode(json));
 }
