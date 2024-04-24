@@ -13,7 +13,12 @@ class CreateAgentCommand extends Command<Object> {
 
   @override
   Future<void> run() async {
-    final projectName = argResults?.arguments.lastOrNull;
+    late final String? projectName;
+    if (argResults == null || argResults!.arguments.isEmpty) {
+      projectName = null;
+    } else {
+      projectName = argResults!.arguments.last;
+    }
 
     if (projectName == null) {
       wtLog.error('Project name is required');
