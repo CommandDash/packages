@@ -160,7 +160,7 @@ In future more steps will be included in the list as the framework evolves.
 
 ## Additional information
 
-We welcome the flutter and AI enthusiasts likewise to contribute to this amazing open source framework. You can contribute this framework in following ways:
+We welcome the Flutter and AI enthusiasts likewise to contribute to this amazing open source framework. You can contribute in following ways:
 
 -  **File feature requests**: Suggest features that'll make your development process easier in the [issues board](https://github.com/CommandDash/packages/issues).
 
