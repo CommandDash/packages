@@ -155,7 +155,6 @@ Currently supported steps that are avaiable for you leverage are shared below:
 - `WorkspaceQueryStep` - Helps you find the matching code snippets from the user's project.
 - `PromptQueryStep` - Enables you to perform a request to the lllm model with your customised prompt and instruction from the user to perform get generated code or any other general reponse that can be either used for next steps or passed back to the user as the final response.
 - `AppendToChatStep` - Enables you to append the reponse (anything like code, feedback, or general reponse) to the commanddash client chat box.
-- `ReplaceCodeStep` - This is experimental at the moment. This step will enable you to directly replace the user's selected code with the resulting output code from the command.
 - `ContinueDecisionStep` - This is also experimental at the moment. This step will help you in adding a conditional logic in your series of steps. While calling this step, if it outputs `false`. Then the further execution of steps will stop and command is considered executed.
 
 In future more steps will be included in the list as the framework evolves.
