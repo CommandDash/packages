@@ -171,7 +171,8 @@ class PromptQueryStep extends Step {
 
   @override
   List<DashOutput> get dashOutputs =>
-      [promptOutput, codeOutput].nonNulls.toList();
+      [promptOutput, codeOutput].where((e) => e != null).toList()
+          as List<DashOutput>;
 }
 
 /// Appends the value to the chat.

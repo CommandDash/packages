@@ -33,8 +33,8 @@ import 'package:dash_agent/variables/dash_output.dart';
 
 ///   // Outputs
 ///  final matchingDocuments = MatchDocumentObject();
-//   final matchingCode = MultiCodeObject();
-//   final queryOutput = QueryOutput();
+///   final matchingCode = MultiCodeObject();
+///   final queryOutput = QueryOutput();
 
 ///   @override
 ///   String get slug => '/ask';
@@ -165,7 +165,7 @@ abstract class Command {
 
     processedJson['steps'] = [];
     for (final step in steps) {
-      registerOutputs.addAll(step.dashOutputs.nonNulls);
+      registerOutputs.addAll(step.dashOutputs);
       processedJson['steps'].add(await step.process());
     }
 
