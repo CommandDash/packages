@@ -71,7 +71,7 @@ class DocsDataSource extends DataSource {
      [ProjectDataObject.fromText('Data in form of raw text')];
 
 
- /// Enables you to pass web data your agent by passing web pages urls or sitemaps in the object.
+ /// Enables your agent to use web pages by indexing specified web pages urls or sitemaps in the object.
   @override
  List<WebDataObject> get webObjects =>
      [WebDataObject.fromWebPage('https://sampleurl.com'), 
