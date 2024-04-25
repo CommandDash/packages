@@ -10,7 +10,9 @@ You can create a new dash agent using [dash-cli](https://pub.dev/packages/dash_c
 dart pub global activate dash-cli
 ```
 
-Now, run the below shared command in the terminal once again:
+After activating the CLI, run the command to create your agent project. 
+
+Replace `{{agent}}` with the unique name of your agent. 
 
 ```shell
 dash-cli create {{agent}}
