@@ -24,7 +24,7 @@ This package contain the building blocks for creating dash agents:
 
 The main part of the framework that glues together your agent configuration is `AgentConfiguration`.
 
-Sample example of `AgentConfiguration` for demonstration purpose:
+Sample example of `AgentConfiguration`:
 
 ```dart
 class MyAgent extends AgentConfiguration {
