@@ -10,7 +10,6 @@ import 'api.dart';
 
 /// Auth class to handle authentication
 class Auth {
-
   /// Check if user is authenticated
   static Future<AuthStatus> get isAuthenticated async {
     bool tokenExists = DashCliEnv.instance.env.authToken != null &&

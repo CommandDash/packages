@@ -15,7 +15,7 @@ class LogoutCommand extends Command<Object> {
       wtLog.info('You are not logged in');
       return;
     }
-    
+
     wtLog.startSpinner('Logging out...', severity: MessageSeverity.info);
     bool loggedOut = Auth.logout();
     loggedOut

@@ -8,6 +8,5 @@ import '../../core/auth.dart';
 import '../../utils/consts.dart';
 import '../../utils/logger.dart';
 
-
 part 'login.dart';
 part 'logout.dart';
