@@ -55,7 +55,7 @@ Example for DataSource:
 ```dart
 class DocsDataSource extends DataSource {
 
- /// Enables you to pass data stored in files and directories in you local system.
+ /// Enables you to provide data stored in files and directories in you local system.
  @override
  List<FileDataObject> get fileObjects => [
        FileDataObject.fromFile(File(
