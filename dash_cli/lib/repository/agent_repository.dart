@@ -7,14 +7,17 @@ import 'package:http/http.dart';
 import '../utils/env.dart';
 
 class AgentRepository {
-  final baseUrl = 'http://127.0.0.1:5000';
+  final baseUrl = 'https://api.commanddash.dev';
 
   Future<String> publishAgent(Map agentJson) async {
-    agentJson['testing'] = true;
+    agentJson['testing'] = false;
     final response = await http.post(Uri.parse('$baseUrl/agent/deploy-agent'),
         body: jsonEncode(agentJson),
-        headers: { HttpHeaders.authorizationHeader:
-              'Bearer ${DashCliEnv.instance.env.authToken}', "Content-Type": "application/json"});
+        headers: {
+          HttpHeaders.authorizationHeader:
+              'Bearer ${DashCliEnv.instance.env.authToken}',
+          "Content-Type": "application/json"
+        });
 
     if (response.statusCode == 200) {
       return jsonDecode(response.body)['status'];

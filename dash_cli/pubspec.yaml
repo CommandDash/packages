@@ -3,7 +3,7 @@ description: A sample command-line application.
 version: 1.0.0
 # repository: https://github.com/my_org/my_repo
 environment:
-  sdk: ^3.2.5
+  sdk: ^2.19.0
 
 executables:
   dash_cli:
@@ -13,10 +13,9 @@ dependencies:
   ansi_escapes: ^1.1.0
   args: ^2.4.2
   dart_jsonwebtoken: ^2.13.0
-  http: ^1.2.1
+  http: ^0.13.6
   interact: ^2.2.0
-  path: ^1.9.0
-  oauth2: ^2.0.2
+  path: ^1.8.3
   yaml: ^3.1.2
 
 dev_dependencies:

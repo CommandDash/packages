@@ -36,6 +36,7 @@ Future<void> processAgent(AgentConfiguration configuration) async {
     throw {'Issues with Agent Configuration': commandValidationReponse}
         .humanReadableString();
   }
-  
+
   print(jsonEncode(json));
+  print('END_OF_AGENT_JSON');
 }
