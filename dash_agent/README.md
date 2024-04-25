@@ -39,10 +39,10 @@ class MyAgent extends AgentConfiguration {
 }
 ```
 
-The above sample AgentConfiguration object taking data sources and supported commands. Both of them are explained below:
+The above AgentConfiguration registers your data sources and supported commands.
 
-- `DataSource`: Data sources will enable you to pass on any form of data that your agent might need to perform its intended tasks.
-- `Command`: Commands are the specialised tasks you want your agents to perform (like understanding the developer query, refactoring, code generation, etc).
+- `DataSource`: Data sources enables you to provide any form of data that your agent might need to perform its intended tasks.
+- `Command`: Commands are the specialised tasks you want your agents to perform (like answering developer's query, refactoring, code generation, etc).
 
 ### Datasource
 
