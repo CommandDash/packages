@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart';
-import 'package:interact/interact.dart';
 
-import '../repository/user_repository.dart';
 import '../utils/consts.dart';
 import '../utils/env.dart';
 import '../utils/helpers.dart';
@@ -12,7 +10,6 @@ import 'api.dart';
 
 /// Auth class to handle authentication
 class Auth {
-  static final _userRepository = UserRepository();
 
   /// Check if user is authenticated
   static Future<AuthStatus> get isAuthenticated async {
@@ -127,10 +124,6 @@ class Auth {
     if (refreshToken != null) {
       DashCliEnv.addNew('refresh_token', refreshToken);
     }
-    // if (emailFound == null || emailFound == 'False') {
-    //   final email = _promptForMailId();
-    //   await _userRepository.updateEmail(email);
-    // }
 
     wtLog.stopSpinner(
         message: accessToken == null
@@ -139,20 +132,5 @@ class Auth {
         severity: accessToken == null
             ? MessageSeverity.error
             : MessageSeverity.success);
-  }
-
-  static String _promptForMailId() {
-    final email = Input(
-      prompt:
-          'Unable to Fetch mail id from GitHub. Please provide your mail id manually:',
-      validator: (String x) {
-        // Regular expression pattern for a valid email address
-        final emailRegex = RegExp(
-          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-        );
-        return emailRegex.hasMatch(x);
-      },
-    ).interact();
-    return email;
   }
 }
