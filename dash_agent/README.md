@@ -65,7 +65,7 @@ class DocsDataSource extends DataSource {
      ];
  
 
- /// Enables you to pass in raw string and json data
+ /// Enables you to provide raw string and json data
  @override
  List<ProjectDataObject> get projectObjects =>
      [ProjectDataObject.fromText('Data in form of raw text')];
