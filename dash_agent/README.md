@@ -4,7 +4,7 @@ Dash Agent is a framework enabling you to create and publish agents inside Comma
 
 ## Getting started
 
-You don't need to manually install the package. As the package comes pre-installed with the agent project that you can create using [dash-cli](). If it's not already activated. You can do so by running the following command in the terminal:
+You can create a new dash agent using [dash-cli](https://pub.dev/packages/dash_cli) which automatically creates a starter project for you. 
 
 ```shell
 dart pub global activate dash-cli
