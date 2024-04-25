@@ -113,7 +113,7 @@ class Auth {
   }
 
   /// Update the accessToken(local cache), refreshToken (local cache), email(commanddash backend)
-  static Future<void> _updateAuthData(
+  static Future<bool> _updateAuthData(
       {required String? accessToken,
       required String? refreshToken,
       required String? emailFound}) async {
@@ -124,12 +124,14 @@ class Auth {
       DashCliEnv.addNew('refresh_token', refreshToken);
     }
 
+    final hasAccessToken = accessToken != null;
+
     wtLog.stopSpinner(
-        message: accessToken == null
-            ? 'Failed to Authorize'
-            : 'Authorization successful!',
-        severity: accessToken == null
-            ? MessageSeverity.error
-            : MessageSeverity.success);
+        message: hasAccessToken
+            ? 'Authorization successful!'
+            : 'Failed to Authorize',
+        severity:
+            hasAccessToken ? MessageSeverity.success : MessageSeverity.error);
+    return hasAccessToken;
   }
 }
