@@ -30,7 +30,6 @@ import 'package:dash_agent/data/datasource.dart';
 /// }
 /// ```
 abstract class AgentConfiguration {
-
   /// List of [DataSource]s that will be used by agent commands to perform
   /// designated tasks.
   ///
