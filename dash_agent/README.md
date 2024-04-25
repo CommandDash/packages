@@ -1,6 +1,6 @@
 # Dash Agent 
 
-Dash agent is a framework enabling you to create and publish agents in CommandDash marketplace. 
+Dash Agent is a framework enabling you to create and publish agents inside CommandDash marketplace. 
 
 ## Getting started
 
