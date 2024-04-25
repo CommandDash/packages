@@ -50,7 +50,7 @@ The above AgentConfiguration registers your data sources and supported commands.
 
 As described above data sources lets you attach the data that your agent will need to perform its tasks. It can be anything from raw texts, json, files data, or even webpages.
 
-Sample example for DataSource for demostration purpose:
+Example for DataSource:
 
 ```dart
 class DocsDataSource extends DataSource {
