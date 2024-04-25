@@ -15,12 +15,12 @@ After activating the CLI, run the command to create your agent project.
 Replace `{{agent}}` with the unique name of your agent. 
 
 ```shell
-dash-cli create {{agent}}
+dash_cli create {{agent}}
 ```
 
 ## Usage
 
-This package contain the building blocks for creating dash agents:
+This package contains the building blocks for creating dash agents:
 
 ### AgentConfiguration
 
@@ -43,19 +43,19 @@ class MyAgent extends AgentConfiguration {
 
 The above AgentConfiguration registers your data sources and supported commands.
 
-- `DataSource`: Data sources enables you to provide any form of data that your agent might need to perform its intended tasks.
+- `DataSource`: Data sources enable you to provide any form of data that your agent might need to perform its intended tasks.
 - `Command`: Commands are the specialised tasks you want your agents to perform (like answering developer's query, refactoring, code generation, etc).
 
 ### Datasource
 
-As described above data sources lets you attach the data that your agent will need to perform its tasks. It can be anything from raw texts, json, files data, or even webpages.
+As described above data sources let you attach the data that your agent will need to perform its tasks. It can be anything from raw texts, JSON, file data, or even webpages.
 
 Example for DataSource:
 
 ```dart
 class DocsDataSource extends DataSource {
 
- /// Enables you to provide data stored in files and directories in you local system.
+ /// Enables you to provide data stored in files and directories in your local system.
  @override
  List<FileDataObject> get fileObjects => [
        FileDataObject.fromFile(File(
@@ -71,7 +71,7 @@ class DocsDataSource extends DataSource {
      [ProjectDataObject.fromText('Data in form of raw text')];
 
 
- /// Enables your agent to use web pages by indexing specified web pages urls or sitemaps in the object.
+ /// Enables your agent to use web pages by indexing specified web page URLs or sitemaps in the object.
   @override
  List<WebDataObject> get webObjects =>
      [WebDataObject.fromWebPage('https://sampleurl.com'), 
@@ -79,18 +79,11 @@ class DocsDataSource extends DataSource {
 }
 ```
 
-To create any data object, the easiest (and also the recommended way) is to call static functions of the above shared bases class of the object. For example if you want to store the json data. You can add the json data as shared below:
-
-```dart
-final yourJson = {'key': 'data'};
-final jsonDataSource = ProjectDataSource.fromJson(yourJson);
-```
-
-**Note**: At the moment, storing only text based files like code, markdown or raw text is only supported.
+**Note**: At the moment, storing only text-based files like code, markdown or raw text is supported.
 
 ### Commands
 
-Commands are the specialised tasks you want your agents to perform  (such as refactoring, code generation, code analysis, etc). Once the agent will be published, user's can invoke this command in the commanddash client (such as VS Code extensions) and use them. 
+Commands are the specialised tasks you want your agents to perform  (such as refactoring, code generation, code analysis, etc). Once the agent is published, users can invoke this command in the command dash client (such as VS Code extensions) and use it. 
 
 Sample example for `Command` object is shared below:
 
@@ -103,16 +96,12 @@ class AskCommand extends Command {
   // Inputs
   final userQuery = StringInput('Your query');
   final codeAttachment = CodeInput('Code Attachment');
-
- // Outputs
- final matchingDocuments = MatchDocumentObject();
- final queryOutput = QueryOutput();
   
   /// Unique identifier of the command
   @override
   String get slug => '/ask';
 
-  /// Brief description about the command
+  /// Brief description of the command
   @override
   String get intent => 'Ask me anything';
 
@@ -120,9 +109,14 @@ class AskCommand extends Command {
   @override
   List<DashInput> get registerInputs => [userQuery, codeAttachment];
 
-  /// Series of operation that needs to be performed for a command finish its task
+  /// Series of operations that need to be performed for a command to finish its task
   @override
-  List<Step> get steps => [
+  List<Step> get steps {
+      // Outputs
+     final matchingDocuments = MatchDocumentObject();
+     final queryOutput = QueryOutput();
+
+      return [
         MatchingDocumentStep(
             query: '$userQuery$codeAttachment',
             dataSources: [docsSource],
@@ -136,6 +130,7 @@ class AskCommand extends Command {
             value:
                 'This was your query: $userQuery and here is your output: $queryOutput'),
       ];
+}
  
   /// Phrase that will be shown to user when the command is invoked
   @override
@@ -144,23 +139,23 @@ class AskCommand extends Command {
 }
 ```
 
-One of important element of `Command` object are the series of steps that you will be passing that will help the command to execute its tasks by performing the mini-tasks required to be performed by the main task.
+One of the important elements of the `Command` object is the series of steps that you will be passing that will help the command to execute its tasks by performing the mini-tasks required to be performed by the main task.
 
 
 ### Step
 
-Currently supported steps that are avaiable for you leverage are shared below:
+Currently supported steps that are available for you to leverage are shared below:
 
 - `MatchDocumentStep` - Helps you find the matching document from the provided data source form `DataSource` objects.
 - `WorkspaceQueryStep` - Helps you find the matching code snippets from the user's project.
-- `PromptQueryStep` - Enables you to perform a request to the lllm model with your customised prompt and instruction from the user to perform get generated code or any other general reponse that can be either used for next steps or passed back to the user as the final response.
-- `AppendToChatStep` - Enables you to append the reponse (anything like code, feedback, or general reponse) to the commanddash client chat box.
+- `PromptQueryStep` - Enables you to perform a request to the LLM model with your customised prompt and instruction from the user to perform get generated code or any other general response that can be either used for the next steps or passed back to the user as the final response.
+- `AppendToChatStep` - Enables you to append the response (anything like code, feedback, or general response) to the command dash client chat box.
 
 In future more steps will be included in the list as the framework evolves.
 
 ## Additional information
 
-We welcome the Flutter and AI enthusiasts likewise to contribute to this amazing open source framework. You can contribute in following ways:
+We welcome the Flutter and AI enthusiasts likewise to contribute to this amazing open-source framework. You can contribute in the following ways:
 
 -  **File feature requests**: Suggest features that'll make your development process easier in the [issues board](https://github.com/CommandDash/packages/issues).
 
@@ -171,4 +166,4 @@ We welcome the Flutter and AI enthusiasts likewise to contribute to this amazing
 
 ## Community
 
-Connect with like minded people building with Flutter and using AI to do so, every step of the way :D [Join Now](https://join.slack.com/t/welltested-ai/shared_invite/zt-25u09fty8-gaggH9HbmopB~4tialTrlA)
+Connect with like-minded people building with Flutter and using AI to do so, every step of the way :D [Join Now](https://join.slack.com/t/welltested-ai/shared_invite/zt-25u09fty8-gaggH9HbmopB~4tialTrlA)
