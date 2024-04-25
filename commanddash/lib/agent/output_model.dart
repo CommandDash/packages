@@ -49,6 +49,9 @@ class MultiCodeOutput extends Output {
       return code;
     } else {
       for (WorkspaceFile file in value!) {
+        if (code.length > 18000) {
+          break; //maximum char limit ?? TODO: Replace this later with a holistic counting mechanism
+        }
         code += 'File: ${file.path}\n';
         if (file.content == null) {
           code += File(file.path).readAsStringSync();

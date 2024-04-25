@@ -1,6 +1,6 @@
 name: commanddash
 description: CLI enhancments to Dash-AI
-version: 0.0.1
+version: 0.0.3
 repository: https://github.com/Welltested-AI/commanddash
 
 environment:
@@ -18,7 +18,7 @@ dependencies:
   dio: ^5.4.1
   equatable: ^2.0.5
   crypto: ^3.0.3
-  google_generative_ai: ^0.2.2
+  google_generative_ai: ^0.3.1
   rxdart: ^0.27.7
   # path: ^1.8.0
 

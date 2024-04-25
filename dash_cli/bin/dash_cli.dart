@@ -28,6 +28,5 @@ Future<void> main(List<String> args) async {
     wtLog.info(stackTrace.toString(), verbose: true);
   } finally {
     // await wtTelemetry.flush();
-    wtLog.warning('Thank you for using dash');
   }
 }

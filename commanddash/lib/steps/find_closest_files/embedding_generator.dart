@@ -14,8 +14,10 @@ class EmbeddingGenerator {
         .where((file) {
       return !RegExp(excludePattern).hasMatch(file.path);
     }).toList();
-    final fileContents =
-        dartFiles.map((file) => WorkspaceFile.fromPaths(file.path)).toList();
+    final fileContents = dartFiles.map((file) {
+      return WorkspaceFile.fromPaths(file.path);
+    }).toList();
+    fileContents.removeWhere((element) => (element.content ?? '').isEmpty);
     return fileContents;
   }
 
@@ -26,7 +28,7 @@ class EmbeddingGenerator {
       if (cacheEntry == null) {
         return true; // File not in cache, update required
       }
-      return cacheEntry['codehash'] != element.codeHash;
+      return cacheEntry['codeHash'] != element.codeHash;
     }).toList();
     return filesToUpdate;
   }
@@ -43,7 +45,9 @@ class EmbeddingGenerator {
 
     // Use the batches API to update the embeddings
     final embeddings = await Future.wait(batches.map((batch) async {
-      final code = batch.map((file) => file.content!).toList();
+      final code = batch
+          .map((file) => {'content': file.content!, 'title': file.path})
+          .toList();
       final embeddings =
           await generationRepository.getCodeBatchEmbeddings(code);
       return embeddings;
@@ -67,8 +71,8 @@ class EmbeddingGenerator {
           calculateCosineSimilarity(queryEmbeddings, a.embedding!);
       final distanceB =
           calculateCosineSimilarity(queryEmbeddings, b.embedding!);
-      return distanceA.compareTo(distanceB);
+      return distanceB.compareTo(distanceA);
     }));
-    return files;
+    return files.sublist(0, 3);
   }
 }

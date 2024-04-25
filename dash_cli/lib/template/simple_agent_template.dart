@@ -1,10 +1,9 @@
 class SimpleAgentTemplate {
   static const main = r'''
 import 'package:dash_agent/dash_agent.dart';
+import 'package:{project_name}/agent.dart';
 
-import '../lib/my_agent.dart';
-
-// Boiler plate code to processes your agent
+/// Entry point used by the [dash-cli] to extract your agent configuration during publishing.
 Future<void> main() async {
   await processAgent(MyAgent());
 }
@@ -14,11 +13,14 @@ Future<void> main() async {
 import 'package:dash_agent/data/datasource.dart';
 import 'package:dash_agent/configuration/command.dart';
 import 'package:dash_agent/configuration/dash_agent.dart';
-
-import 'ask_command.dart';
+import 'package:riverpod/commands/ask.dart';
 import 'data_sources.dart';
 
-/// Your agent configurations
+/// [MyAgent] consists of all your agent configuration.
+///
+/// This includes:
+/// [DataSource] - For providing additional data to commands to process.
+/// [Command] - Actions available to the user in the IDE, like "/ask", "/generate" etc
 class MyAgent extends AgentConfiguration {
   final docsSource = DocsDataSource();
   final blogsSource = BlogsDataSource();
@@ -37,15 +39,14 @@ import 'dart:io';
 
 import 'package:dash_agent/data/datasource.dart';
 import 'package:dash_agent/data/objects/project_data_object.dart';
-import 'package:dash_agent/data/objects/system_data_object.dart';
+import 'package:dash_agent/data/objects/file_data_object.dart';
 import 'package:dash_agent/data/objects/web_data_object.dart';
 
+/// [DocsDataSource] indexes all the documentation related data and provides it to commands.
 class DocsDataSource extends DataSource {
   @override
-  List<FileDataObject> get fileObjects => [
-        SystemDataObject.fromFile(File(
-            'your_file_path'))
-      ];
+  List<FileDataObject> get fileObjects =>
+      [FileDataObject.fromFile(File('your_file_path'))];
 
   @override
   List<ProjectDataObject> get projectObjects =>
@@ -55,14 +56,14 @@ class DocsDataSource extends DataSource {
   List<WebDataObject> get webObjects => [];
 }
 
+/// [BlogsDataSource] is a specific data source indexing blogs stored in filesystem or on web.
+///
+/// We are not using it in any of the commands.
 class BlogsDataSource extends DataSource {
   @override
   List<FileDataObject> get fileObjects => [
-        DirectoryFiles(
-            Directory(
-                'directory_path_to_data_source'),
-            relativeTo:
-                'parent_directory_path')
+        DirectoryFiles(Directory('directory_path_to_data_source'),
+            relativeTo: 'parent_directory_path')
       ];
 
   @override
@@ -72,31 +73,27 @@ class BlogsDataSource extends DataSource {
   List<WebDataObject> get webObjects =>
       [WebDataObject.fromWebPage('https://sampleurl.com')];
 }
-
 ''';
 
-static const askCommand = r"""
+  static const askCommand = r"""
 import 'package:dash_agent/configuration/command.dart';
 import 'package:dash_agent/data/datasource.dart';
 import 'package:dash_agent/steps/steps.dart';
 import 'package:dash_agent/variables/dash_input.dart';
 import 'package:dash_agent/variables/dash_output.dart';
 
+/// [AskCommand] accepts a [CodeInput] from the user with their query [StringInput] and provides the with a suitable answer taking reference from your provided [docsSource].
 class AskCommand extends Command {
   AskCommand({required this.docsSource});
 
   final DataSource docsSource;
 
-  /// Inputs
+  /// Inputs to be provided by the user in the text field
   final userQuery = StringInput('Your query', optional: false);
   final codeAttachment = CodeInput(
     'Primary method',
   );
 
-  final testMethod = CodeInput(
-    'Test Method',
-  );
-  final references = CodeInput('Existing References', optional: true);
   @override
   String get slug => '/ask';
 
@@ -112,30 +109,29 @@ class AskCommand extends Command {
 
   @override
   List<Step> get steps {
-    // Outputs
+    // Temporary outputs generated during processing command.
     final matchingDocuments = MatchDocumentOuput();
-    final matchingCode = MultiCodeObject();
     final promptOutput = PromptOutput();
+
     return [
       MatchDocumentStep(
           query: '$userQuery$codeAttachment',
           dataSources: [docsSource],
           output: matchingDocuments),
-      WorkspaceQueryStep(query: '$matchingDocuments', output: matchingCode),
       PromptQueryStep(
         prompt:
-            '''You are an X agent. Here is the $userQuery, here is the $codeAttachment $matchingCode and the document references: $matchingDocuments. Answer the user's query.''',
+            '''You are an X agent. Here is the $userQuery, here is the $codeAttachment and some relevant documents for your reference: $matchingDocuments. 
+            
+            Answer the user's query.''',
         promptOutput: promptOutput,
       ),
-      AppendToChatStep(
-          value:
-              'This was your query: $userQuery and here is your output: $promptOutput')
+      AppendToChatStep(value: '$promptOutput')
     ];
   }
 }
 """;
 
-static const readme = '''
+  static const readme = '''
 # Agent Reamde File
 
 This is a sample readme file for agent. You add description about the agent and any other instruction or information.
