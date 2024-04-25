@@ -22,7 +22,7 @@ This package contain the building blocks for creating dash agents:
 
 ### AgentConfiguration
 
-The main part of the framework that glues together your agent configuration is `AgentConfiguration`. It is the base class for creating agent.
+The main part of the framework that glues together your agent configuration is `AgentConfiguration`.
 
 Sample example of `AgentConfiguration` for demonstration purpose:
 
