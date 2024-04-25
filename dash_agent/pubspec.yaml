@@ -3,7 +3,7 @@ description: "Framework package to create and publish dash agents for commanddas
 version: 0.0.1
 homepage: https://www.commanddash.io
 
-repository: https://github.com/CommandDash/packages
+repository: https://github.com/CommandDash/packages/tree/main/dash_agent
 issue_tracker: https://github.com/CommandDash/packages/issues
 
 environment:

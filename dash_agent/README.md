@@ -4,21 +4,17 @@ Dash agent is a framework enabling you to create and publish agents in CommandDa
 
 ## Getting started
 
-Install the package in your dart project:
+You don't need to manually install the package. As the package comes pre-installed with the agent project that you can create using [dash-cli](). If it's not already activated. You can do so by running the following command in the terminal:
 
-```bash
-flutter pub add dash_agent
+```shell
+dart pub global activate dash-cli
 ```
 
-This will add a line like this to your package's pubspec.yaml (and run an implicit flutter pub get):
+Now, run the below shared command in the terminal once again:
 
-```yaml
-dependencies:
-  dash_agent: ^1.0.0
+```shell
+dash-cli create {{agent}}
 ```
-
-**Note**: Ideally, you won't need to install the package into your dart project. Since, you will be creating the agent project using [dash-cli]()'s `dash-cli create {{agent}}` command line tool. This will install the package for you.
-
 
 ## Usage
 
@@ -46,7 +42,7 @@ class MyAgent extends AgentConfiguration {
 The above sample AgentConfiguration object taking data sources and supported commands. Both of them are explained below:
 
 - `DataSource`: Data sources will enable you to pass on any form of data that your agent might need to perform its intended tasks.
-- `Command`: Commands are the specialised tasks you want your agents to perform. They can be anything like understanding the developer query and providing the desired response, evaluating the project workspace, updating a piece of code based on the user requirement and the type of agent, or even generate code as per the developer requirement.
+- `Command`: Commands are the specialised tasks you want your agents to perform (like understanding the developer query, refactoring, code generation, etc).
 
 ### Datasource
 
@@ -56,44 +52,30 @@ Sample example for DataSource for demostration purpose:
 
 ```dart
 class DocsDataSource extends DataSource {
- @override
- List<SystemDataObject> get fileObjects => [
-       SystemDataObject.fromFile(File(
-           'your_file_path'))
-     ];
 
+ /// Enables you to pass data stored in files and directories in you local system.
+ @override
+ List<FileDataObject> get fileObjects => [
+       FileDataObject.fromFile(File(
+           'your_file_path')),
+        FileDataObject.fromDirectory(Directory(
+            'directory_path_to_data_source'))
+     ];
+ 
+
+ /// Enables you to pass in raw string and json data
  @override
  List<ProjectDataObject> get projectObjects =>
      [ProjectDataObject.fromText('Data in form of raw text')];
 
- @override
- List<WebDataObject> get webObjects => [];
-}
 
-class BlogsDataSource extends DataSource {
- @override
- List<SystemDataObject> get fileObjects => [
-       DirectoryFiles(
-           Directory(
-               'directory_path_to_data_source'),
-           relativeTo:
-               'parent_directory_path')
-     ];
-
- @override
- List<ProjectDataObject> get projectObjects => [];
-
- @override
+ /// Enables you to pass web data your agent by passing web pages urls or sitemaps in the object.
+  @override
  List<WebDataObject> get webObjects =>
-     [WebDataObject.fromWebPage('https://sampleurl.com')];
+     [WebDataObject.fromWebPage('https://sampleurl.com'), 
+     WebDataObject.fromSiteMap('https://sampleurl.com/sitemap.xml')];
 }
 ```
-
-As visible in the above example, the data is divided into:
-
-- Project Data (aka `ProjectDataObject`): This data object enables you to pass in raw string and json data.
-- System Data  (aka `SystemDataObject`): This data object enables you to pass data stored in files and directories in you local system,
-- Web Data (aka `WebDataObject`): This data object enables you to pass web data your agent by passing web pages urls or sitemaps in the object.
 
 To create any data object, the easiest (and also the recommended way) is to call static functions of the above shared bases class of the object. For example if you want to store the json data. You can add the json data as shared below:
 
@@ -102,7 +84,7 @@ final yourJson = {'key': 'data'};
 final jsonDataSource = ProjectDataSource.fromJson(yourJson);
 ```
 
-**Note**: At the moment, storing pdf files is not supported out of the box. However you can extract the relevant data from the pdf using the open source tools and pass the extracted data either via project data object or system data object
+**Note**: At the moment, storing pdf files is not supported out of the box. However you can extract the relevant data from the pdf using the open source tools and pass the extracted data either via project data object or system data object.
 
 ### Commands
 
@@ -123,16 +105,20 @@ class AskCommand extends Command {
  // Outputs
  final matchingDocuments = MatchDocumentObject();
  final queryOutput = QueryOutput();
-
+  
+  /// Unique identifier of the command
   @override
   String get slug => '/ask';
 
+  /// Brief description about the command
   @override
   String get intent => 'Ask me anything';
 
+  /// List of `DashInput`s that will be used in the command in its lifecycle
   @override
   List<DashInput> get registerInputs => [userQuery, codeAttachment];
 
+  /// Series of operation that needs to be performed for a command finish its task
   @override
   List<Step> get steps => [
         MatchingDocumentStep(
@@ -148,25 +134,13 @@ class AskCommand extends Command {
             value:
                 'This was your query: $userQuery and here is your output: $queryOutput'),
       ];
-
+ 
+  /// Phrase that will be shown to user when the command is invoked
   @override
   String get textFieldLayout =>
       "Hi, I'm here to help you. $userQuery $codeAttachment";
 }
 ```
-
-`Command` object takes the following properties:
-- `slug` - Unique identifier of the command
-- `intent` - Brief description about the command
-- `textFieldLayout` - Phrase that will be shown to user when the command is
-invoked
-- `registerInputs` - `DashInput`s that will be used in the command in its
-lifecycle
-- `steps` - Series of operation that needs to be performed for a command finish its
-task. Steps can be of the following nature: Matching docs that are shared
-with the command, performing a query in the user project, prompt that code/
-info generation, appending the info/code at the right place in the project,
-many more.
 
 One of important element of `Command` object are the series of steps that you will be passing that will help the command to execute its tasks by performing the mini-tasks required to be performed by the main task.
 
