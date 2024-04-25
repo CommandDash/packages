@@ -86,7 +86,7 @@ final yourJson = {'key': 'data'};
 final jsonDataSource = ProjectDataSource.fromJson(yourJson);
 ```
 
-**Note**: At the moment, storing pdf files is not supported out of the box. However you can extract the relevant data from the pdf using the open source tools and pass the extracted data either via project data object or system data object.
+**Note**: At the moment, storing only text based files like code, markdown or raw text is only supported.
 
 ### Commands
 
