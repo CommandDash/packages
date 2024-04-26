@@ -28,7 +28,7 @@ Future<ProcessResult> openUrl(String url) {
 /// Create a server to handle the OAuth2 callback.
 Future<void> createServer(
     String url,
-    Future<void> Function(
+    Future<bool> Function(
             {required String? accessToken,
             required String? refreshToken,
             required String? emailFound})
@@ -45,10 +45,20 @@ Future<void> createServer(
         String? refreshToken = request.uri.queryParameters['refresh_token'];
         String? emailFound = request.uri.queryParameters['email_found'];
 
-        serverCallback(
+        final successfullLogin = await serverCallback(
             accessToken: accessToken,
             refreshToken: refreshToken,
             emailFound: emailFound);
+
+        // Respond to the request
+        final postRequestReponse = request.response
+          ..statusCode = accessToken == null ? 404 : 200
+          ..headers.contentType = ContentType.html
+          ..write(successfullLogin
+              ? 'Authorized Successfully!'
+              : 'Failed to Authorize')
+          ..write('<script>window.close();</script>');
+        await postRequestReponse.close();
 
         break;
       }

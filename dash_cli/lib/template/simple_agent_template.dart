@@ -13,7 +13,7 @@ Future<void> main() async {
 import 'package:dash_agent/data/datasource.dart';
 import 'package:dash_agent/configuration/command.dart';
 import 'package:dash_agent/configuration/dash_agent.dart';
-import 'package:riverpod/commands/ask.dart';
+import 'commands/ask.dart';
 import 'data_sources.dart';
 
 /// [MyAgent] consists of all your agent configuration.
