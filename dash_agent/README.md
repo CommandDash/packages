@@ -55,7 +55,8 @@ Example for DataSource:
 ```dart
 class DocsDataSource extends DataSource {
 
- /// Enables you to provide data stored in files and directories in your local system.
+ /// Enables you to provide data stored in files and directories in your 
+ /// local system.
  @override
  List<FileDataObject> get fileObjects => [
        FileDataObject.fromFile(File(
@@ -71,7 +72,8 @@ class DocsDataSource extends DataSource {
      [ProjectDataObject.fromText('Data in form of raw text')];
 
 
- /// Enables your agent to use web pages by indexing specified web page URLs or sitemaps in the object.
+ /// Enables your agent to use web pages by indexing specified web page 
+ /// URLs or sitemaps in the object.
   @override
  List<WebDataObject> get webObjects =>
      [WebDataObject.fromWebPage('https://sampleurl.com'), 
@@ -105,11 +107,13 @@ class AskCommand extends Command {
   @override
   String get intent => 'Ask me anything';
 
-  /// List of `DashInput`s that will be used in the command in its lifecycle
+  /// List of `DashInput`s that will be used in the command in its
+  /// lifecycle
   @override
   List<DashInput> get registerInputs => [userQuery, codeAttachment];
 
-  /// Series of operations that need to be performed for a command to finish its task
+  /// Series of operations that need to be performed for a command to
+  /// finish its task
   @override
   List<Step> get steps {
       // Outputs
@@ -123,7 +127,11 @@ class AskCommand extends Command {
             output: matchingDocuments),
         PromptQueryStep(
             prompt:
-                '''You are an X agent. Here is the $userQuery, here is the document references: $matchingDocuments. Answer the user's query.''',
+                '''You are an X agent. 
+                
+                Here is the $userQuery, here is the document references: $matchingDocuments. 
+                
+                Answer the user's query.''',
             postProcessKind: PostProcessKind.raw,
             output: queryOutput),
         AppendToChatStep(
