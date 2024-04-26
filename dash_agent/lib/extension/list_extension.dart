@@ -30,3 +30,16 @@ extension ReadableStringExtension on List<String>? {
     return outputString;
   }
 }
+
+extension NullObjectListExtension<T extends Object> on List<T?> {
+  List<T> nonNull() {
+    final updatedList = <T>[];
+
+    for (final item in this) {
+      if (item != null) {
+        updatedList.add(item);
+      }
+    }
+    return updatedList;
+  }
+}

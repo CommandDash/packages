@@ -1,4 +1,5 @@
 import 'package:dash_agent/data/datasource.dart';
+import 'package:dash_agent/extension/list_extension.dart';
 import 'package:dash_agent/variables/dash_input.dart';
 import 'package:dash_agent/variables/dash_output.dart';
 import 'package:meta/meta.dart';
@@ -171,8 +172,7 @@ class PromptQueryStep extends Step {
 
   @override
   List<DashOutput> get dashOutputs =>
-      [promptOutput, codeOutput].where((e) => e != null).toList()
-          as List<DashOutput>;
+      [promptOutput, codeOutput].nonNull();
 }
 
 /// Appends the value to the chat.
