@@ -123,11 +123,11 @@ class AgentOperation {
       agentJson['description'] = agentDescription;
       agentJson['version'] = agentVersion;
 
-      wtLog.log('- Agent configuration fetched');
+      wtLog.log('✔︎ Agent configuration fetched');
       wtLog.updateSpinnerMessage('Publishing agent...');
       final status = await _agentRepository.publishAgent(agentJson);
 
-      wtLog.log('- Published agent');
+      wtLog.log('✔︎ Published agent');
       wtLog.stopSpinner();
       wtLog.info(status);
       return;

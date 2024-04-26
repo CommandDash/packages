@@ -13,9 +13,4 @@ class CliConstants {
   static String updateEmailPath = '/account/github/update/email';
 }
 
-
-enum AuthStatus {
-  authenticated,
-  authenticationExpired,
-  notAuthenticated
-}
+enum AuthStatus { authenticated, authenticationExpired, notAuthenticated }

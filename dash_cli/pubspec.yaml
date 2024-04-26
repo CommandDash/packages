@@ -1,14 +1,17 @@
 name: dash_cli
-description: A sample command-line application.
-version: 1.0.0
-# repository: https://github.com/my_org/my_repo
+description: "CLI tool for building dash agents for CommandDash"
+version: 0.0.1
+homepage: https://www.commanddash.io
+
+repository: https://github.com/CommandDash/packages/tree/main/dash_cli
+issue_tracker: https://github.com/CommandDash/packages/issues
+
 environment:
-  sdk: ^2.19.0
+  sdk: '>=2.19.0 <4.0.0'
 
 executables:
   dash_cli:
     
-# Add regular dependencies here.
 dependencies:
   ansi_escapes: ^1.1.0
   args: ^2.4.2

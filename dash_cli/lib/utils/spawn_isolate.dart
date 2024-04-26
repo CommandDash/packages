@@ -40,6 +40,12 @@ class IsolateFunction {
     await completer.future;
     // before closing the function dispose
     await _dispose(projectPath);
+
+    if (agentString.startsWith('PROCESS_AGENT_FAILURE')) {
+      final errorMessage = jsonDecode(agentString.substring(21).trim());
+      throw 'Failed to fetch agent configuration\n$errorMessage';
+    }
+
     return jsonDecode(agentString);
   }
 
