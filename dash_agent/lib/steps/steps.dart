@@ -102,6 +102,7 @@ class WorkspaceQueryStep extends Step {
       'type': 'search_in_workspace',
       'query': query,
       'outputs': [for (final dashOutput in dashOutputs) '$dashOutput'],
+      'workspace_object_type': 'all',
       'version': version
     };
     return processedJson;
