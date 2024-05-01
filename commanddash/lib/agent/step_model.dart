@@ -24,8 +24,13 @@ abstract class Step {
     // required this.outputs,
   });
 
-  factory Step.fromJson(Map<String, dynamic> json, Map<String, Input> inputs,
-      Map<String, Output> outputs, String agentName, String agentVersion) {
+  factory Step.fromJson(
+      Map<String, dynamic> json,
+      Map<String, Input> inputs,
+      Map<String, Output> outputs,
+      String agentName,
+      String agentVersion,
+      bool isTest) {
     switch (json['type']) {
       case 'search_in_workspace':
         return SearchInWorkspaceStep.fromJson(
@@ -73,11 +78,11 @@ abstract class Step {
         );
       case 'search_in_sources':
         return SearchInSourceStep.fromJson(
-          json,
-          (json['query'] as String).replacePlaceholder(inputs, outputs),
-          agentName,
-          agentVersion,
-        );
+            json,
+            (json['query'] as String).replacePlaceholder(inputs, outputs),
+            agentName,
+            agentVersion,
+            isTest);
       default:
         throw Exception('Unknown step type: ${json['type']}');
     }

@@ -1,4 +1,5 @@
 import 'package:dash_agent/data/datasource.dart';
+import 'package:dash_agent/extension/list_extension.dart';
 import 'package:dash_agent/variables/dash_input.dart';
 import 'package:dash_agent/variables/dash_output.dart';
 import 'package:meta/meta.dart';
@@ -101,6 +102,7 @@ class WorkspaceQueryStep extends Step {
       'type': 'search_in_workspace',
       'query': query,
       'outputs': [for (final dashOutput in dashOutputs) '$dashOutput'],
+      'workspace_object_type': 'all',
       'version': version
     };
     return processedJson;
@@ -171,7 +173,7 @@ class PromptQueryStep extends Step {
 
   @override
   List<DashOutput> get dashOutputs =>
-      [promptOutput, codeOutput].nonNulls.toList();
+      [promptOutput, codeOutput].nonNull();
 }
 
 /// Appends the value to the chat.

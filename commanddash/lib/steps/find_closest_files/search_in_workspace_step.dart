@@ -68,7 +68,7 @@ class SearchInWorkspaceStep extends Step {
           "embeddings":
               json.encode(embeddedFiles.map((e) => e.getCacheMap()).toList()),
         },
-        timeoutKind: TimeoutKind.stretched);
+        timeoutKind: TimeoutKind.sync);
 
     // This logic is include the newly generated embeddings in the embedding matching
     for (var file in dartFiles) {
