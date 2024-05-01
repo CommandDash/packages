@@ -174,13 +174,13 @@ We welcome the Flutter and AI enthusiasts likewise to contribute to this amazing
 
 ## Testing Your Agents
 
-Once the agent is [deployed for testing](https://pub.dev/packages/dash_cli#3-deploy-your-agent). You can test them in your CommandDash extension. You'll be able to find your agent with **test** label in the **agent marketplace** of CommandDash as shown below:
+After deploying your agent for testing using the `dash_cli publish --test` command, you'll find your agent labeled as test in the CommandDash agent marketplace, as illustrated below:
 
 [<img src="assets/test-agent-card.png"/>](assets/test-agent-card.png)
 
-Click on the install button. And you should be able to test your newly created agent in the extension.
+Simply click on the "install" button, and you'll be able to test your newly created agent within the extension.
 
-**Note**: You can navigate to the **agent marketplace** page in the CommandDash extension by clicking at the marketplace icon (encircled in the red square): 
+**Note**: Access the CommandDash agent marketplace page by clicking on the marketplace icon (highlighted in the red square) within the CommandDash extension:
 
 [<img src="assets/marketplace-icon.png" width="500"/>](assets/marketplace-icon.png)
 
