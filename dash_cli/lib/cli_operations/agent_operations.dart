@@ -107,7 +107,7 @@ class AgentOperation {
     wtLog.info('\nSuccessfully created the agent project $projectName');
   }
 
-  Future<void> publishAgent() async {
+  Future<void> publishAgent(bool isTest) async {
     wtLog.startSpinner('Fetching agent configuration...');
     final projectDirectory = PathUtils.currentPath;
     try {
@@ -122,6 +122,7 @@ class AgentOperation {
       agentJson['name'] = agentName;
       agentJson['description'] = agentDescription;
       agentJson['version'] = agentVersion;
+      agentJson['testing'] = isTest;
 
       wtLog.log('✔︎ Agent configuration fetched');
       wtLog.updateSpinnerMessage('Publishing agent...');
