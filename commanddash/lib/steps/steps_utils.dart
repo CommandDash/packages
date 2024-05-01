@@ -21,6 +21,16 @@ enum OutputType {
 }
 
 extension ProcessedQueryExtension on String {
+  List<String> getInputIds() {
+    final RegExp queryIdPattern = RegExp(r'<(\d+)>');
+    String stringValue = this;
+    final allMatches = queryIdPattern.allMatches(stringValue).toList();
+    final ids = allMatches.map((e) {
+      return e.group(1)!;
+    }).toList();
+    return ids;
+  }
+
   String replacePlaceholder(
       Map<String, Input> inputs, Map<String, Output> outputs) {
     final RegExp queryIdPattern = RegExp(r'<(\d+)>');

@@ -2,6 +2,8 @@ import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
+import 'package:commanddash/models/contextual_code.dart';
+import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
@@ -11,12 +13,14 @@ import 'package:commanddash/steps/steps_utils.dart';
 class PromptQueryStep extends Step {
   final String query;
   final List<Output> outputs;
-  final List<Input> inputs;
+  Map<String, Input> inputs;
+  Map<String, Output> outputsUntilNow; //TODO:rename eneded
   PromptQueryStep(
       {required List<String>? outputIds,
       required this.outputs,
       required this.query,
       required this.inputs,
+      required this.outputsUntilNow,
       Loader loader = const MessageLoader('Preparing Result')})
       : super(outputIds: outputIds, type: StepType.promptQuery, loader: loader);
 
@@ -24,7 +28,8 @@ class PromptQueryStep extends Step {
     Map<String, dynamic> json,
     String query,
     List<Output> outputs,
-    List<Input> inputs,
+    Map<String, Input> inputs,
+    Map<String, Output> outputsUntilNow,
   ) {
     return PromptQueryStep(
       outputIds:
@@ -32,6 +37,7 @@ class PromptQueryStep extends Step {
       outputs: outputs,
       query: query,
       inputs: inputs,
+      outputsUntilNow: outputsUntilNow,
     );
   }
 
@@ -41,21 +47,110 @@ class PromptQueryStep extends Step {
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     List<CodeInput> currentlyAdded = [];
-    currentlyAdded.addAll(inputs.whereType<CodeInput>());
+    final List<String> usedIds = query
+        .getInputIds(); // These are the input or output ids which are used in the prompt query
 
-    for (CodeInput code in inputs.whereType<CodeInput>()) {
-      taskAssist.sendLogMessage(message: "context-requrest", data: {
-        "filePath": code.filePath,
-        "range": code.range!.toJson(),
-      });
-      final context = await taskAssist.processStep(
-          kind: "context",
-          args: {
-            "filePath": code.filePath,
-            "range": code.range!.toJson(),
-          },
-          timeoutKind: TimeoutKind.async);
-      taskAssist.sendLogMessage(message: "context-recieved", data: context);
+    String prompt = query;
+    int promptLength = prompt.length;
+    double availableToken = (26000 * 2.7) -
+        promptLength; // Max limit should come from the generation repository
+    // If there are available token, we will add the outputs
+    if (availableToken <= 0) {
+      taskAssist.sendLogMessage(
+          message: "Prompt length too long to add outputs code",
+          data: {"promptLength": promptLength});
+    } else {
+      for (String id in usedIds) {
+        if (inputs.containsKey(id) && inputs[id] is CodeInput) {
+          prompt.replaceAll(id, inputs[id].toString());
+          currentlyAdded.add(inputs[id] as CodeInput);
+        } else if (outputs.contains(id) &&
+            outputsUntilNow[id] is MultiCodeOutput) {
+          final value = outputsUntilNow[id] as MultiCodeOutput;
+          if (value.value != null) {
+            prompt = prompt.replaceAll(id, value.toString());
+            for (WorkspaceFile file in value.value!) {
+              final CodeInput codeInput = CodeInput(
+                id: id,
+                content: file.content,
+                range: file.range,
+              );
+              if (availableToken > 0) {
+                currentlyAdded.add(codeInput);
+              }
+            }
+          }
+        }
+      }
+    }
+    if (availableToken <= 0) {
+      taskAssist.sendLogMessage(
+          message: "Prompt length too long to add nested code",
+          data: {"promptLength": promptLength});
+    } else {
+      final Map<CodeInput, int> nestedCodes = {};
+      // Extract inputids from query
+      for (CodeInput code in inputs.values.whereType<CodeInput>()) {
+        taskAssist.sendLogMessage(message: "context-requrest", data: {
+          "filePath": code.filePath,
+          "range": code.range!.toJson(),
+        });
+        final context = await taskAssist.processStep(
+            kind: "context",
+            args: {
+              "filePath": code.filePath,
+              "range": code.range!.toJson(),
+            },
+            timeoutKind: TimeoutKind.async);
+        // TODO: change this to accomodate more than one context per each codeInput
+        final listOfContext = context['context'] as List<dynamic>;
+        for (var nestedCode in listOfContext) {
+          final CodeInput codeInput = CodeInput(
+            id: code.id + "-context",
+            content: nestedCode['content'],
+            filePath: nestedCode['filePath'],
+            range: Range(
+              start: Position(line: 1, character: 1),
+              end: Position(
+                line: (nestedCode['content'] as String).split('\n').length,
+                character:
+                    (nestedCode['content'] as String).split('\n').last.length,
+              ),
+            ),
+          );
+          final duplicatedId =
+              checkIfUnique(nestedCodes.keys.toList(), codeInput);
+
+          if (duplicatedId == null) {
+            nestedCodes.addAll({codeInput: 1});
+          } else {
+            final key = nestedCodes.keys
+                .where((element) => element.id == duplicatedId)
+                .first;
+            nestedCodes[key] = nestedCodes[key]! + 1;
+          }
+        }
+
+        // nestedCode sorted by frequency
+        final sortedNestedCode = nestedCodes.entries.toList()
+          ..sort(((a, b) {
+            return b.value.compareTo(a.value);
+          }));
+
+        int indexForNested = 0;
+        prompt =
+            "$prompt\nHere is some contextual code which might be helpful\n";
+        while (availableToken > 0 && indexForNested < sortedNestedCode.length) {
+          final code = sortedNestedCode[indexForNested].key;
+          prompt = prompt + '${code.filePath}\n```${code.content}```';
+          indexForNested++;
+          availableToken = availableToken - code.content!.length;
+          currentlyAdded.add(code);
+        }
+        taskAssist.sendLogMessage(
+            message: "context-recieved",
+            data: {"context": currentlyAdded, "prompt": prompt});
+      }
     }
 
     final response = await generationRepository.getCompletion(query);

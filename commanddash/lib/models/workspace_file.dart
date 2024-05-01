@@ -9,11 +9,28 @@ class WorkspaceFile {
   List<double>? embedding;
   Range? range;
 
-  WorkspaceFile.fromPaths(this.path) {
+  WorkspaceFile.fromPaths(
+    this.path,
+  ) {
     content = File(path).readAsStringSync();
     if (File(path).existsSync() && content != null) {
       codeHash = computeCodeHash(content!);
     }
+    range = Range(
+        start: Position(line: 0, character: 0),
+        end: _getEndPosition(content ?? ''));
+  }
+
+  Position _getEndPosition(String content) {
+    // Split the content into lines
+    List<String> lines = content.split('\n');
+
+    // Determine the last line number and character position
+    int lastLine = lines.length - 1;
+    int lastCharacter = lines.isNotEmpty ? lines.last.length : 0;
+
+    // Return the last position
+    return Position(line: lastLine, character: lastCharacter);
   }
 
   WorkspaceFile(this.path, {this.content, this.codeHash, this.embedding});
@@ -72,6 +89,13 @@ class Range {
         character: json['end']['character'],
       ),
     );
+  }
+
+  bool includes(Range range) {
+    return range.start.line >= start.line &&
+        range.start.character >= start.character &&
+        range.end.line <= end.line &&
+        range.end.character <= end.character;
   }
 
   // Convert Range to JSON map
