@@ -56,33 +56,44 @@ class PromptQueryStep extends Step {
         promptLength; // Max limit should come from the generation repository
     // If there are available token, we will add the outputs
     if (availableToken <= 0) {
-      taskAssist.sendLogMessage(
+      taskAssist.sendErrorMessage(
           message: "Prompt length too long to add outputs code",
           data: {"promptLength": promptLength});
-    } else {
-      for (String id in usedIds) {
-        if (inputs.containsKey(id) && inputs[id] is CodeInput) {
-          prompt.replaceAll(id, inputs[id].toString());
-          currentlyAdded.add(inputs[id] as CodeInput);
-        } else if (outputs.contains(id) &&
-            outputsUntilNow[id] is MultiCodeOutput) {
-          final value = outputsUntilNow[id] as MultiCodeOutput;
-          if (value.value != null) {
-            prompt = prompt.replaceAll(id, value.toString());
-            for (WorkspaceFile file in value.value!) {
-              final CodeInput codeInput = CodeInput(
-                id: id,
-                content: file.content,
-                range: file.range,
-              );
-              if (availableToken > 0) {
+      return [];
+    }
+
+    for (String id in usedIds) {
+      if (inputs.containsKey(id)) {
+        switch (inputs[id].runtimeType) {
+          case CodeInput:
+            currentlyAdded.add(inputs[id] as CodeInput);
+            break;
+        }
+      } else if (outputsUntilNow.containsKey(id)) {
+        switch (outputsUntilNow[id].runtimeType) {
+          case MultiCodeOutput:
+            final value = outputsUntilNow[id] as MultiCodeOutput;
+            if (value.value != null) {
+              for (WorkspaceFile file in value.value!) {
+                final CodeInput codeInput = CodeInput(
+                  id: id,
+                  content: file.content,
+                  range: file.range,
+                );
+
                 currentlyAdded.add(codeInput);
               }
             }
-          }
+            break;
         }
       }
     }
+
+    /// replace prompt with our common logic and reduce total tokens replaced.
+    prompt = prompt.replacePlaceholder(inputs, outputsUntilNow,
+        totalTokensAddedCallback: (newReplacedTokens) =>
+            availableToken -= newReplacedTokens);
+
     if (availableToken <= 0) {
       taskAssist.sendLogMessage(
           message: "Prompt length too long to add nested code",
