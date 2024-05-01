@@ -23,12 +23,12 @@ class DashRepository {
     return response.data;
   }
 
-  Future<List<DataSource>> getDatasource({
-    required String agentName,
-    required String agentVersion,
-    required String query,
-    required List<DataSource> datasources,
-  }) async {
+  Future<List<DataSource>> getDatasource(
+      {required String agentName,
+      required String agentVersion,
+      required String query,
+      required List<DataSource> datasources,
+      required bool isTest}) async {
     try {
       final response = await dio.post(
         '/agent/get-reference',
@@ -37,7 +37,7 @@ class DashRepository {
           "query": query,
           "version": agentVersion,
           "matching_doc_data_source_ids": datasources.map((e) => e.id).toList(),
-          "testing": false,
+          "testing": isTest,
         },
       );
       return List<Map<String, dynamic>>.from(response.data['data']).map((e) {

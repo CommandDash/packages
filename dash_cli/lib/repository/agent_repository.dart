@@ -10,7 +10,6 @@ class AgentRepository {
   final baseUrl = 'https://api.commanddash.dev';
 
   Future<String> publishAgent(Map agentJson) async {
-    agentJson['testing'] = false;
     final response = await http.post(Uri.parse('$baseUrl/agent/deploy-agent'),
         body: jsonEncode(agentJson),
         headers: {

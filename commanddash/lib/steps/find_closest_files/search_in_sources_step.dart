@@ -14,6 +14,7 @@ class SearchInSourceStep extends Step {
   final List<DataSource> dataSource;
   final String agentName;
   final String agentVersion;
+  final bool isTest;
 
   SearchInSourceStep({
     required List<String> outputIds,
@@ -21,6 +22,7 @@ class SearchInSourceStep extends Step {
     required this.dataSource,
     required this.agentName,
     required this.agentVersion,
+    required this.isTest,
     Loader loader = const MessageLoader('Searching in sources'),
   }) : super(
           outputIds: outputIds,
@@ -33,16 +35,19 @@ class SearchInSourceStep extends Step {
     String query,
     String agentName,
     String agentVersion,
+    bool isTest,
   ) {
     return SearchInSourceStep(
-      outputIds:
-          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
-      query: query,
-      agentName: agentName,
-      agentVersion: agentVersion,
-      dataSource:
-          (json['data_sources'] as List).map((e) => DataSource(id: e)).toList(),
-    );
+        outputIds: (json['outputs'] as List<dynamic>)
+            .map((e) => e.toString())
+            .toList(),
+        query: query,
+        agentName: agentName,
+        agentVersion: agentVersion,
+        dataSource: (json['data_sources'] as List)
+            .map((e) => DataSource(id: e))
+            .toList(),
+        isTest: isTest);
   }
 
   @override
@@ -57,7 +62,8 @@ class SearchInSourceStep extends Step {
         query: query,
         agentName: agentName,
         agentVersion: agentVersion,
-        datasources: dataSource);
+        datasources: dataSource,
+        isTest: isTest);
     return [DataSourceResultOutput(response)];
   }
 }
