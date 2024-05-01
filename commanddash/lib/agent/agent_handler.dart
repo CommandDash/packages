@@ -50,7 +50,7 @@ class AgentHandler {
         githubAccessToken: json['auth_details']['github_token'],
         agentName: json['agent_name'],
         agentVersion: json['agent_version'],
-        isTest: json['testing']);
+        isTest: json['testing'] ?? false);
   }
 
   Future<void> runTask(TaskAssist taskAssist) async {
