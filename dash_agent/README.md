@@ -172,6 +172,18 @@ We welcome the Flutter and AI enthusiasts likewise to contribute to this amazing
 -  **Participate in discussions**: Help by sharing your ideas in the [active discussions](https://join.slack.com/t/welltested-ai/shared_invite/zt-25u09fty8-gaggH9HbmopB~4tialTrlA) in our community slack.
 
 
+## Testing Your Agents
+
+Once the agent is [deployed for testing](https://pub.dev/packages/dash_cli#3-deploy-your-agent). You can test them in your CommandDash extension. You'll be able to find your agent with **test** label in the **agent marketplace** of CommandDash as shown below:
+
+[<img src="assets/test-agent-card.png"/>](assets/test-agent-card.png)
+
+Click on the install button. And you should be able to test your newly created agent in the extension.
+
+**Note**: You can navigate to the **agent marketplace** page in the CommandDash extension by clicking at the marketplace icon (encircled in the red square): 
+
+[<img src="assets/marketplace-icon.png" width="500"/>](assets/marketplace-icon.png)
+
 ## Community
 
 Connect with like-minded people building with Flutter and using AI to do so, every step of the way :D [Join Now](https://join.slack.com/t/welltested-ai/shared_invite/zt-25u09fty8-gaggH9HbmopB~4tialTrlA)
