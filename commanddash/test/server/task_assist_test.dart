@@ -112,6 +112,9 @@ void main() {
         "data": {"result": "success", "value": "unique_value"}
       }));
       result = await queue.next;
+      expect(result, isA<LogMessage>());
+      expect((result as LogMessage).message, 'response received');
+      result = await queue.next;
       expect(result, isA<ResultMessage>());
       expect(result.id, 1);
     });

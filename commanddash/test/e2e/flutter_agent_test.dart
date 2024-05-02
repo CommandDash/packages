@@ -31,14 +31,14 @@ void main() {
         {
           "method": "agent-execute",
           "id": 1,
-          "version": "1.0.0",
           'params': {
-            "authdetails": {
+            "auth_details": {
               "type": "gemini",
               "key": EnvReader.get('GEMINI_KEY'),
               "githubToken": "authtoken",
             },
             "agent_name": "flutter",
+            "agent_version": "1.0.0",
             "slug": "/doc",
             "intent": "Your Flutter doc expert",
             "text_field_layout":
@@ -77,7 +77,7 @@ void main() {
               },
               {
                 "type": "prompt_query",
-                "query":
+                "prompt":
                     "You are an Flutter expert who answers user's queries related to the framework. \n\n Please find the user query <Query> and relavant references <References> picked from the Flutter docs to assist you: \n\n Query: <14340369>, \nReferences: <897806645>. Please respond to the user's query!",
                 "outputs": ["81443790", "81443791"],
               },

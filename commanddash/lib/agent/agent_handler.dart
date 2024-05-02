@@ -14,15 +14,18 @@ class AgentHandler {
   final String agentName;
   final String agentVersion;
 
-  AgentHandler({
-    required this.inputs,
-    required this.outputs,
-    required this.steps,
-    required this.generationRepository,
-    required this.agentName,
-    required this.agentVersion,
-    this.githubAccessToken,
-  });
+  /// Marks the agent as a test agent.
+  final bool isTest;
+
+  AgentHandler(
+      {required this.inputs,
+      required this.outputs,
+      required this.steps,
+      required this.generationRepository,
+      required this.agentName,
+      required this.agentVersion,
+      this.githubAccessToken,
+      this.isTest = false});
 
   factory AgentHandler.fromJson(Map<String, dynamic> json) {
     final inputs = <String, Input>{};
@@ -37,17 +40,17 @@ class AgentHandler {
         (json['steps'] as List).cast<Map<String, dynamic>>();
 
     final GenerationRepository generationRepository =
-        GenerationRepository.fromJson(json['authdetails']);
+        GenerationRepository.fromJson(json['auth_details']);
 
     return AgentHandler(
-      inputs: inputs,
-      outputs: outputs,
-      steps: steps,
-      generationRepository: generationRepository,
-      githubAccessToken: json['authdetails']['githubToken'],
-      agentName: json['name'] ?? '',
-      agentVersion: json['version'] ?? '',
-    );
+        inputs: inputs,
+        outputs: outputs,
+        steps: steps,
+        generationRepository: generationRepository,
+        githubAccessToken: json['auth_details']['github_token'],
+        agentName: json['agent_name'],
+        agentVersion: json['agent_version'],
+        isTest: json['testing'] ?? false);
   }
 
   Future<void> runTask(TaskAssist taskAssist) async {
@@ -58,8 +61,8 @@ class AgentHandler {
     try {
       for (Map<String, dynamic> stepJson in steps) {
         try {
-          final step =
-              Step.fromJson(stepJson, inputs, outputs, agentName, agentVersion);
+          final step = Step.fromJson(
+              stepJson, inputs, outputs, agentName, agentVersion, isTest);
           final results = await step.run(
                   taskAssist, generationRepository, dashRepository) ??
               [];

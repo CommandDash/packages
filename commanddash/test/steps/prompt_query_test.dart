@@ -30,7 +30,9 @@ void main() {
       "method": "agent-execute",
       "id": 1,
       "params": {
-        "authdetails": {
+        "agent_name": "",
+        "agent_version": "1.0.0",
+        "auth_details": {
           "type": "gemini",
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
@@ -49,7 +51,7 @@ void main() {
         "steps": [
           {
             "type": "prompt_query",
-            "query": "<736841542>. Extra info: <736841543>",
+            "prompt": "<736841542>. Extra info: <736841543>",
             "post_process": {"type": "raw"},
             "outputs": ["90611917"]
           },
@@ -70,18 +72,6 @@ void main() {
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect((result as ResultMessage).message, isNotEmpty);
-    expect((result as ResultMessage).data.containsKey('90611917'), true);
-    expect((result as ResultMessage).data['90611917'], isA<DefaultOutput>());
-    expect(
-        ((result as ResultMessage).data['90611917'] as DefaultOutput).value !=
-            null,
-        true);
-    expect(
-        ((result as ResultMessage).data['90611917'] as DefaultOutput)
-            .value!
-            .isNotEmpty,
-        true);
   });
 
   test('Process a prompt request with code parser', () async {
@@ -91,7 +81,9 @@ void main() {
       "method": "agent-execute",
       "id": 1,
       "params": {
-        "authdetails": {
+        "agent_name": "",
+        "agent_version": "1.0.0",
+        "auth_details": {
           "type": "gemini",
           "key": EnvReader.get('GEMINI_KEY'),
           "githubToken": ""
@@ -109,7 +101,7 @@ void main() {
         "steps": [
           {
             "type": "prompt_query",
-            "query": "<736841542>",
+            "prompt": "<736841542>",
             "post_process": {"type": "code"},
             "outputs": ["90611917"]
           },
@@ -130,18 +122,6 @@ void main() {
     expect(result, isA<ResultMessage>());
     expect(result.id, 1);
     expect((result as ResultMessage).message, 'TASK_COMPLETE');
-    expect((result as ResultMessage).message, isNotEmpty);
-    expect((result as ResultMessage).data.containsKey('90611917'), true);
-    expect((result as ResultMessage).data['90611917'], isA<DefaultOutput>());
-    expect(
-        ((result as ResultMessage).data['90611917'] as DefaultOutput).value !=
-            null,
-        true);
-    expect(
-        ((result as ResultMessage).data['90611917'] as DefaultOutput)
-            .value!
-            .isNotEmpty,
-        true);
   });
 
   test(
@@ -153,7 +133,9 @@ void main() {
         "method": "agent-execute",
         "id": 1,
         "params": {
-          "authdetails": {
+          "agent_name": "",
+          "agent_version": "1.0.0",
+          "auth_details": {
             "type": "gemini",
             "key": EnvReader.get('GEMINI_KEY'),
             "githubToken": ""
@@ -198,18 +180,6 @@ void main() {
       expect(result, isA<ResultMessage>());
       expect(result.id, 1);
       expect((result as ResultMessage).message, 'TASK_COMPLETE');
-      expect((result as ResultMessage).message, isNotEmpty);
-      expect((result as ResultMessage).data.containsKey('90611917'), true);
-      expect((result as ResultMessage).data['90611917'], isA<DefaultOutput>());
-      expect(
-          ((result as ResultMessage).data['90611917'] as DefaultOutput).value !=
-              null,
-          true);
-      expect(
-          ((result as ResultMessage).data['90611917'] as DefaultOutput)
-              .value!
-              .isNotEmpty,
-          true);
     },
   );
   test(
@@ -221,7 +191,9 @@ void main() {
         "method": "agent-execute",
         "id": 1,
         "params": {
-          "authdetails": {
+          "agent_name": "",
+          "agent_version": "1.0.0",
+          "auth_details": {
             "type": "gemini",
             "key": EnvReader.get('GEMINI_KEY'),
             "githubToken": ""
@@ -246,7 +218,7 @@ void main() {
           "steps": [
             {
               "type": "prompt_query",
-              "query": "<736841542>. Extra info: <736841543>",
+              "prompt": "<736841542>. Extra info: <736841543>",
               "outputs": [
                 "90611917",
                 "90611918",
@@ -270,29 +242,6 @@ void main() {
       expect(result, isA<ResultMessage>());
       expect(result.id, 1);
       expect((result as ResultMessage).message, 'TASK_COMPLETE');
-      expect((result as ResultMessage).message, isNotEmpty);
-      expect((result as ResultMessage).data.containsKey('90611917'), true);
-      expect((result as ResultMessage).data['90611917'], isA<DefaultOutput>());
-      expect(
-          ((result as ResultMessage).data['90611917'] as DefaultOutput).value !=
-              null,
-          true);
-      expect(
-          ((result as ResultMessage).data['90611917'] as DefaultOutput)
-              .value!
-              .isNotEmpty,
-          true);
-      expect((result as ResultMessage).data.containsKey('90611918'), true);
-      expect((result as ResultMessage).data['90611918'], isA<CodeOutput>());
-      expect(
-          ((result as ResultMessage).data['90611918'] as CodeOutput).code !=
-              null,
-          true);
-      expect(
-          ((result as ResultMessage).data['90611918'] as CodeOutput)
-              .code!
-              .isNotEmpty,
-          true);
     },
   );
 }

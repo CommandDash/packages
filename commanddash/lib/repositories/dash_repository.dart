@@ -23,25 +23,28 @@ class DashRepository {
     return response.data;
   }
 
-  Future<List<DataSource>> getDatasource({
-    required String agentName,
-    required String agentVersion,
-    required String query,
-    required List<DataSource> datasources,
-  }) async {
+  Future<List<DataSource>> getDatasource(
+      {required String agentName,
+      required String agentVersion,
+      required String query,
+      required List<DataSource> datasources,
+      required bool isTest}) async {
     try {
-      final response = await dio.post('/agent/get-reference', data: {
-        "name": agentName,
-        "query": query,
-        "version": agentVersion,
-        "matching_doc_data_source_ids": datasources.map((e) => e.id).toList(),
-        "testing": true,
-      });
+      final response = await dio.post(
+        '/agent/get-reference',
+        data: {
+          "name": agentName,
+          "query": query,
+          "version": agentVersion,
+          "matching_doc_data_source_ids": datasources.map((e) => e.id).toList(),
+          "testing": isTest,
+        },
+      );
       return List<Map<String, dynamic>>.from(response.data['data']).map((e) {
         return DataSource.fromJson(e);
       }).toList();
     } catch (e) {
-      throw Exception('Error fetching datasource');
+      throw Exception('Error fetching datasource: ${e.toString()}');
     }
   }
 
@@ -49,7 +52,7 @@ class DashRepository {
   Future<List<Map<String, dynamic>>> getAgents() async {
     try {
       final response = await dio.post('/agent/get-general-agents', data: {
-        "testing": true,
+        "testing": false,
         "min_cli_version": "1.0.0",
       });
       return response.data;

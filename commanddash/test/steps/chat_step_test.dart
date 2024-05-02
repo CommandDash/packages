@@ -34,7 +34,9 @@ void main() {
               "method": "agent-execute",
               "id": 1,
               "params": {
-                "authdetails": {
+                "agent_name": "",
+                "agent_version": "1.0.0",
+                "auth_details": {
                   "type": "gemini",
                   "key": EnvReader.get('GEMINI_KEY'),
                   "githubToken": ""
@@ -113,7 +115,9 @@ void main() {
               "method": "agent-execute",
               "id": 1,
               "params": {
-                "authdetails": {
+                "agent_name": "",
+                "agent_version": "1.0.0",
+                "auth_details": {
                   "type": "gemini",
                   "key": EnvReader.get('GEMINI_KEY'),
                   "githubToken": ""

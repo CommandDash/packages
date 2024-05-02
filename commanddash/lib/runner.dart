@@ -32,7 +32,8 @@ class VersionCommand extends Command {
 
   @override
   void run() {
-    print('0.0.1');
+    /// It is not possible to fetch version from pubspec.yaml hence assigning manually
+    print('0.0.5');
   }
 }
 
@@ -47,6 +48,6 @@ class MinCLIVersionCommand extends Command {
 
   @override
   void run() {
-    print('0.3.2');
+    print('0.3.4');
   }
 }

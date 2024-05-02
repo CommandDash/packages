@@ -80,12 +80,11 @@ class WebPage extends WebDataObject {
 class SiteMap extends WebDataObject {
   SiteMap(this.xml);
 
-  /// xml link that contains the link of all the web pages of the domain which are 
+  /// xml link that contains the link of all the web pages of the domain which are
   /// relevant to agent and can be used for referencing.
   final String xml;
 
-
-/// Internal method used by dash_agent to convert the shared `DataSource` to json
+  /// Internal method used by dash_agent to convert the shared `DataSource` to json
   /// format that can be sent on the web
   ///
   /// **Note**: Ideally, this method is not supposed to be overriden by the child

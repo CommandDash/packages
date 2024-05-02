@@ -25,7 +25,7 @@ class AgentOperation {
     final projectPath = '${PathUtils.currentPath}/$projectName';
 
     // update the bin directory
-    wtLog.log('- created dart project.');
+    wtLog.log('Setting up the agent project');
     wtLog.updateSpinnerMessage('updating bin directory...');
     final binPath = '$projectPath/bin';
     final binDirectory = Directory(binPath);
@@ -42,10 +42,10 @@ class AgentOperation {
     }
 
     // add the main file from the template
-    File('$binPath/main.dart').writeAsStringSync(SimpleAgentTemplate.main);
+    File('$binPath/main.dart').writeAsStringSync(
+        SimpleAgentTemplate.main.replaceFirst('{project_name}', projectName));
 
     // update the lib directory
-    wtLog.log('- updated bin directory.');
     wtLog.updateSpinnerMessage('updating lib directory...');
     final libPath = '$projectPath/lib';
     final libDirectory = Directory(libPath);
@@ -62,12 +62,15 @@ class AgentOperation {
     }
 
     // add the lib files from the template
-    File('$libPath/my_agent.dart')
-        .writeAsStringSync(SimpleAgentTemplate.myAgent);
+    File('$libPath/agent.dart').writeAsStringSync(SimpleAgentTemplate.myAgent);
+    wtLog.log('✔︎ Agent configuration created');
     File('$libPath/data_sources.dart')
         .writeAsStringSync(SimpleAgentTemplate.dataSources);
-    File('$libPath/ask_command.dart')
+    wtLog.log('✔︎ Added starter datasources');
+    await Directory('$libPath/commands').create();
+    File('$libPath/commands/ask.dart')
         .writeAsStringSync(SimpleAgentTemplate.askCommand);
+    wtLog.log('✔︎ Added sample commands');
 
     // delete test directory content
     final testPath = '$projectPath/test';
@@ -84,17 +87,15 @@ class AgentOperation {
     }
 
     // update readme file
-    wtLog.log('- updated lib directory.');
     wtLog.updateSpinnerMessage('updating the reamdme file...');
     final readmeFilePath = '$projectPath/README.md';
     File(readmeFilePath).writeAsStringSync(SimpleAgentTemplate.readme);
 
     // update the pubspec file
-    wtLog.log('- updated reamdme file.');
     wtLog.updateSpinnerMessage('updating the pubspec file..');
 
     try {
-      await runCommand('dart', ['pub', 'add', 'welltested_annotation'],
+      await runCommand('dart', ['pub', 'add', 'dash_agent'],
           workingDirectory: projectPath);
     } catch (error) {
       wtLog.log(
@@ -102,12 +103,11 @@ class AgentOperation {
       wtLog.stopSpinner();
       return;
     }
-    wtLog.log('- updated pubspec file.');
     wtLog.stopSpinner();
-    wtLog.info('\nSuccessfully created the project $projectName');
+    wtLog.info('\nSuccessfully created the agent project $projectName');
   }
 
-  Future<void> publishAgent() async {
+  Future<void> publishAgent(bool isTest) async {
     wtLog.startSpinner('Fetching agent configuration...');
     final projectDirectory = PathUtils.currentPath;
     try {
@@ -122,12 +122,13 @@ class AgentOperation {
       agentJson['name'] = agentName;
       agentJson['description'] = agentDescription;
       agentJson['version'] = agentVersion;
+      agentJson['testing'] = isTest;
 
-      wtLog.log('- Agent configuration fetched');
+      wtLog.log('✔︎ Agent configuration fetched');
       wtLog.updateSpinnerMessage('Publishing agent...');
       final status = await _agentRepository.publishAgent(agentJson);
 
-      wtLog.log('- Published agent');
+      wtLog.log('✔︎ Published agent');
       wtLog.stopSpinner();
       wtLog.info(status);
       return;

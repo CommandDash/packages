@@ -8,6 +8,10 @@ import '../../core/auth.dart';
 import '../../utils/logger.dart';
 
 class PublishAgentCommand extends Command<Object> {
+  late bool isTest;
+  PublishAgentCommand() {
+    argParser.addFlag('test', abbr: 't', callback: (p0) => isTest = p0);
+  }
   @override
   String get description => 'Publish the agent to command dash server';
 
@@ -30,6 +34,6 @@ class PublishAgentCommand extends Command<Object> {
       }
     }
 
-    await AgentOperation().publishAgent();
+    await AgentOperation().publishAgent(isTest);
   }
 }
