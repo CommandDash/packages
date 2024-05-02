@@ -37,15 +37,26 @@ This command initiates the GitHub login flow, redirecting you to an authenticati
 
 ### 3. Deploy your Agent
 
-To deploy the agent once you are finished logging in, please run the following command from the agent project directory:
+Before deploying the agent for the first time, it's recommended to test its functionality to ensure it meets your expectations. You can do this by deploying the agent in test mode, which makes it accessible only to you via the CommandDash extension. To deploy the agent in test mode, navigate to the agent project directory and run the following command:
 
 ```shell
-dash_cli publish
+dash_cli publish --test
 ```
 
 This command fetches and validates your agent configuration. If validation is successful:
 - The agent will be scheduled for creation.
 - If validation fails, a warning will be issued indicating 'Failed to fetch agent configuration'. In such a case, please fix the agent configuration and attempt to publish again.
+
+Once the deployment is successful, you will receive an email notification at the email address associated with your CommandDash account, confirming that your agent is ready for testing. Follow the instructions provided in the [Test Your Agent](#5-test-your-agents) section to proceed with testing your deployed agents.
+
+
+After you are satisfied with the performance of your agent and wish to publish it for the developer community, you can do so by running the following command from the agent directory:
+
+```shell
+dash_cli publish
+```
+
+**Note**: You need to be logged in to dash_cli to deploy the agent
 
 ### 4. Logout from your dash_cli
 
@@ -54,6 +65,18 @@ To logout from your dash_cli. Simply run the following command:
 ```shell
 dash_cli logout
 ```
+
+### 5. Test Your Agents
+
+After deploying your agent for testing using the `dash_cli publish --test` command, you'll find your agent labeled as test in the CommandDash agent marketplace, as illustrated below:
+
+[<img src="assets/test-agent-card.png"/>](assets/test-agent-card.png)
+
+Simply click on the "install" button, and you'll be able to test your newly created agent within the extension.
+
+**Note**: Access the CommandDash agent marketplace page by clicking on the marketplace icon (highlighted in the red square) within the CommandDash extension:
+
+[<img src="assets/marketplace-icon.png" width="500"/>](assets/marketplace-icon.png)
 
 ## Additional information
 
