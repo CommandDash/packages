@@ -172,8 +172,7 @@ class PromptQueryStep extends Step {
   String get version => '0.0.1';
 
   @override
-  List<DashOutput> get dashOutputs =>
-      [promptOutput, codeOutput].nonNull();
+  List<DashOutput> get dashOutputs => [promptOutput, codeOutput].nonNull();
 }
 
 /// Appends the value to the chat.
