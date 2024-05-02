@@ -1,6 +1,6 @@
 name: dash_cli
 description: "CLI tool for building dash agents for CommandDash"
-version: 0.1.0
+version: 0.1.1
 homepage: https://www.commanddash.io
 
 repository: https://github.com/CommandDash/packages/tree/main/dash_cli
