@@ -1,6 +1,6 @@
 name: dash_agent
 description: "Framework package to create and publish dash agents for commanddash"
-version: 0.2.0
+version: 0.2.1
 homepage: https://www.commanddash.io
 
 repository: https://github.com/CommandDash/packages/tree/main/dash_agent

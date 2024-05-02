@@ -1,3 +1,7 @@
+## 0.2.1
+
+* **Updated README**: Fixed broken images in README
+
 ## 0.2.0
 
 * **WorkspaceQueryStep Improvement**: Added `workspace_object_type` parameter to WorkpaceQeuryStep

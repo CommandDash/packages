@@ -161,6 +161,18 @@ Currently supported steps that are available for you to leverage are shared belo
 
 In future more steps will be included in the list as the framework evolves.
 
+## Testing Your Agents
+
+After deploying your agent for testing using the `dash_cli publish --test` command, you'll find your agent labeled as test in the CommandDash agent marketplace, as illustrated below:
+
+[<img src="https://raw.githubusercontent.com/CommandDash/packages/develop/dash_agent/assets/test-agent-card.png"/>](assets/test-agent-card.png)
+
+Simply click on the "install" button, and you'll be able to test your newly created agent within the extension.
+
+**Note**: Access the CommandDash agent marketplace page by clicking on the marketplace icon (highlighted in the red square) within the CommandDash extension:
+
+[<img src="https://raw.githubusercontent.com/CommandDash/packages/develop/dash_agent/assets/marketplace-icon.png" width="500"/>](assets/marketplace-icon.png)
+
 ## Additional information
 
 We welcome the Flutter and AI enthusiasts likewise to contribute to this amazing open-source framework. You can contribute in the following ways:
@@ -170,19 +182,6 @@ We welcome the Flutter and AI enthusiasts likewise to contribute to this amazing
 -  **Pick up open issues**: Pick up and fix existing issues open to the community in [issues board](https://github.com/CommandDash/packages/issues).
 
 -  **Participate in discussions**: Help by sharing your ideas in the [active discussions](https://join.slack.com/t/welltested-ai/shared_invite/zt-25u09fty8-gaggH9HbmopB~4tialTrlA) in our community slack.
-
-
-## Testing Your Agents
-
-After deploying your agent for testing using the `dash_cli publish --test` command, you'll find your agent labeled as test in the CommandDash agent marketplace, as illustrated below:
-
-[<img src="assets/test-agent-card.png"/>](assets/test-agent-card.png)
-
-Simply click on the "install" button, and you'll be able to test your newly created agent within the extension.
-
-**Note**: Access the CommandDash agent marketplace page by clicking on the marketplace icon (highlighted in the red square) within the CommandDash extension:
-
-[<img src="assets/marketplace-icon.png" width="500"/>](assets/marketplace-icon.png)
 
 ## Community
 
