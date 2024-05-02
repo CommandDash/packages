@@ -166,7 +166,7 @@ class PromptQueryStep extends Step {
       }
     }
 
-    final response = await generationRepository.getCompletion(query);
+    final response = await generationRepository.getCompletion(prompt);
     final result = <Output>[];
     for (Output output in outputs) {
       if (output is CodeOutput) {
