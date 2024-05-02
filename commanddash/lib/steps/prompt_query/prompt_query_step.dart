@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
@@ -106,15 +108,16 @@ class PromptQueryStep extends Step {
           "filePath": code.filePath,
           "range": code.range!.toJson(),
         });
-        final context = await taskAssist.processStep(
-            kind: "context",
-            args: {
-              "filePath": code.filePath,
-              "range": code.range!.toJson(),
-            },
-            timeoutKind: TimeoutKind.async);
-        // TODO: change this to accomodate more than one context per each codeInput
-        final listOfContext = context['context'] as List<dynamic>;
+        final data = await taskAssist.processStep(
+          kind: "context",
+          args: {
+            "filePath": code.filePath,
+            "range": code.range!.toJson(),
+          },
+          timeoutKind: TimeoutKind.stretched,
+        );
+        final context = data['context'];
+        final listOfContext = context as List<dynamic>;
         for (var nestedCode in listOfContext) {
           final CodeInput codeInput = CodeInput(
             id: code.id + "-context",
@@ -159,8 +162,7 @@ class PromptQueryStep extends Step {
           currentlyAdded.add(code);
         }
         taskAssist.sendLogMessage(
-            message: "context-recieved",
-            data: {"context": currentlyAdded, "prompt": prompt});
+            message: "context-recieved", data: {"prompt": prompt});
       }
     }
 
