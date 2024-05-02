@@ -1,3 +1,8 @@
+## 0.2.0
+
+* **WorkspaceQueryStep Improvement**: Added `workspace_object_type` parameter to WorkpaceQeuryStep
+* **Updated README**: The README has been updated to add section of **Testing Your Agents**.
+
 ## 0.1.1
 
 * Fixed type cast error for `PromptQueryStep.dashOutputs`
