@@ -68,7 +68,8 @@ class SearchInWorkspaceStep extends Step {
           "embeddings":
               json.encode(embeddedFiles.map((e) => e.getCacheMap()).toList()),
         },
-        timeoutKind: TimeoutKind.sync);
+        timeoutKind: TimeoutKind
+            .async); // Theres logic on the Ide which may take more than 6 seconds for huge workspaces.
 
     // This logic is include the newly generated embeddings in the embedding matching
     for (var file in dartFiles) {

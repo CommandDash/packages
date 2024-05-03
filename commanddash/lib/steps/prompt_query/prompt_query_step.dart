@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
@@ -16,7 +14,7 @@ class PromptQueryStep extends Step {
   final String query;
   final List<Output> outputs;
   Map<String, Input> inputs;
-  Map<String, Output> outputsUntilNow; //TODO:rename eneded
+  Map<String, Output> outputsUntilNow; //TODO:rename needed
   PromptQueryStep(
       {required List<String>? outputIds,
       required this.outputs,
@@ -102,12 +100,11 @@ class PromptQueryStep extends Step {
           data: {"promptLength": promptLength});
     } else {
       final Map<CodeInput, int> nestedCodes = {};
-      // Extract inputids from query
       for (CodeInput code in inputs.values.whereType<CodeInput>()) {
-        taskAssist.sendLogMessage(message: "context-requrest", data: {
-          "filePath": code.filePath,
-          "range": code.range!.toJson(),
-        });
+        if (!usedIds.contains(code.id)) {
+          continue;
+        }
+
         final data = await taskAssist.processStep(
           kind: "context",
           args: {
@@ -120,7 +117,7 @@ class PromptQueryStep extends Step {
         final listOfContext = context as List<dynamic>;
         for (var nestedCode in listOfContext) {
           final CodeInput codeInput = CodeInput(
-            id: code.id + "-context",
+            id: "${code.id}-context",
             content: nestedCode['content'],
             filePath: nestedCode['filePath'],
             range: Range(
@@ -156,13 +153,11 @@ class PromptQueryStep extends Step {
             "$prompt\nHere is some contextual code which might be helpful\n";
         while (availableToken > 0 && indexForNested < sortedNestedCode.length) {
           final code = sortedNestedCode[indexForNested].key;
-          prompt = prompt + '${code.filePath}\n```${code.content}```';
+          prompt = '$prompt${code.filePath}\n```${code.content}```';
           indexForNested++;
           availableToken = availableToken - code.content!.length;
           currentlyAdded.add(code);
         }
-        taskAssist.sendLogMessage(
-            message: "context-recieved", data: {"prompt": prompt});
       }
     }
 
