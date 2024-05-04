@@ -57,7 +57,7 @@ class PromptQueryStep extends Step {
     // If there are available token, we will add the outputs
     if (availableToken <= 0) {
       taskAssist.sendErrorMessage(
-          message: "Prompt length too long to add outputs code",
+          message: "Context length of prompt too long",
           data: {"promptLength": promptLength});
       return [];
     }
@@ -95,69 +95,81 @@ class PromptQueryStep extends Step {
             availableToken -= newReplacedTokens);
 
     if (availableToken <= 0) {
-      taskAssist.sendLogMessage(
-          message: "Prompt length too long to add nested code",
+      taskAssist.sendErrorMessage(
+          message: "Context length of prompt with given inputs is too long",
           data: {"promptLength": promptLength});
-    } else {
-      final Map<CodeInput, int> nestedCodes = {};
-      for (CodeInput code in inputs.values.whereType<CodeInput>()) {
-        if (!usedIds.contains(code.id)) {
+      return [];
+    }
+    final Map<CodeInput, int> nestedCodes = {};
+
+    for (CodeInput code in inputs.values.whereType<CodeInput>()) {
+      if (!usedIds.contains(code.id) && !code.includeContextualCode) {
+        continue;
+      }
+
+      /// TODO: Verify the code file is not already included in other code snippets
+      ///  - Include entire file if under a certain file size
+      ///  - or only occurency objects if not
+      /// TODO: Include the file of the code inputs as the context.
+
+      final data = await taskAssist.processStep(
+        kind: "context",
+        args: {
+          "filePath": code.filePath,
+          "range": code.range!.toJson(),
+        },
+        timeoutKind: TimeoutKind.stretched,
+      );
+      final context = data['context'];
+      final listOfContext = context as List<Map<String, dynamic>>;
+      for (final nestedCode in listOfContext) {
+        final CodeInput codeInput = CodeInput(
+          id: "${code.id}-context",
+          content: nestedCode['content'],
+          filePath: nestedCode['filePath'],
+          range: Range(
+            start: Position(line: 1, character: 1),
+            end: Position(
+              line: (nestedCode['content'] as String).split('\n').length,
+              character:
+                  (nestedCode['content'] as String).split('\n').last.length,
+            ),
+          ),
+        );
+        if (currentlyAdded.indexWhere((e) =>
+                e.fileContent?.contains(nestedCode['content']) ?? false) !=
+            -1) {
+          /// If the nested code is already added somewhere in the prompt (code input or matching documents), skip it!
           continue;
         }
 
-        final data = await taskAssist.processStep(
-          kind: "context",
-          args: {
-            "filePath": code.filePath,
-            "range": code.range!.toJson(),
-          },
-          timeoutKind: TimeoutKind.stretched,
-        );
-        final context = data['context'];
-        final listOfContext = context as List<dynamic>;
-        for (var nestedCode in listOfContext) {
-          final CodeInput codeInput = CodeInput(
-            id: "${code.id}-context",
-            content: nestedCode['content'],
-            filePath: nestedCode['filePath'],
-            range: Range(
-              start: Position(line: 1, character: 1),
-              end: Position(
-                line: (nestedCode['content'] as String).split('\n').length,
-                character:
-                    (nestedCode['content'] as String).split('\n').last.length,
-              ),
-            ),
-          );
-          final duplicatedId =
-              checkIfUnique(nestedCodes.keys.toList(), codeInput);
+        final duplicatedId =
+            checkIfUnique(nestedCodes.keys.toList(), codeInput);
 
-          if (duplicatedId == null) {
-            nestedCodes.addAll({codeInput: 1});
-          } else {
-            final key = nestedCodes.keys
-                .where((element) => element.id == duplicatedId)
-                .first;
-            nestedCodes[key] = nestedCodes[key]! + 1;
-          }
+        if (duplicatedId == null) {
+          nestedCodes.addAll({codeInput: 1});
+        } else {
+          final key = nestedCodes.keys
+              .where((element) => element.id == duplicatedId)
+              .first;
+          nestedCodes[key] = nestedCodes[key]! + 1;
         }
+      }
 
-        // nestedCode sorted by frequency
-        final sortedNestedCode = nestedCodes.entries.toList()
-          ..sort(((a, b) {
-            return b.value.compareTo(a.value);
-          }));
+      // nestedCode sorted by frequency
+      final sortedNestedCode = nestedCodes.entries.toList()
+        ..sort(((a, b) {
+          return b.value.compareTo(a.value);
+        }));
 
-        int indexForNested = 0;
-        prompt =
-            "$prompt\nHere is some contextual code which might be helpful\n";
-        while (availableToken > 0 && indexForNested < sortedNestedCode.length) {
-          final code = sortedNestedCode[indexForNested].key;
-          prompt = '$prompt${code.filePath}\n```${code.content}```';
-          indexForNested++;
-          availableToken = availableToken - code.content!.length;
-          currentlyAdded.add(code);
-        }
+      int indexForNested = 0;
+      prompt = "$prompt\nHere is some contextual code which might be helpful\n";
+      while (availableToken > 0 && indexForNested < sortedNestedCode.length) {
+        final code = sortedNestedCode[indexForNested].key;
+        prompt = '$prompt${code.filePath}\n```${code.content}```';
+        indexForNested++;
+        availableToken = availableToken - code.content!.length;
+        currentlyAdded.add(code);
       }
     }
 

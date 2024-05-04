@@ -53,21 +53,23 @@ class CodeInput extends Input {
   bool generateFullString;
   String? content;
   String? fileContent;
+  final bool includeContextualCode;
 
-  CodeInput({
-    required String id,
-    this.filePath,
-    this.range,
-    this.content,
-    this.generateFullString = false,
-    this.fileContent,
-  }) : super(id, 'code_input');
+  CodeInput(
+      {required String id,
+      this.filePath,
+      this.range,
+      this.content,
+      this.generateFullString = false,
+      this.fileContent,
+      this.includeContextualCode = true})
+      : super(id, 'code_input');
 
   factory CodeInput.fromJson(Map<String, dynamic> json) {
     if (json['value'] == null) {
       return CodeInput(
-        id: json['id'],
-      );
+          id: json['id'],
+          includeContextualCode: json['includeContextualCode'] ?? true);
     }
     final value = jsonDecode(json['value']);
     return CodeInput(
