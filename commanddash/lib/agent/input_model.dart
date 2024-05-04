@@ -15,7 +15,7 @@ abstract class Input {
     if (type == "string_input") {
       return StringInput.fromJson(json);
     } else if (type == "code_input") {
-      return CodeInput.fromJson(json);
+      return BaseCodeInput.fromJson(json);
     } else if (type == "chat_query_input") {
       return ChatQueryInput.fromJson(json);
     } else {
@@ -47,29 +47,14 @@ class StringInput extends Input {
   }
 }
 
-class CodeInput extends Input {
-  String? filePath;
-  Range? range;
-  bool generateFullString;
-  String? content;
-  String? fileContent;
-  final bool includeContextualCode;
+class BaseCodeInput extends Input {
+  BaseCodeInput(String id) : super(id, 'code_input');
 
-  CodeInput(
-      {required String id,
-      this.filePath,
-      this.range,
-      this.content,
-      this.generateFullString = false,
-      this.fileContent,
-      this.includeContextualCode = true})
-      : super(id, 'code_input');
-
-  factory CodeInput.fromJson(Map<String, dynamic> json) {
+  factory BaseCodeInput.fromJson(Map<String, dynamic> json) {
     if (json['value'] == null) {
-      return CodeInput(
-          id: json['id'],
-          includeContextualCode: json['includeContextualCode'] ?? true);
+      return EmptyCodeInput(
+        id: json['id'],
+      );
     }
     final value = jsonDecode(json['value']);
     return CodeInput(
@@ -77,44 +62,54 @@ class CodeInput extends Input {
       filePath: value['filePath'],
       range: Range.fromJson(value['referenceData']['selection']),
       content: value['referenceContent'],
-      generateFullString: json['generate_full_string'] ?? false,
       fileContent: File(value['filePath']).readAsStringSync(),
+      generateFullString: json['generate_full_string'] ?? false,
     );
   }
+}
 
-  // Generates the full string which includes the cursor selection.
-  // Has all the content of the file with the selected range highlighted with <CURSOR_SELECTION> tag.
-  String getCodeWithCursorSelection() {
-    if (range == null) {
-      return 'NA';
-    }
-    final startOffet = getOffset(range!.start.line, range!.start.character);
-    final endOffset = getOffset(range!.end.line, range!.end.character);
-    return '${fileContent!.substring(0, startOffet)}<CURSOR_SELECTION>${fileContent!.substring(startOffet, endOffset)}</CURSOR_SELECTION>${fileContent!.substring(endOffset)}';
+class EmptyCodeInput extends BaseCodeInput {
+  EmptyCodeInput({required String id}) : super(id);
+  @override
+  String toString() {
+    return "N/A";
   }
+}
 
-  /// Generates the full string with [newContent].
-  String getFileCodeWithReplacedCode(String newContent) {
-    if (range == null) {
-      throw Exception("Code input value is required for replacing in file");
-    }
-    final startOffet = getOffset(range!.start.line, range!.start.character);
-    final endOffset = getOffset(range!.end.line, range!.end.character);
-    return '${fileContent!.substring(0, startOffet)}$newContent${fileContent!.substring(endOffset)}';
-  }
+class CodeInput extends BaseCodeInput {
+  String filePath;
+  Range range;
+  String content;
+  String fileContent;
+  final bool includeContextualCode;
+  final bool generateFullString;
+
+  CodeInput(
+      {required String id,
+      required this.filePath,
+      required this.range,
+      required this.content,
+      required this.fileContent,
+      this.includeContextualCode = true,
+      this.generateFullString = false})
+      : super(id);
 
   @override
   String toString() {
-    if (content == null) {
-      return 'NA';
-    }
     return 'filepath:$filePath\n\n$content';
   }
 
+  int getOffset(int line, int character) {
+    return fileContent.split('\n').take(line).join('\n').length + character;
+  }
+
+  String getFileCodeWithReplacedCode(String newContent) {
+    final startOffet = getOffset(range.start.line, range.start.character);
+    final endOffset = getOffset(range.end.line, range.end.character);
+    return '${fileContent.substring(0, startOffet)}$newContent${fileContent.substring(endOffset)}';
+  }
+
   Map<String, dynamic> getReplaceFileJson(String newContent) {
-    if (range == null) {
-      throw Exception("Code input value is required for replacing in file");
-    }
     if (generateFullString) {
       newContent = getFileCodeWithReplacedCode(newContent);
     }
@@ -124,10 +119,6 @@ class CodeInput extends Input {
       "originalCode": fileContent,
       "selection": range?.toJson(),
     };
-  }
-
-  int getOffset(int line, int character) {
-    return fileContent!.split('\n').take(line).join('\n').length + character;
   }
 }
 

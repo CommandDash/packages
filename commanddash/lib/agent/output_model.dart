@@ -52,10 +52,10 @@ class MultiCodeOutput extends Output {
       for (WorkspaceFile file in value!) {
         String newContent = "";
         newContent += 'File: ${file.path}\n';
-        if (file.content == null) {
+        if (file.fileContent == null) {
           newContent += File(file.path).readAsStringSync();
         }
-        newContent += file.content!;
+        newContent += file.fileContent!;
         if ((newContent.length + code.length) <= maxCharsInPrompt!) {
           code += newContent;
         }

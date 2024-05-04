@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
@@ -46,7 +48,7 @@ class PromptQueryStep extends Step {
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
-    List<CodeInput> currentlyAdded = [];
+
     final List<String> usedIds = query
         .getInputIds(); // These are the input or output ids which are used in the prompt query
 
@@ -62,33 +64,6 @@ class PromptQueryStep extends Step {
       return [];
     }
 
-    for (String id in usedIds) {
-      if (inputs.containsKey(id)) {
-        switch (inputs[id].runtimeType) {
-          case CodeInput:
-            currentlyAdded.add(inputs[id] as CodeInput);
-            break;
-        }
-      } else if (outputsUntilNow.containsKey(id)) {
-        switch (outputsUntilNow[id].runtimeType) {
-          case MultiCodeOutput:
-            final value = outputsUntilNow[id] as MultiCodeOutput;
-            if (value.value != null) {
-              for (WorkspaceFile file in value.value!) {
-                final CodeInput codeInput = CodeInput(
-                  id: id,
-                  content: file.content,
-                  range: file.range,
-                );
-
-                currentlyAdded.add(codeInput);
-              }
-            }
-            break;
-        }
-      }
-    }
-
     /// replace prompt with our common logic and reduce total tokens replaced.
     prompt = prompt.replacePlaceholder(inputs, outputsUntilNow,
         totalTokensAddedCallback: (newReplacedTokens) =>
@@ -100,77 +75,89 @@ class PromptQueryStep extends Step {
           data: {"promptLength": promptLength});
       return [];
     }
-    final Map<CodeInput, int> nestedCodes = {};
 
-    for (CodeInput code in inputs.values.whereType<CodeInput>()) {
-      if (!usedIds.contains(code.id) && !code.includeContextualCode) {
-        continue;
+    List<WorkspaceFile> includedInPrompt = [];
+    final Map<String, int> nestedCodes = {};
+
+    void appendNestedCodeCount(String filePath, {int priority = 1}) {
+      nestedCodes[filePath] = (nestedCodes[filePath] ?? 0) + priority;
+    }
+
+    void markIncludedInPrompt(
+        {required String path, required List<Range> ranges}) {
+      final existingFileIndex =
+          includedInPrompt.indexWhere((file) => file.path == path);
+      if (existingFileIndex != -1) {
+        includedInPrompt[existingFileIndex].selectedRanges.addAll(ranges);
+      } else {
+        includedInPrompt
+            .add(WorkspaceFile.fromPath(path, selectedRanges: ranges));
       }
+    }
 
-      /// TODO: Verify the code file is not already included in other code snippets
-      ///  - Include entire file if under a certain file size
-      ///  - or only occurency objects if not
-      /// TODO: Include the file of the code inputs as the context.
+    for (String id in usedIds) {
+      if (inputs.containsKey(id)) {
+        switch (inputs[id].runtimeType) {
+          case CodeInput:
+            final code = inputs[id] as CodeInput;
+            markIncludedInPrompt(
+                path: (inputs[id] as CodeInput).filePath,
+                ranges: [(inputs[id] as CodeInput).range]);
+            if ((inputs[id] as CodeInput).includeContextualCode) {
+              /// add the code file itself as context
+              appendNestedCodeCount(code.filePath, priority: 10);
 
-      final data = await taskAssist.processStep(
-        kind: "context",
-        args: {
-          "filePath": code.filePath,
-          "range": code.range!.toJson(),
-        },
-        timeoutKind: TimeoutKind.stretched,
-      );
-      final context = data['context'];
-      final listOfContext = context as List<Map<String, dynamic>>;
-      for (final nestedCode in listOfContext) {
-        final CodeInput codeInput = CodeInput(
-          id: "${code.id}-context",
-          content: nestedCode['content'],
-          filePath: nestedCode['filePath'],
-          range: Range(
-            start: Position(line: 1, character: 1),
-            end: Position(
-              line: (nestedCode['content'] as String).split('\n').length,
-              character:
-                  (nestedCode['content'] as String).split('\n').last.length,
-            ),
-          ),
-        );
-        if (currentlyAdded.indexWhere((e) =>
-                e.fileContent?.contains(nestedCode['content']) ?? false) !=
-            -1) {
-          /// If the nested code is already added somewhere in the prompt (code input or matching documents), skip it!
-          continue;
+              final data = await taskAssist.processStep(
+                kind: "context",
+                args: {
+                  "filePath": code.filePath,
+                  "range": code.range.toJson(),
+                },
+                timeoutKind: TimeoutKind.stretched,
+              );
+              final context = data['context'];
+              final listOfContext = context as List<Map<String, dynamic>>;
+              for (final nestedCode in listOfContext) {
+                final filePath = nestedCode['filePath'];
+                appendNestedCodeCount(filePath);
+              }
+            }
+            break;
         }
-
-        final duplicatedId =
-            checkIfUnique(nestedCodes.keys.toList(), codeInput);
-
-        if (duplicatedId == null) {
-          nestedCodes.addAll({codeInput: 1});
-        } else {
-          final key = nestedCodes.keys
-              .where((element) => element.id == duplicatedId)
-              .first;
-          nestedCodes[key] = nestedCodes[key]! + 1;
+      } else if (outputsUntilNow.containsKey(id)) {
+        switch (outputsUntilNow[id].runtimeType) {
+          case MultiCodeOutput:
+            final value = outputsUntilNow[id] as MultiCodeOutput;
+            if (value.value != null) {
+              for (WorkspaceFile file in value.value!) {
+                markIncludedInPrompt(
+                    path: file.path, ranges: file.selectedRanges);
+              }
+            }
+            break;
         }
       }
+    }
 
-      // nestedCode sorted by frequency
-      final sortedNestedCode = nestedCodes.entries.toList()
-        ..sort(((a, b) {
-          return b.value.compareTo(a.value);
-        }));
+    /// TODO: Verify the code file is not already included in other code snippets
+    ///  - Include entire file if under a certain file size
+    ///  - or only occurency objects if not
+    /// TODO:
 
-      int indexForNested = 0;
-      prompt = "$prompt\nHere is some contextual code which might be helpful\n";
-      while (availableToken > 0 && indexForNested < sortedNestedCode.length) {
-        final code = sortedNestedCode[indexForNested].key;
-        prompt = '$prompt${code.filePath}\n```${code.content}```';
-        indexForNested++;
-        availableToken = availableToken - code.content!.length;
-        currentlyAdded.add(code);
-      }
+    // nestedCode sorted by frequency
+    final sortedNestedCode = nestedCodes.entries.toList()
+      ..sort(((a, b) {
+        return b.value.compareTo(a.value);
+      }));
+
+    int indexForNested = 0;
+    prompt = "$prompt\nHere is some contextual code which might be helpful\n";
+    while (availableToken > 0 && indexForNested < sortedNestedCode.length) {
+      final code = sortedNestedCode[indexForNested].key;
+      prompt = '$prompt${code.filePath}\n```${code.content}```';
+      indexForNested++;
+      availableToken = availableToken - code.content!.length;
+      includedInPrompt.add(code);
     }
 
     final response = await generationRepository.getCompletion(prompt);
@@ -187,4 +174,59 @@ class PromptQueryStep extends Step {
     }
     return result;
   }
+}
+
+List<BaseCodeInput> processCurrentlyAddedInputs(
+    List<BaseCodeInput> currentlyAdded) {
+  Map<String, List<BaseCodeInput>> groupedCurrentlyAdded = currentlyAdded.fold(
+    {},
+    (Map<String, List<BaseCodeInput>> map, BaseCodeInput input) {
+      map[input.filePath ?? ''] ??= [];
+      map[input.filePath ?? '']!.add(input);
+      return map;
+    },
+  );
+
+  List<BaseCodeInput> processedInputs = [];
+
+  for (final entry in groupedCurrentlyAdded.entries) {
+    if (entry.key != '') {
+      final fileContent = entry.value.first.fileContent ?? '';
+      final sortedInputs = entry.value.toList()
+        ..sort((a, b) {
+          final aStart = a.range!.start;
+          final bStart = b.range!.start;
+          if (bStart.line != aStart.line) {
+            return bStart.line.compareTo(aStart.line);
+          } else {
+            return bStart.character.compareTo(aStart.character);
+          }
+        });
+
+      String updatedFileContent = fileContent;
+
+      for (final input in sortedInputs) {
+        final range = input.range!;
+        final startIndex = range.start;
+        final endIndex = range.end;
+
+        updatedFileContent = updatedFileContent.replaceRange(
+          startIndex,
+          endIndex,
+          '(already included in currently added)',
+        );
+      }
+
+      processedInputs.add(
+        BaseCodeInput(
+          id: entry.value.first.id,
+          filePath: entry.key,
+          fileContent: updatedFileContent,
+          includeContextualCode: false,
+        ),
+      );
+    }
+  }
+
+  return processedInputs;
 }

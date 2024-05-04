@@ -4,7 +4,7 @@ version: 0.0.5
 repository: https://github.com/Welltested-AI/commanddash
 
 environment:
-  sdk: '>=2.15.0 <4.0.0'
+  sdk: '3.0.0'
 
 executables:
   commanddash:

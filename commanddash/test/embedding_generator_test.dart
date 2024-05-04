@@ -23,16 +23,17 @@ void main() {
       });
 
       when(mockGenerationRepository.getCodeBatchEmbeddings(files
-              .map((file) => {'content': file.content!, 'title': file.path})
+              .map((file) => {'content': file.fileContent!, 'title': file.path})
               .toList()))
-          .thenAnswer((_) async =>
-              files.map((e) => getMockEmbeddingForString(e.content!)).toList());
+          .thenAnswer((_) async => files
+              .map((e) => getMockEmbeddingForString(e.fileContent!))
+              .toList());
 
       final updatedFiles = await EmbeddingGenerator.updateEmbeddings(
           files, mockGenerationRepository);
       for (int i = 0; i < files.length; i++) {
         expect(updatedFiles[i].embedding,
-            getMockEmbeddingForString(files[i].content!));
+            getMockEmbeddingForString(files[i].fileContent!));
       }
       verify(mockGenerationRepository.getCodeBatchEmbeddings(any)).called(1);
     });
@@ -44,26 +45,26 @@ void main() {
 
       when(mockGenerationRepository.getCodeBatchEmbeddings(files
               .sublist(0, 100)
-              .map((file) => {'content': file.content!, 'title': file.path})
+              .map((file) => {'content': file.fileContent!, 'title': file.path})
               .toList()))
           .thenAnswer((_) async => files
               .sublist(0, 100)
-              .map((e) => getMockEmbeddingForString(e.content!))
+              .map((e) => getMockEmbeddingForString(e.fileContent!))
               .toList());
       when(mockGenerationRepository.getCodeBatchEmbeddings(files
               .sublist(100)
-              .map((file) => {'content': file.content!, 'title': file.path})
+              .map((file) => {'content': file.fileContent!, 'title': file.path})
               .toList()))
           .thenAnswer((_) async => files
               .sublist(100)
-              .map((e) => getMockEmbeddingForString(e.content!))
+              .map((e) => getMockEmbeddingForString(e.fileContent!))
               .toList());
 
       final updatedFiles = await EmbeddingGenerator.updateEmbeddings(
           files, mockGenerationRepository);
       for (int i = 0; i < files.length; i++) {
         expect(updatedFiles[i].embedding,
-            getMockEmbeddingForString(files[i].content!));
+            getMockEmbeddingForString(files[i].fileContent!));
       }
       verify(mockGenerationRepository.getCodeBatchEmbeddings(any)).called(2);
     });
@@ -75,34 +76,34 @@ void main() {
 
       when(mockGenerationRepository.getCodeBatchEmbeddings(files
               .sublist(0, 100)
-              .map((file) => {'content': file.content!, 'title': file.path})
+              .map((file) => {'content': file.fileContent!, 'title': file.path})
               .toList()))
           .thenAnswer((_) async => files
               .sublist(0, 100)
-              .map((e) => getMockEmbeddingForString(e.content!))
+              .map((e) => getMockEmbeddingForString(e.fileContent!))
               .toList());
       when(mockGenerationRepository.getCodeBatchEmbeddings(files
               .sublist(100, 200)
-              .map((file) => {'content': file.content!, 'title': file.path})
+              .map((file) => {'content': file.fileContent!, 'title': file.path})
               .toList()))
           .thenAnswer((_) async => files
               .sublist(100, 200)
-              .map((e) => getMockEmbeddingForString(e.content!))
+              .map((e) => getMockEmbeddingForString(e.fileContent!))
               .toList());
       when(mockGenerationRepository.getCodeBatchEmbeddings(files
               .sublist(200)
-              .map((file) => {'content': file.content!, 'title': file.path})
+              .map((file) => {'content': file.fileContent!, 'title': file.path})
               .toList()))
           .thenAnswer((_) async => files
               .sublist(200)
-              .map((e) => getMockEmbeddingForString(e.content!))
+              .map((e) => getMockEmbeddingForString(e.fileContent!))
               .toList());
 
       final updatedFiles = await EmbeddingGenerator.updateEmbeddings(
           files, mockGenerationRepository);
       for (int i = 0; i < files.length; i++) {
         expect(updatedFiles[i].embedding,
-            getMockEmbeddingForString(files[i].content!));
+            getMockEmbeddingForString(files[i].fileContent!));
       }
       verify(mockGenerationRepository.getCodeBatchEmbeddings(any)).called(3);
     });
