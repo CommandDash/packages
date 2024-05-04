@@ -17,7 +17,7 @@ class EmbeddingGenerator {
     final fileContents = dartFiles.map((file) {
       return WorkspaceFile.fromPath(file.path);
     }).toList();
-    fileContents.removeWhere((element) => (element.fileContent ?? '').isEmpty);
+    fileContents.removeWhere((element) => (element.fileContent).isEmpty);
     return fileContents;
   }
 
@@ -46,7 +46,7 @@ class EmbeddingGenerator {
     // Use the batches API to update the embeddings
     final embeddings = await Future.wait(batches.map((batch) async {
       final code = batch
-          .map((file) => {'content': file.fileContent!, 'title': file.path})
+          .map((file) => {'content': file.fileContent, 'title': file.path})
           .toList();
       final embeddings =
           await generationRepository.getCodeBatchEmbeddings(code);

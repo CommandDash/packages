@@ -4,7 +4,6 @@ import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
-import 'package:commanddash/models/contextual_code.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
@@ -139,25 +138,35 @@ class PromptQueryStep extends Step {
       }
     }
 
-    /// TODO: Verify the code file is not already included in other code snippets
-    ///  - Include entire file if under a certain file size
-    ///  - or only occurency objects if not
-    /// TODO:
-
     // nestedCode sorted by frequency
     final sortedNestedCode = nestedCodes.entries.toList()
       ..sort(((a, b) {
         return b.value.compareTo(a.value);
       }));
 
-    int indexForNested = 0;
-    prompt = "$prompt\nHere is some contextual code which might be helpful\n";
-    while (availableToken > 0 && indexForNested < sortedNestedCode.length) {
-      final code = sortedNestedCode[indexForNested].key;
-      prompt = '$prompt${code.filePath}\n```${code.content}```';
-      indexForNested++;
-      availableToken = availableToken - code.content!.length;
-      includedInPrompt.add(code);
+    prompt = "$prompt\n\nHere is some contextual code which might be helpful\n";
+
+    for (final nestedFilePath in sortedNestedCode.map((e) => e.key)) {
+      final includedInPromptIndex = includedInPrompt
+          .indexWhere((element) => element.path == nestedFilePath);
+      if (includedInPromptIndex != -1) {
+        final content =
+            includedInPrompt[includedInPromptIndex].surroundingContent;
+        if (content != null) {
+          if (availableToken - content.length > 0) {
+            prompt = '$prompt$nestedFilePath\n```$content```\n\n';
+            availableToken -= content.length;
+          }
+        }
+        continue;
+      }
+      final content = await File(nestedFilePath).readAsString();
+      if (content.length > 9500) {
+        continue; // Don't include extremely large nested code files.
+      }
+      if (availableToken - content.length < 0) continue;
+      prompt = '$prompt$nestedFilePath\n```$content```\n\n';
+      availableToken -= content.length;
     }
 
     final response = await generationRepository.getCompletion(prompt);
@@ -174,59 +183,4 @@ class PromptQueryStep extends Step {
     }
     return result;
   }
-}
-
-List<BaseCodeInput> processCurrentlyAddedInputs(
-    List<BaseCodeInput> currentlyAdded) {
-  Map<String, List<BaseCodeInput>> groupedCurrentlyAdded = currentlyAdded.fold(
-    {},
-    (Map<String, List<BaseCodeInput>> map, BaseCodeInput input) {
-      map[input.filePath ?? ''] ??= [];
-      map[input.filePath ?? '']!.add(input);
-      return map;
-    },
-  );
-
-  List<BaseCodeInput> processedInputs = [];
-
-  for (final entry in groupedCurrentlyAdded.entries) {
-    if (entry.key != '') {
-      final fileContent = entry.value.first.fileContent ?? '';
-      final sortedInputs = entry.value.toList()
-        ..sort((a, b) {
-          final aStart = a.range!.start;
-          final bStart = b.range!.start;
-          if (bStart.line != aStart.line) {
-            return bStart.line.compareTo(aStart.line);
-          } else {
-            return bStart.character.compareTo(aStart.character);
-          }
-        });
-
-      String updatedFileContent = fileContent;
-
-      for (final input in sortedInputs) {
-        final range = input.range!;
-        final startIndex = range.start;
-        final endIndex = range.end;
-
-        updatedFileContent = updatedFileContent.replaceRange(
-          startIndex,
-          endIndex,
-          '(already included in currently added)',
-        );
-      }
-
-      processedInputs.add(
-        BaseCodeInput(
-          id: entry.value.first.id,
-          filePath: entry.key,
-          fileContent: updatedFileContent,
-          includeContextualCode: false,
-        ),
-      );
-    }
-  }
-
-  return processedInputs;
 }

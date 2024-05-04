@@ -117,7 +117,7 @@ class CodeInput extends BaseCodeInput {
       "path": filePath,
       "optimizedCode": newContent,
       "originalCode": fileContent,
-      "selection": range?.toJson(),
+      "selection": range.toJson(),
     };
   }
 }

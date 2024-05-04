@@ -3,6 +3,11 @@ import 'dart:io';
 import 'package:commanddash/utils/embedding_utils.dart';
 
 class WorkspaceFile {
+  WorkspaceFile(this.path,
+      {required this.contentLines,
+      required this.codeHash,
+      required this.selectedRanges,
+      this.embedding});
   final String path;
   final List<String> contentLines;
   final String codeHash;
@@ -135,12 +140,6 @@ class WorkspaceFile {
 
     return surroundingLines.join('\n');
   }
-
-  WorkspaceFile(this.path,
-      {required this.contentLines,
-      required this.codeHash,
-      required this.selectedRanges,
-      this.embedding});
 
   Map<String, dynamic> toJson() {
     return {

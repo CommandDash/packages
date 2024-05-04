@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
