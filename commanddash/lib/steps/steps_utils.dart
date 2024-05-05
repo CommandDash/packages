@@ -1,5 +1,6 @@
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/output_model.dart';
+import 'package:commanddash/server/server.dart';
 
 enum StepType {
   searchInWorkspace,
@@ -50,7 +51,8 @@ extension ProcessedQueryExtension on String {
       if (replaceValue != null) {
         stringValue =
             stringValue.replaceRange(match.start, match.end, replaceValue);
-        totalTokens += stringValue.length;
+
+        totalTokens += replaceValue.length;
       }
     }
     if (totalTokensAddedCallback != null) {

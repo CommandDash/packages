@@ -7,6 +7,7 @@ import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/prompt_query/prompt_response_parsers.dart';
 import 'package:commanddash/steps/steps_utils.dart';
@@ -53,25 +54,27 @@ class PromptQueryStep extends Step {
 
     String prompt = query;
     int promptLength = prompt.length;
+
     double availableToken = (26000 * 2.7) -
         promptLength; // Max limit should come from the generation repository
     // If there are available token, we will add the outputs
     if (availableToken <= 0) {
       taskAssist.sendErrorMessage(
           message: "Context length of prompt too long",
-          data: {"promptLength": promptLength});
+          data: {"available_tokens": availableToken});
       return [];
     }
 
     /// replace prompt with our common logic and reduce total tokens replaced.
     prompt = prompt.replacePlaceholder(inputs, outputsUntilNow,
-        totalTokensAddedCallback: (newReplacedTokens) =>
-            availableToken -= newReplacedTokens);
+        totalTokensAddedCallback: (newReplacedTokens) {
+      availableToken = availableToken - newReplacedTokens;
+    });
 
     if (availableToken <= 0) {
       taskAssist.sendErrorMessage(
           message: "Context length of prompt with given inputs is too long",
-          data: {"promptLength": promptLength});
+          data: {"available_tokens": availableToken});
       return [];
     }
 
@@ -115,7 +118,7 @@ class PromptQueryStep extends Step {
                 timeoutKind: TimeoutKind.stretched,
               );
               final context = data['context'];
-              final listOfContext = context as List<Map<String, dynamic>>;
+              final listOfContext = List<Map<String, dynamic>>.from(context);
               for (final nestedCode in listOfContext) {
                 final filePath = nestedCode['filePath'];
                 appendNestedCodeCount(filePath);
@@ -146,6 +149,7 @@ class PromptQueryStep extends Step {
 
     prompt = "$prompt\n\nHere is some contextual code which might be helpful\n";
 
+    ///TODO: Figure out a way to attach the most relevant part of the file if the full file is extremely long
     for (final nestedFilePath in sortedNestedCode.map((e) => e.key)) {
       final includedInPromptIndex = includedInPrompt
           .indexWhere((element) => element.path == nestedFilePath);
@@ -160,7 +164,8 @@ class PromptQueryStep extends Step {
         }
         continue;
       }
-      final content = await File(nestedFilePath).readAsString();
+      final content = (await File(nestedFilePath).readAsString())
+          .replaceAll(RegExp(r"[\n\s]+"), "");
       if (content.length > 9500) {
         continue; // Don't include extremely large nested code files.
       }
@@ -168,6 +173,7 @@ class PromptQueryStep extends Step {
       prompt = '$prompt$nestedFilePath\n```$content```\n\n';
       availableToken -= content.length;
     }
+    sendDebugMessage({'nested_code': nestedCodes, 'prompt': prompt});
 
     final response = await generationRepository.getCompletion(prompt);
     final result = <Output>[];
