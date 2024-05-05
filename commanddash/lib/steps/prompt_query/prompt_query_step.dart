@@ -55,7 +55,7 @@ class PromptQueryStep extends Step {
     String prompt = query;
     int promptLength = prompt.length;
 
-    double availableToken = (26000 * 2.7) -
+    double availableToken = (24000 * 2.7) -
         promptLength; // Max limit should come from the generation repository
     // If there are available token, we will add the outputs
     if (availableToken <= 0) {
@@ -146,8 +146,8 @@ class PromptQueryStep extends Step {
       ..sort(((a, b) {
         return b.value.compareTo(a.value);
       }));
-
-    prompt = "$prompt\n\nHere is some contextual code which might be helpful\n";
+    String contextualCode =
+        "[CONTEXTUAL CODE FOR YOUR INFORMATION FROM USER PROJECT]\n\n";
 
     ///TODO: Figure out a way to attach the most relevant part of the file if the full file is extremely long
     for (final nestedFilePath in sortedNestedCode.map((e) => e.key)) {
@@ -158,7 +158,8 @@ class PromptQueryStep extends Step {
             includedInPrompt[includedInPromptIndex].surroundingContent;
         if (content != null) {
           if (availableToken - content.length > 0) {
-            prompt = '$prompt$nestedFilePath\n```$content```\n\n';
+            contextualCode =
+                '$contextualCode$nestedFilePath\n```$content```\n\n';
             availableToken -= content.length;
           }
         }
@@ -170,9 +171,11 @@ class PromptQueryStep extends Step {
         continue; // Don't include extremely large nested code files.
       }
       if (availableToken - content.length < 0) continue;
-      prompt = '$prompt$nestedFilePath\n```$content```\n\n';
+      contextualCode = '$contextualCode$nestedFilePath\n```$content```\n\n';
       availableToken -= content.length;
     }
+    contextualCode = '$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
+    prompt = '$contextualCode$prompt';
     sendDebugMessage({'nested_code': nestedCodes, 'prompt': prompt});
 
     final response = await generationRepository.getCompletion(prompt);
