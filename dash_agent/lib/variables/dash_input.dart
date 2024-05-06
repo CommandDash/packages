@@ -74,7 +74,7 @@ class CodeInput extends DashInput {
       'display_text': displayText,
       'type': 'code_input',
       'optional': optional,
-      'includeContextualCode': includeContextualCode,
+      'include_contextual_code': includeContextualCode,
       'version': version,
     };
   }

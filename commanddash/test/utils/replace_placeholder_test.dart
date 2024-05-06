@@ -51,8 +51,24 @@ void main() {
     };
     final Map<String, Output> outputs = {
       '2': MultiCodeOutput([
-        WorkspaceFile('file1', content: 'content1'),
-        WorkspaceFile('file2', content: 'content2'),
+        WorkspaceFile(
+          'file1',
+          contentLines: ['content1'],
+          codeHash: '',
+          selectedRanges: [
+            Range(
+                start: Position(line: 0, character: 0),
+                end: Position(line: 0, character: 8))
+          ],
+        ),
+        WorkspaceFile('file2',
+            contentLines: ['content2'],
+            codeHash: '',
+            selectedRanges: [
+              Range(
+                  start: Position(line: 0, character: 0),
+                  end: Position(line: 0, character: 8))
+            ]),
       ]),
     };
 

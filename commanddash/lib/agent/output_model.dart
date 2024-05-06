@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/steps/steps_utils.dart';
@@ -50,12 +48,7 @@ class MultiCodeOutput extends Output {
       return code;
     } else {
       for (WorkspaceFile file in value!) {
-        String newContent = "";
-        newContent += 'File: ${file.path}\n';
-        if (file.content == null) {
-          newContent += File(file.path).readAsStringSync();
-        }
-        newContent += file.content!;
+        String newContent = 'File: ${file.path}\n${file.fileContent}';
         if ((newContent.length + code.length) <= maxCharsInPrompt!) {
           code += newContent;
         }

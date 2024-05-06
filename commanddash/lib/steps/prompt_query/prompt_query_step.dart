@@ -1,11 +1,13 @@
+import 'dart:io';
+
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
-import 'package:commanddash/models/contextual_code.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/prompt_query/prompt_response_parsers.dart';
 import 'package:commanddash/steps/steps_utils.dart';
@@ -46,27 +48,82 @@ class PromptQueryStep extends Step {
       TaskAssist taskAssist, GenerationRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
-    List<CodeInput> currentlyAdded = [];
+
     final List<String> usedIds = query
         .getInputIds(); // These are the input or output ids which are used in the prompt query
 
     String prompt = query;
     int promptLength = prompt.length;
-    double availableToken = (26000 * 2.7) -
+
+    double availableToken = (24000 * 2.7) -
         promptLength; // Max limit should come from the generation repository
     // If there are available token, we will add the outputs
     if (availableToken <= 0) {
       taskAssist.sendErrorMessage(
           message: "Context length of prompt too long",
-          data: {"promptLength": promptLength});
+          data: {"available_tokens": availableToken});
       return [];
+    }
+
+    /// replace prompt with our common logic and reduce total tokens replaced.
+    prompt = prompt.replacePlaceholder(inputs, outputsUntilNow,
+        totalTokensAddedCallback: (newReplacedTokens) {
+      availableToken = availableToken - newReplacedTokens;
+    });
+
+    if (availableToken <= 0) {
+      taskAssist.sendErrorMessage(
+          message: "Context length of prompt with given inputs is too long",
+          data: {"available_tokens": availableToken});
+      return [];
+    }
+
+    List<WorkspaceFile> includedInPrompt = [];
+    final Map<String, int> nestedCodes = {};
+
+    void appendNestedCodeCount(String filePath, {int priority = 1}) {
+      nestedCodes[filePath] = (nestedCodes[filePath] ?? 0) + priority;
+    }
+
+    void markIncludedInPrompt(
+        {required String path, required List<Range> ranges}) {
+      final existingFileIndex =
+          includedInPrompt.indexWhere((file) => file.path == path);
+      if (existingFileIndex != -1) {
+        includedInPrompt[existingFileIndex].selectedRanges.addAll(ranges);
+      } else {
+        includedInPrompt
+            .add(WorkspaceFile.fromPath(path, selectedRanges: ranges));
+      }
     }
 
     for (String id in usedIds) {
       if (inputs.containsKey(id)) {
         switch (inputs[id].runtimeType) {
           case CodeInput:
-            currentlyAdded.add(inputs[id] as CodeInput);
+            final code = inputs[id] as CodeInput;
+            markIncludedInPrompt(
+                path: (inputs[id] as CodeInput).filePath,
+                ranges: [(inputs[id] as CodeInput).range]);
+            if ((inputs[id] as CodeInput).includeContextualCode) {
+              /// add the code file itself as context
+              appendNestedCodeCount(code.filePath, priority: 10);
+
+              final data = await taskAssist.processStep(
+                kind: "context",
+                args: {
+                  "filePath": code.filePath,
+                  "range": code.range.toJson(),
+                },
+                timeoutKind: TimeoutKind.stretched,
+              );
+              final context = data['context'];
+              final listOfContext = List<Map<String, dynamic>>.from(context);
+              for (final nestedCode in listOfContext) {
+                final filePath = nestedCode['filePath'];
+                appendNestedCodeCount(filePath);
+              }
+            }
             break;
         }
       } else if (outputsUntilNow.containsKey(id)) {
@@ -75,13 +132,8 @@ class PromptQueryStep extends Step {
             final value = outputsUntilNow[id] as MultiCodeOutput;
             if (value.value != null) {
               for (WorkspaceFile file in value.value!) {
-                final CodeInput codeInput = CodeInput(
-                  id: id,
-                  content: file.content,
-                  range: file.range,
-                );
-
-                currentlyAdded.add(codeInput);
+                markIncludedInPrompt(
+                    path: file.path, ranges: file.selectedRanges);
               }
             }
             break;
@@ -89,89 +141,42 @@ class PromptQueryStep extends Step {
       }
     }
 
-    /// replace prompt with our common logic and reduce total tokens replaced.
-    prompt = prompt.replacePlaceholder(inputs, outputsUntilNow,
-        totalTokensAddedCallback: (newReplacedTokens) =>
-            availableToken -= newReplacedTokens);
+    // nestedCode sorted by frequency
+    final sortedNestedCode = nestedCodes.entries.toList()
+      ..sort(((a, b) {
+        return b.value.compareTo(a.value);
+      }));
+    String contextualCode =
+        "[CONTEXTUAL CODE FOR YOUR INFORMATION FROM USER PROJECT]\n\n";
 
-    if (availableToken <= 0) {
-      taskAssist.sendErrorMessage(
-          message: "Context length of prompt with given inputs is too long",
-          data: {"promptLength": promptLength});
-      return [];
-    }
-    final Map<CodeInput, int> nestedCodes = {};
-
-    for (CodeInput code in inputs.values.whereType<CodeInput>()) {
-      if (!usedIds.contains(code.id) && !code.includeContextualCode) {
+    ///TODO: Figure out a way to attach the most relevant part of the file if the full file is extremely long
+    for (final nestedFilePath in sortedNestedCode.map((e) => e.key)) {
+      final includedInPromptIndex = includedInPrompt
+          .indexWhere((element) => element.path == nestedFilePath);
+      if (includedInPromptIndex != -1) {
+        final content =
+            includedInPrompt[includedInPromptIndex].surroundingContent;
+        if (content != null) {
+          if (availableToken - content.length > 0) {
+            contextualCode =
+                '$contextualCode$nestedFilePath\n```$content```\n\n';
+            availableToken -= content.length;
+          }
+        }
         continue;
       }
-
-      /// TODO: Verify the code file is not already included in other code snippets
-      ///  - Include entire file if under a certain file size
-      ///  - or only occurency objects if not
-      /// TODO: Include the file of the code inputs as the context.
-
-      final data = await taskAssist.processStep(
-        kind: "context",
-        args: {
-          "filePath": code.filePath,
-          "range": code.range!.toJson(),
-        },
-        timeoutKind: TimeoutKind.stretched,
-      );
-      final context = data['context'];
-      final listOfContext = context as List<Map<String, dynamic>>;
-      for (final nestedCode in listOfContext) {
-        final CodeInput codeInput = CodeInput(
-          id: "${code.id}-context",
-          content: nestedCode['content'],
-          filePath: nestedCode['filePath'],
-          range: Range(
-            start: Position(line: 1, character: 1),
-            end: Position(
-              line: (nestedCode['content'] as String).split('\n').length,
-              character:
-                  (nestedCode['content'] as String).split('\n').last.length,
-            ),
-          ),
-        );
-        if (currentlyAdded.indexWhere((e) =>
-                e.fileContent?.contains(nestedCode['content']) ?? false) !=
-            -1) {
-          /// If the nested code is already added somewhere in the prompt (code input or matching documents), skip it!
-          continue;
-        }
-
-        final duplicatedId =
-            checkIfUnique(nestedCodes.keys.toList(), codeInput);
-
-        if (duplicatedId == null) {
-          nestedCodes.addAll({codeInput: 1});
-        } else {
-          final key = nestedCodes.keys
-              .where((element) => element.id == duplicatedId)
-              .first;
-          nestedCodes[key] = nestedCodes[key]! + 1;
-        }
+      final content = (await File(nestedFilePath).readAsString())
+          .replaceAll(RegExp(r"[\n\s]+"), "");
+      if (content.length > 9500) {
+        continue; // Don't include extremely large nested code files.
       }
-
-      // nestedCode sorted by frequency
-      final sortedNestedCode = nestedCodes.entries.toList()
-        ..sort(((a, b) {
-          return b.value.compareTo(a.value);
-        }));
-
-      int indexForNested = 0;
-      prompt = "$prompt\nHere is some contextual code which might be helpful\n";
-      while (availableToken > 0 && indexForNested < sortedNestedCode.length) {
-        final code = sortedNestedCode[indexForNested].key;
-        prompt = '$prompt${code.filePath}\n```${code.content}```';
-        indexForNested++;
-        availableToken = availableToken - code.content!.length;
-        currentlyAdded.add(code);
-      }
+      if (availableToken - content.length < 0) continue;
+      contextualCode = '$contextualCode$nestedFilePath\n```$content```\n\n';
+      availableToken -= content.length;
     }
+    contextualCode = '$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
+    prompt = '$contextualCode$prompt';
+    sendDebugMessage({'nested_code': nestedCodes, 'prompt': prompt});
 
     final response = await generationRepository.getCompletion(prompt);
     final result = <Output>[];
