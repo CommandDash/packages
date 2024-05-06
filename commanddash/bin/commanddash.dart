@@ -5,6 +5,6 @@ void main(List<String> arguments) async {
   var runner = CommandRunner("commanddash", "CLI enhancements for Dash AI")
     ..addCommand(ProcessCommand())
     ..addCommand(VersionCommand())
-    ..addCommand(MinCLIVersionCommand());
+    ..addCommand(MinimumClientVersionCommand());
   await runner.run(arguments);
 }
