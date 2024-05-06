@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:async/async.dart';
-import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_handler.dart';
@@ -144,13 +143,12 @@ void main() {
             {
               "id": "736841542",
               "type": "string_input",
-              "value":
-                  "Where do you think AI is heading in the field of programming? Give a one line answer."
+              "value": "Explain this code"
             },
             {
               "id": "736841543",
               "type": "string_input",
-              "value": null,
+              // "value": null,
             }
           ],
           "registered_outputs": [

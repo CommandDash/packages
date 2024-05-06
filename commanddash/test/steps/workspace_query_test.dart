@@ -42,7 +42,13 @@ void main() {
             "id": "736841542",
             "type": "string_input",
             "value": "Where is the themeing of the app?"
-          }
+          },
+          {
+            "id": "736841543",
+            "display_text": "Extra info",
+            "type": "string_input",
+            "optional": true
+          },
         ],
         "registered_outputs": [
           {"id": "436621806", "type": "default_output"},

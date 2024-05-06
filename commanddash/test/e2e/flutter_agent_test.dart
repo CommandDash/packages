@@ -61,7 +61,12 @@ void main() {
                 "id": "81443790",
                 "type": "prompt_output",
                 "version": "0.0.1",
-              }
+              },
+              {
+                "id": "81443791",
+                "type": "code_object",
+                "version": "0.0.1",
+              },
             ],
             "steps": [
               {
@@ -74,7 +79,7 @@ void main() {
                 "type": "prompt_query",
                 "prompt":
                     "You are an Flutter expert who answers user's queries related to the framework. \n\n Please find the user query <Query> and relavant references <References> picked from the Flutter docs to assist you: \n\n Query: <14340369>, \nReferences: <897806645>. Please respond to the user's query!",
-                "outputs": ["81443790"],
+                "outputs": ["81443790", "81443791"],
               },
               {
                 "type": "append_to_chat",

@@ -1,12 +1,11 @@
-import 'dart:io';
-
 import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/steps/steps_utils.dart';
 
 abstract class Output {
   OutputType type;
-  Output(this.type);
+  Output(this.type, [this.maxCharsInPrompt]);
+  double? maxCharsInPrompt;
 
   factory Output.fromJson(Map<String, dynamic> json) {
     final type = json['type'];
@@ -40,7 +39,7 @@ abstract class Output {
 
 class MultiCodeOutput extends Output {
   List<WorkspaceFile>? value;
-  MultiCodeOutput([this.value]) : super(OutputType.multiCodeOutput);
+  MultiCodeOutput([this.value]) : super(OutputType.multiCodeOutput, 6000 * 2.7);
 
   @override
   String toString() {
@@ -49,14 +48,10 @@ class MultiCodeOutput extends Output {
       return code;
     } else {
       for (WorkspaceFile file in value!) {
-        if (code.length > 18000) {
-          break; //maximum char limit ?? TODO: Replace this later with a holistic counting mechanism
+        String newContent = 'File: ${file.path}\n${file.fileContent}';
+        if ((newContent.length + code.length) <= maxCharsInPrompt!) {
+          code += newContent;
         }
-        code += 'File: ${file.path}\n';
-        if (file.content == null) {
-          code += File(file.path).readAsStringSync();
-        }
-        code += file.content!;
       }
     }
     return code;
@@ -77,7 +72,10 @@ class MultiCodeOutput extends Output {
 
 class DefaultOutput extends Output {
   String? value;
-  DefaultOutput([this.value]) : super(OutputType.defaultOutput);
+  DefaultOutput([this.value])
+      : super(
+          OutputType.defaultOutput,
+        );
 
   @override
   String toString() {
@@ -105,17 +103,26 @@ class ContinueToNextStepOutput extends Output {
 
 class DataSourceResultOutput extends Output {
   List<DataSource>? value;
+  // TODO: limit for each output
 
-  DataSourceResultOutput([this.value]) : super(OutputType.dataSourceOuput);
+  DataSourceResultOutput([this.value])
+      : super(OutputType.dataSourceOuput, 6000 * 2.7);
 
   @override
   String toString() {
     if (value == null) {
       throw Exception("DataSource value not assigned");
     }
+    // do not add if limit is reched here.
     String result = "";
     for (DataSource ds in value!) {
-      result += "${ds.content}\n";
+      if (ds.content != null) {
+        final newLength = result.length + ds.content!.length;
+        if (newLength > maxCharsInPrompt!) {
+          return result;
+        }
+        result += "${ds.content}\n";
+      }
     }
     return result;
   }
