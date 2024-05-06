@@ -61,7 +61,11 @@ class StringInput extends DashInput {
 /// List<DashInput> get registerInputs => [testMethod, reference1, reference2, reference3 ];
 /// ```
 class CodeInput extends DashInput {
-  CodeInput(super.displayText, {super.optional});
+  CodeInput(super.displayText,
+      {super.optional, this.includeContextualCode = true});
+
+  /// [includeContextualCode] extracts the nested code objects and matching code files from the codebase.
+  final bool includeContextualCode;
 
   @override
   Future<Map<String, dynamic>> process() async {
@@ -70,6 +74,7 @@ class CodeInput extends DashInput {
       'display_text': displayText,
       'type': 'code_input',
       'optional': optional,
+      'include_contextual_code': includeContextualCode,
       'version': version,
     };
   }

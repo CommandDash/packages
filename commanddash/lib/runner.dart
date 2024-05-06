@@ -33,21 +33,22 @@ class VersionCommand extends Command {
   @override
   void run() {
     /// It is not possible to fetch version from pubspec.yaml hence assigning manually
-    print('0.0.5');
+    print('0.0.6');
   }
 }
 
-class MinCLIVersionCommand extends Command {
+class MinimumClientVersionCommand extends Command {
   @override
-  final String name = "min_cli_version";
+  final String name = "min_client_version";
 
   @override
-  final String description = "Print the current minimum version of the CLI.";
+  final String description =
+      "Print the current minimum Client version the CLI needs";
 
-  MinCLIVersionCommand();
+  MinimumClientVersionCommand();
 
   @override
   void run() {
-    print('0.3.4');
+    print('0.3.9');
   }
 }

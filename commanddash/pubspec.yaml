@@ -1,10 +1,10 @@
 name: commanddash
 description: CLI enhancments to Dash-AI
-version: 0.0.5
+version: 0.0.6
 repository: https://github.com/Welltested-AI/commanddash
 
 environment:
-  sdk: '>=2.15.0 <4.0.0'
+  sdk: '>=3.0.0'
 
 executables:
   commanddash:
