@@ -93,7 +93,7 @@ jobs:
         run: |
           chmod +x ./executable/commanddash-linux
           echo "Version: $(./executable/commanddash-linux version)"
-          echo "Minimum client version: $(./executable/commanddash-linux min_cli_version)"
+          echo "Minimum client version: $(./executable/commanddash-linux min_client_version)"
           curl -X POST "https://api.commanddash.dev/executable/add" \
           -H "Content-Type: multipart/form-data" \
           -F "secret=${{ secrets.SECRET_KEY }}" \
