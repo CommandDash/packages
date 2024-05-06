@@ -6,7 +6,7 @@ void main() {
   group('CodeInput tests', () {
     test('getFileCodeWithReplacedCode should replace code within range', () {
       // Arrange
-      final codeInput = BaseCodeInput(
+      final codeInput = CodeInput(
         id: '1',
         filePath: '/path/to/file',
         range: Range(
@@ -51,7 +51,7 @@ void main() {
 
     test('getFileCodeWithReplacedCode should handle empty content', () {
       // Arrange
-      final codeInput = BaseCodeInput(
+      final codeInput = CodeInput(
         id: '1',
         filePath: '/path/to/file',
         range: Range(

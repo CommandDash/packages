@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/models/workspace_file.dart';
+import 'package:commanddash/server/server.dart';
 
 abstract class Input {
   String id;
@@ -51,6 +52,7 @@ class BaseCodeInput extends Input {
   BaseCodeInput(String id) : super(id, 'code_input');
 
   factory BaseCodeInput.fromJson(Map<String, dynamic> json) {
+    sendDebugMessage(json);
     if (json['value'] == null) {
       return EmptyCodeInput(
         id: json['id'],
@@ -58,13 +60,13 @@ class BaseCodeInput extends Input {
     }
     final value = jsonDecode(json['value']);
     return CodeInput(
-      id: json['id'],
-      filePath: value['filePath'],
-      range: Range.fromJson(value['referenceData']['selection']),
-      content: value['referenceContent'],
-      fileContent: File(value['filePath']).readAsStringSync(),
-      generateFullString: json['generate_full_string'] ?? false,
-    );
+        id: json['id'],
+        filePath: value['filePath'],
+        range: Range.fromJson(value['referenceData']['selection']),
+        content: value['referenceContent'],
+        fileContent: File(value['filePath']).readAsStringSync(),
+        generateFullString: json['generate_full_string'] ?? false,
+        includeContextualCode: json['include_contextual_code'] ?? true);
   }
 }
 
