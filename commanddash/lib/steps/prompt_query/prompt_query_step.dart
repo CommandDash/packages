@@ -176,8 +176,17 @@ class PromptQueryStep extends Step {
     }
     contextualCode = '$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
     prompt = '$contextualCode$prompt';
-    sendDebugMessage({'nested_code': nestedCodes, 'prompt': prompt});
 
+    final filesInvolved = Set<String>.from(
+            includedInPrompt.map((e) => e.path).toList() +
+                nestedCodes.keys.toList())
+        .map((e) => e.split('/').last)
+        .toList();
+    await taskAssist.processStep(
+        kind: 'loader_update',
+        args: ProcessingFilesLoader(filesInvolved, message: 'Preparing Result')
+            .toJson(),
+        timeoutKind: TimeoutKind.sync);
     final response = await generationRepository.getCompletion(prompt);
     final result = <Output>[];
     for (Output output in outputs) {

@@ -34,7 +34,6 @@ class ProcessingFilesLoader extends Loader {
   @override
   Map<String, dynamic> toJson() => {
         'kind': 'processingFiles',
-        'files': files,
-        if (message != null) 'message': message,
+        'message': {if (message != null) 'value': message, 'files': files}
       };
 }
