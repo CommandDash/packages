@@ -98,7 +98,7 @@ jobs:
           -H "Content-Type: multipart/form-data" \
           -F "secret=${{ secrets.SECRET_KEY }}" \
           -F "version=$(./executable/commanddash-linux version)" \
-          -F "minimum_client_version=$(./executable/commanddash-linux min_cli_version)" \
+          -F "minimum_client_version=$(./executable/commanddash-linux min_client_version)" \
           -F "windows_binary=@executable/commanddash-windows.exe" \
           -F "macos_binary=@executable/commanddash-mac" \
           -F "linux_binary=@executable/commanddash-linux"
