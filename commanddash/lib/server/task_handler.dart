@@ -1,9 +1,11 @@
 import 'package:commanddash/agent/agent_handler.dart';
+import 'package:commanddash/chat/chat_handler.dart';
 import 'package:commanddash/repositories/client/dio_client.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/server/messages.dart';
 import 'package:commanddash/server/server.dart';
 import 'package:commanddash/server/task_assist.dart';
+import 'package:commanddash/steps/chat/chat_step.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TaskHandler {
@@ -58,6 +60,10 @@ class TaskHandler {
         case 'agent-execute':
           final handler = AgentHandler.fromJson(message.data);
           await handler.runTask(taskAssist);
+          break;
+        case 'chat-request':
+          final handler = ChatHandler.fromJson(message.data);
+          handler.run(taskAssist);
           break;
         default:
           taskAssist.sendErrorMessage(message: 'INVALID_TASK_KIND', data: {});

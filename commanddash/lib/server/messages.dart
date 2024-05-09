@@ -12,6 +12,11 @@ class IncomingMessage extends Equatable {
         final taskKind = json['params']['kind'];
         final taskData = json['params']['data'];
         return TaskStartMessage(taskId, taskKind: taskKind, data: taskData);
+      case 'chat-request':
+        final taskId = json['id'];
+        final taskKind = json['method'];
+        final taskData = json['params'];
+        return TaskStartMessage(taskId, taskKind: taskKind, data: taskData);
       case 'agent-execute':
         final taskId = json['id'];
         final taskKind = json['method'];
