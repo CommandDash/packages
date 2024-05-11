@@ -1,5 +1,6 @@
 import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/repositories/gemini_repository.dart';
+import 'package:dio/dio.dart';
 
 part 'generation_exceptions.dart';
 
@@ -16,10 +17,11 @@ abstract class GenerationRepository {
   Future getStringEmbeddings(String value);
   Future<List<List<double>>> getStringBatchEmbeddings(List<String> value);
 
-  factory GenerationRepository.fromJson(Map<String, dynamic> json) {
+  factory GenerationRepository.fromJson(
+      Map<String, dynamic> json, {required Dio dioClient}) {
     final type = json['type'];
     if (type == 'gemini') {
-      return GeminiRepository(json['key']);
+      return GeminiRepository(json['key'], dio: dioClient);
     } else {
       throw UnimplementedError();
     }

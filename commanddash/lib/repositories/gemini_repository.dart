@@ -1,5 +1,6 @@
 import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:dio/dio.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:google_generative_ai/src/client.dart';
 import 'package:google_generative_ai/src/error.dart';
@@ -11,19 +12,23 @@ class UnknownException implements Exception {
 
 class GeminiRepository implements GenerationRepository {
   final String apiKey;
-  GeminiRepository(this.apiKey);
+  final Dio dio;
+  GeminiRepository(this.apiKey, {required this.dio});
   @override
   Future<String> getCompletion(
     String messages,
   ) async {
-    // For text-only input, use the gemini-pro model
-    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
-    final content = [Content.text(messages)];
-    final response = await model.generateContent(content);
-    if (response.text != null) {
-      return response.text!;
-    } else {
-      throw ModelException("No response recieved from gemini");
+    try {
+      final message = {'role': 'user', 'content': messages};
+      final response =
+          await dio.post('/ai/message/create', data: {'message': message});
+      final responseText = response.data['text'];
+      if (responseText == null) {
+        throw Exception('No response received from Claud');
+      }
+      return responseText;
+    } catch (e) {
+      throw Exception('Error getting response from claud: ${e.toString()}');
     }
   }
 
@@ -150,22 +155,27 @@ class GeminiRepository implements GenerationRepository {
   @override
   Future<String> getChatCompletion(
       List<ChatMessage> messages, String lastMessage) async {
-    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
-    final Content content = Content.text(lastMessage);
-    final history = messages.map((e) {
-      if (e.role == ChatRole.user) {
-        return Content.text(e.message);
-      } else {
-        return Content.model([TextPart(e.message)]);
-      }
-    }).toList();
+    try {
+      final history = messages
+          .map((message) => {
+                'role': message.role == ChatRole.user ? 'user' : 'assistant',
+                'content': message.message
+              })
+          .toList();
+      final message = [
+        ...history,
+        {'role': 'user', 'content': lastMessage}
+      ];
 
-    final chat = model.startChat(history: history);
-    var response = await chat.sendMessage(content);
-    if (response.text != null) {
-      return response.text!;
-    } else {
-      throw ModelException("No response recieved from gemini");
+      final response =
+          await dio.post('/ai/message/create', data: {'message': message});
+      final responseText = response.data['text'];
+      if (responseText == null) {
+        throw Exception('No response received from Claud');
+      }
+      return responseText;
+    } catch (e) {
+      throw Exception('Error getting response from claud: ${e.toString()}');
     }
   }
 }

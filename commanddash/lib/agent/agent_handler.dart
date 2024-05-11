@@ -4,6 +4,7 @@ import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
+import 'package:dio/dio.dart';
 
 class AgentHandler {
   final Map<String, Input> inputs;
@@ -27,7 +28,8 @@ class AgentHandler {
       this.githubAccessToken,
       this.isTest = false});
 
-  factory AgentHandler.fromJson(Map<String, dynamic> json) {
+  factory AgentHandler.fromJson(Map<String, dynamic> json,
+      {required Dio dioClient}) {
     final inputs = <String, Input>{};
     for (Map<String, dynamic> input in (json['registered_inputs'] as List)) {
       inputs.addAll({input['id']: Input.fromJson(input)});
@@ -40,7 +42,8 @@ class AgentHandler {
         (json['steps'] as List).cast<Map<String, dynamic>>();
 
     final GenerationRepository generationRepository =
-        GenerationRepository.fromJson(json['auth_details']);
+        GenerationRepository.fromJson(json['auth_details'],
+            dioClient: dioClient);
 
     return AgentHandler(
         inputs: inputs,

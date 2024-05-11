@@ -56,7 +56,14 @@ class TaskHandler {
           /// Pass this to the agent.
           break;
         case 'agent-execute':
-          final handler = AgentHandler.fromJson(message.data);
+          final client = getClient(
+              message.data['auth']['github_access_token'],
+              () async => taskAssist.processOperation(
+                    kind: 'refresh_access_token',
+                    args: {},
+                  ));
+          final handler =
+              AgentHandler.fromJson(message.data, dioClient: client);
           await handler.runTask(taskAssist);
           break;
         default:
