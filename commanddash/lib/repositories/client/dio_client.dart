@@ -6,11 +6,17 @@ typedef RefreshAccessToken = Future<Map<String, dynamic>> Function();
 
 Dio getClient(String accessToken, RefreshAccessToken updateAccessToken) {
   final dio = Dio();
-  dio.options.baseUrl = 'https://api.commanddash.dev';
+  dio.options.baseUrl = 'http://127.0.0.1:5000';
   dio.interceptors.add(CustomInterceptor(
       dio: dio,
       accessToken: accessToken,
       updateAccessToken: updateAccessToken));
+  return dio;
+}
+
+Dio getAgentClient() {
+  final dio = Dio();
+  dio.options.baseUrl = 'http://127.0.0.1:5000';
   return dio;
 }
 

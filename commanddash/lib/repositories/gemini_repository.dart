@@ -19,7 +19,9 @@ class GeminiRepository implements GenerationRepository {
     String messages,
   ) async {
     try {
-      final message = {'role': 'user', 'content': messages};
+      final message = [
+        {'role': 'user', 'content': messages}
+      ];
       final response =
           await dio.post('/ai/message/create', data: {'message': message});
       final responseText = response.data['text'];
