@@ -41,7 +41,7 @@ void main() {
           {
             "id": "736841542",
             "type": "string_input",
-            "value": "Where is the themeing of the app?"
+            "value": "What does the operations class do?"
           },
           {
             "id": "736841543",
@@ -103,13 +103,23 @@ void main() {
 
     messageStreamController
         .add(StepResponseMessage(1, 'cache', data: {'value': '{}'}));
-
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'update_cache');
     result = await queue.next;
     expect(result, isA<StepMessage>());
     expect(result.id, 1);
     expect((result as StepMessage).kind, 'loader_update');
     expect(result.args['kind'], 'message');
     expect(result.args['message'], 'Preparing Result');
+    messageStreamController
+        .add(StepResponseMessage(1, 'loader_update', data: {}));
+    result = await queue.next;
+    expect(result, isA<StepMessage>());
+    expect(result.id, 1);
+    expect((result as StepMessage).kind, 'loader_update');
+    expect(result.args['kind'], 'processingFiles');
     messageStreamController
         .add(StepResponseMessage(1, 'loader_update', data: {}));
     result = await queue.next;
