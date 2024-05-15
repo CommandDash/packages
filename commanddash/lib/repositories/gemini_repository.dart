@@ -157,27 +157,22 @@ class GeminiRepository implements GenerationRepository {
   @override
   Future<String> getChatCompletion(
       List<ChatMessage> messages, String lastMessage) async {
-    try {
-      final history = messages
-          .map((message) => {
-                'role': message.role == ChatRole.user ? 'user' : 'assistant',
-                'content': message.message
-              })
-          .toList();
-      final message = [
-        ...history,
-        {'role': 'user', 'content': lastMessage}
-      ];
-
-      final response =
-          await dio.post('/ai/message/create', data: {'message': message});
-      final responseText = response.data['text'];
-      if (responseText == null) {
-        throw Exception('No response received from Claud');
+    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+    final Content content = Content.text(lastMessage);
+    final history = messages.map((e) {
+      if (e.role == ChatRole.user) {
+        return Content.text(e.message);
+      } else {
+        return Content.model([TextPart(e.message)]);
       }
-      return responseText;
-    } catch (e) {
-      throw Exception('Error getting response from claud: ${e.toString()}');
+    }).toList();
+
+    final chat = model.startChat(history: history);
+    var response = await chat.sendMessage(content);
+    if (response.text != null) {
+      return response.text!;
+    } else {
+      throw ModelException("No response recieved from gemini");
     }
   }
 }
