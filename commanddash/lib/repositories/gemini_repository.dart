@@ -19,12 +19,18 @@ class GeminiRepository implements GenerationRepository {
   Future<String> getCompletion(
     String messages,
   ) async {
-    // For text-only input, use the gemini-pro model
-    final model =
-        GenerativeModel(model: 'gemini-1.5-flash-latest', apiKey: apiKey);
-    final content = [Content.text(messages)];
-    final response = await model.generateContent(content);
-    if (response.text != null) {
+    late final GenerateContentResponse? response;
+    try {
+      response = await _getGeminiFlashCompletionResponse(
+          'gemini-1.5-pro-latest', messages);
+    } on ServerException catch (e) {
+      if (e.message.contains(
+          'found for API version v1beta, or is not supported for GenerateContent')) {
+        response =
+            await _getGeminiFlashCompletionResponse('gemini-pro', messages);
+      }
+    }
+    if (response != null && response.text != null) {
       return response.text!;
     } else {
       throw ModelException("No response recieved from gemini");
@@ -154,8 +160,36 @@ class GeminiRepository implements GenerationRepository {
   @override
   Future<String> getChatCompletion(
       List<ChatMessage> messages, String lastMessage) async {
-    final model =
-        GenerativeModel(model: 'gemini-1.5-flash-latest', apiKey: apiKey);
+    late final GenerateContentResponse? response;
+
+    try {
+      response = await _getGeminiFlashChatCompletionResponse(
+          'gemini-1.5-pro-latest', messages, lastMessage);
+    } on ServerException catch (e) {
+      if (e.message.contains(
+          'found for API version v1beta, or is not supported for GenerateContent')) {
+        response = await _getGeminiFlashChatCompletionResponse(
+            'gemini-pro', messages, lastMessage);
+      }
+    }
+
+    if (response != null && response.text != null) {
+      return response.text!;
+    } else {
+      throw ModelException("No response recieved from gemini");
+    }
+  }
+
+  Future<GenerateContentResponse> _getGeminiFlashCompletionResponse(
+      String modelCode, String messages) async {
+    final model = GenerativeModel(model: modelCode, apiKey: apiKey);
+    final content = [Content.text(messages)];
+    return model.generateContent(content);
+  }
+
+  Future<GenerateContentResponse> _getGeminiFlashChatCompletionResponse(
+      String modelCode, List<ChatMessage> messages, String lastMessage) async {
+    final model = GenerativeModel(model: modelCode, apiKey: apiKey);
     final Content content = Content.text(lastMessage);
     final history = messages.map((e) {
       if (e.role == ChatRole.user) {
@@ -166,11 +200,6 @@ class GeminiRepository implements GenerationRepository {
     }).toList();
 
     final chat = model.startChat(history: history);
-    var response = await chat.sendMessage(content);
-    if (response.text != null) {
-      return response.text!;
-    } else {
-      throw ModelException("No response recieved from gemini");
-    }
+    return chat.sendMessage(content);
   }
 }
