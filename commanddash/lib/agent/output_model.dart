@@ -39,7 +39,8 @@ abstract class Output {
 
 class MultiCodeOutput extends Output {
   List<WorkspaceFile>? value;
-  MultiCodeOutput([this.value]) : super(OutputType.multiCodeOutput, 6000 * 2.7);
+  MultiCodeOutput([this.value])
+      : super(OutputType.multiCodeOutput, 10000 * 2.7);
 
   @override
   String toString() {
@@ -106,7 +107,7 @@ class DataSourceResultOutput extends Output {
   // TODO: limit for each output
 
   DataSourceResultOutput([this.value])
-      : super(OutputType.dataSourceOuput, 6000 * 2.7);
+      : super(OutputType.dataSourceOuput, 15000 * 2.7);
 
   @override
   String toString() {
