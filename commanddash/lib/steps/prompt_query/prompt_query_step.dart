@@ -181,11 +181,8 @@ class PromptQueryStep extends Step {
             includedInPrompt.map((e) => e.path).toList() +
                 nestedCodes.keys.toList())
         .map((e) => e.split('/').last)
+        .take(7)
         .toList();
-
-    if (filesInvolved.length > 7) {
-      filesInvolved = filesInvolved.sublist(0, 7);
-    }
     await taskAssist.processStep(
         kind: 'loader_update',
         args: ProcessingFilesLoader(filesInvolved, message: 'Preparing Result')
