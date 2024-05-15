@@ -11,13 +11,15 @@ class UnknownException implements Exception {
 
 class GeminiRepository implements GenerationRepository {
   final String apiKey;
+
   GeminiRepository(this.apiKey);
   @override
   Future<String> getCompletion(
     String messages,
   ) async {
     // For text-only input, use the gemini-pro model
-    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+    final model =
+        GenerativeModel(model: 'gemini-1.5-flash-latest', apiKey: apiKey);
     final content = [Content.text(messages)];
     final response = await model.generateContent(content);
     if (response.text != null) {
@@ -150,7 +152,8 @@ class GeminiRepository implements GenerationRepository {
   @override
   Future<String> getChatCompletion(
       List<ChatMessage> messages, String lastMessage) async {
-    final model = GenerativeModel(model: 'gemini-pro', apiKey: apiKey);
+    final model =
+        GenerativeModel(model: 'gemini-1.5-flash-latest', apiKey: apiKey);
     final Content content = Content.text(lastMessage);
     final history = messages.map((e) {
       if (e.role == ChatRole.user) {
