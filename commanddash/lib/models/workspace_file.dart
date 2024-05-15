@@ -20,14 +20,19 @@ class WorkspaceFile {
     }
     final contentLines = File(path).readAsLinesSync();
     final codeHash = computeCodeHash(contentLines.join('\n'));
-    selectedRanges = selectedRanges ??
-        [
-          Range(
-              start: Position(line: 0, character: 0),
-              end: Position(
-                  line: contentLines.length - 1,
-                  character: contentLines.last.length - 1))
-        ];
+    if (contentLines.isEmpty) {
+      selectedRanges = [];
+    } else {
+      selectedRanges = selectedRanges ??
+          [
+            Range(
+                start: Position(line: 0, character: 0),
+                end: Position(
+                    line: contentLines.length - 1,
+                    character: contentLines.last.length - 1))
+          ];
+    }
+
     return WorkspaceFile(path,
         contentLines: contentLines,
         codeHash: codeHash,
