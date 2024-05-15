@@ -118,10 +118,12 @@ class PromptQueryStep extends Step {
                 timeoutKind: TimeoutKind.stretched,
               );
               final context = data['context'];
-              final listOfContext = List<Map<String, dynamic>>.from(context);
-              for (final nestedCode in listOfContext) {
-                final filePath = nestedCode['filePath'];
-                appendNestedCodeCount(filePath);
+              if (context != null) {
+                final listOfContext = List<Map<String, dynamic>>.from(context);
+                for (final nestedCode in listOfContext) {
+                  final filePath = nestedCode['filePath'];
+                  appendNestedCodeCount(filePath);
+                }
               }
             }
             break;
