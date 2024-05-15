@@ -177,12 +177,15 @@ class PromptQueryStep extends Step {
     contextualCode = '$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
     prompt = '$contextualCode$prompt';
 
-    final filesInvolved = Set<String>.from(
+    var filesInvolved = Set<String>.from(
             includedInPrompt.map((e) => e.path).toList() +
                 nestedCodes.keys.toList())
         .map((e) => e.split('/').last)
-        .toList()
-        .sublist(0, 7);
+        .toList();
+
+    if (filesInvolved.length > 7) {
+      filesInvolved = filesInvolved.sublist(0, 7);
+    }
     await taskAssist.processStep(
         kind: 'loader_update',
         args: ProcessingFilesLoader(filesInvolved, message: 'Preparing Result')
