@@ -55,7 +55,7 @@ class PromptQueryStep extends Step {
     String prompt = query;
     int promptLength = prompt.length;
 
-    double availableToken = (24000 * 2.7) -
+    double availableToken = generationRepository.characterLimit -
         promptLength; // Max limit should come from the generation repository
     // If there are available token, we will add the outputs
     if (availableToken <= 0) {
@@ -118,10 +118,12 @@ class PromptQueryStep extends Step {
                 timeoutKind: TimeoutKind.stretched,
               );
               final context = data['context'];
-              final listOfContext = List<Map<String, dynamic>>.from(context);
-              for (final nestedCode in listOfContext) {
-                final filePath = nestedCode['filePath'];
-                appendNestedCodeCount(filePath);
+              if (context != null) {
+                final listOfContext = List<Map<String, dynamic>>.from(context);
+                for (final nestedCode in listOfContext) {
+                  final filePath = nestedCode['filePath'];
+                  appendNestedCodeCount(filePath);
+                }
               }
             }
             break;
@@ -177,10 +179,11 @@ class PromptQueryStep extends Step {
     contextualCode = '$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
     prompt = '$contextualCode$prompt';
 
-    final filesInvolved = Set<String>.from(
+    var filesInvolved = Set<String>.from(
             includedInPrompt.map((e) => e.path).toList() +
                 nestedCodes.keys.toList())
         .map((e) => e.split('/').last)
+        .take(7)
         .toList();
     await taskAssist.processStep(
         kind: 'loader_update',
