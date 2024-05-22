@@ -1,3 +1,5 @@
+import '../filters/filter.dart';
+
 /// Base class for adding data to [DataSource] from the web pages
 ///
 /// This class should not be directly used to add data as this is a `abstract` class.
@@ -31,6 +33,32 @@ abstract class WebDataObject {
     return SiteMap(xml);
   }
 
+  /// static method to create and return [Github]. It takes a GitHub repository
+  /// `url` as input and optionally accepts [CodeFilter] and [IssueFilter]
+  /// objects.
+  ///
+  /// Example:
+  /// ```dart
+  /// final githubUrl = 'https://github.com/flutter/flutter';
+  ///
+  /// // filter out dart files
+  /// final codeFilter = CodeFilter(pathRegex: '.*\.dart');
+  ///
+  /// // filter out issues with label "bug"
+  /// final issueFilter = IssueFilter(labels: ['bug']);
+  ///
+  /// final githubObject = WebDataObject.fromGithub(githubUrl,
+  ///     codeFilter: codeFilter, issueFilter: issueFilter);
+  /// ```
+  static Github fromGithub(String url, String accessToken,
+      {CodeFilter? codeFilter, IssueFilter? issueFilter}) {
+    return Github(
+        url: url,
+        accessToken: accessToken,
+        codeFilter: codeFilter,
+        issueFilter: issueFilter);
+  }
+
   /// Internal method used by dash_agent to convert the shared `DataSource` to json
   /// format that can be sent on the web
   ///
@@ -48,6 +76,9 @@ abstract class WebDataObject {
 /// final webPageObject = WebDataObject.fromWebPage(webUrl);
 /// ```
 class WebPage extends WebDataObject {
+  /// Creates a new [WebPage] object.
+  ///
+  /// * url: URL of the web page that contains the content that you want to save for referencing.
   WebPage(this.url);
 
   /// url of the web page that contains the content that you want to save for referencing.
@@ -78,6 +109,10 @@ class WebPage extends WebDataObject {
 /// final siteMapObject = WebDataObject.fromSiteMap(siteMapUrl);
 /// ```
 class SiteMap extends WebDataObject {
+  /// Creates a new [SiteMap] object.
+  ///
+  /// * `xml`: xml link that contains the link of all the web pages of the domain
+  /// which are relevant to agent and can be used for referencing.
   SiteMap(this.xml);
 
   /// xml link that contains the link of all the web pages of the domain which are
@@ -95,6 +130,88 @@ class SiteMap extends WebDataObject {
       'id': hashCode.toString(),
       'type': 'site_map',
       'xml': xml,
+      'version': minCliVersion
+    };
+  }
+
+  @override
+  String get minCliVersion => '0.0.1';
+}
+
+/// [Github] is used to index and add github repository codes and issues to the
+/// [DataSource] in the cloud which can be later used for referencing.
+///
+/// This object takes a GitHub repository `url` as input. It can be used to index
+/// the code files in the repository or specific issues from the repository.
+///
+/// You can optionally provide [CodeFilter] object to filter out the specific
+/// files that you want to index from the repository. It accepts a regex string
+/// to filter out the files based on a specific pattern.
+///
+/// You can also provide [IssueFilter] object to filter out the issues that you
+/// want to index from the repository. It allows you to filter the issues based
+/// on their labels and state (open, closed, or all).
+///
+/// Example:
+/// ```dart
+/// final githubUrl = 'https://github.com/flutter/flutter';
+///
+/// // filter out dart files
+/// final codeFilter = CodeFilter(pathRegex: '.*\.dart');
+///
+/// // filter out issues with label "bug"
+/// final issueFilter = IssueFilter(labels: ['bug']);
+///
+/// final githubObject = WebDataObject.fromGithub(githubUrl,
+///     codeFilter: codeFilter, issueFilter: issueFilter);
+/// ```
+class Github extends WebDataObject {
+  /// GitHub repo link that you want to extract and save for referencing
+  final String url;
+
+  /// This parameter is optional. [CodeFilter] object to selectively choose the
+  /// repository codes files based on the specified pattern. Currently you can
+  /// choose the files by proving regex string for fetching files that
+  /// follow specific patterns
+  final CodeFilter? codeFilter;
+
+  /// This parameter is optional. [IssueFilter] object to pick selected issues
+  /// from the GitHub repository. You can filter the issues based on:
+  /// **labels**: Issues which contain specific labels
+  /// **issue status**: Issues which are either open, closed, or all of them
+  final IssueFilter? issueFilter;
+
+  final String accessToken;
+
+  /// Creates a new [Github] object.
+  ///
+  /// * `url`: GitHub repo link that you want to extract and save for referencing.
+  /// * `codeFilter`: [CodeFilter] object to selectively choose the
+  /// repository codes files based on the specified pattern.
+  /// * `issueFilter`: [IssueFilter] object to pick selected issues
+  /// from the GitHub repository.
+  Github(
+      {required this.url,
+      required this.accessToken,
+      this.codeFilter,
+      this.issueFilter});
+
+  /// Internal method used by dash_agent to convert the shared `DataSource` to json
+  /// format that can be sent on the web
+  ///
+  /// **Note**: Ideally, this method is not supposed to be overriden by the child
+  /// objects and should not be altered. It is called automatically by the framework.
+  @override
+  Future<Map<String, dynamic>> process() async {
+    final codeFilterJson = await codeFilter?.process();
+    final issueFilterJson = await issueFilter?.process();
+    return {
+      'id': hashCode.toString(),
+      'type': 'github',
+      'github_url': url,
+      'access_token': accessToken,
+      'code_filter': codeFilterJson,
+      'issue_filter': issueFilterJson,
       'version': minCliVersion
     };
   }
