@@ -85,7 +85,16 @@ class IssueFilter extends Filter {
   /// Default value is `IssueState.closed`
   final IssueState issueStatus;
 
-  /// Duration of how older updated issues needs to be extracted
+  /// Duration of how older updated issues needs to be extracted.
+  ///
+  ///  - It should be a [Duration] object.
+  ///  - It represents the time difference in days, hours, minutes, or seconds.
+  ///
+  /// **Example:**
+  /// ```dart
+  /// final issueFilter = IssueFilter(since: Duration(days: 30));
+  /// ```
+  /// This will only index the issues that were updated in the last 30 days.
   final Duration? since;
 
   /// Creates a [IssueFilter] object.
