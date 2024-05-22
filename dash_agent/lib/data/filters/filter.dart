@@ -85,6 +85,9 @@ class IssueFilter extends Filter {
   /// Default value is `IssueState.closed`
   final IssueState issueStatus;
 
+  /// Duration of how older updated issues needs to be extracted
+  final Duration? since;
+
   /// Creates a [IssueFilter] object.
   ///
   /// ```dart
@@ -92,7 +95,7 @@ class IssueFilter extends Filter {
   /// ```
   ///
   /// This will only index the issues with `bug` or `enhancement` label that are `open`
-  IssueFilter({this.labels, this.issueStatus = IssueState.closed});
+  IssueFilter({this.labels, this.issueStatus = IssueState.closed, this.since});
 
   /// Internal method used by dash_agent to convert the shared `DataSource` to json
   /// format that can be sent on the web
@@ -101,7 +104,15 @@ class IssueFilter extends Filter {
   /// objects and should not be altered. It is called automatically by the framework.
   @override
   Future<Map<String, dynamic>> process() async {
-    return {'labels': labels, 'state': issueStatus, 'version': minCliVersion};
+    final isoFormatSince = since != null
+        ? DateTime.now().subtract(since!).toIso8601String()
+        : null;
+    return {
+      'labels': labels,
+      'state': issueStatus,
+      'version': minCliVersion,
+      'since': isoFormatSince
+    };
   }
 
   @override
