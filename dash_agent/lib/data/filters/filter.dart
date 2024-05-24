@@ -118,7 +118,7 @@ class IssueFilter extends Filter {
         : null;
     return {
       'labels': labels,
-      'state': issueStatus,
+      'state': issueStatus.value,
       'version': minCliVersion,
       'since': isoFormatSince
     };
