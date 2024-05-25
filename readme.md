@@ -36,6 +36,6 @@ Read our [quickstart](https://www.commanddash.io/docs/quickstart) guide to get s
 CommandDash is growing! 
 
 * **Feature Requests:** Suggest new capabilities for the framework by opening an issue in the [issue tracker](https://github.com/CommandDash/packages/issues).
-* **Bug Fixes:** Encountered any bug? Report to us and pull requests with fixes are welcome. 
+* **Bug Fixes:** Encountered any bug? Report to us and Pull Requests with fixes are welcome. 
 
 We are excited to see what you build with CommandDash!
