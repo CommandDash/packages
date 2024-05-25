@@ -15,7 +15,7 @@
 Dash Agents Framework enables developers to create custom programming agents, expert at a defined task, and share them on the CommandDash marketplace.
 <div align="center">
 
-![Image Name](assets/flow.png){width="500px"}
+![Image Name](assets/flow.png)
 
 </div>
 
