@@ -8,7 +8,7 @@
 [![VScode Downloads](https://img.shields.io/visual-studio-marketplace/d/WelltestedAI.fluttergpt)](https://marketplace.visualstudio.com/items?itemName=WelltestedAI.fluttergpt&ssr=false#overview) [![License: APACHE](https://img.shields.io/badge/License-APACHE%202.0-yellow)](/LICENSE)
 </div>
 
-<h3 align="center">Build and share your own IDE Programming Agents</h3>
+<h3 align="center">Build and share your own in IDE Programming Agents</h3>
 
 -----------------
 
