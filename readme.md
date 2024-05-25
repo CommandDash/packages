@@ -8,14 +8,15 @@
 [![VScode Downloads](https://img.shields.io/visual-studio-marketplace/d/WelltestedAI.fluttergpt)](https://marketplace.visualstudio.com/items?itemName=WelltestedAI.fluttergpt&ssr=false#overview) [![License: APACHE](https://img.shields.io/badge/License-APACHE%202.0-yellow)](/LICENSE)
 </div>
 
-<h3 align="center">Build and share your own in IDE Programming Agents</h3>
+<h3 align="center">Build and share your own IDE Programming Agents</h3>
 
 -----------------
 
-Dash Agents Framework enables developers to create custom programming agents expert at a defined task and share them on the CommandDash marketplace.
+Dash Agents Framework enables developers to create custom programming agents, expert at a defined task, and share them on the CommandDash marketplace.
 <div align="center">
 
-![Image Name](assets/flow.png){width="500px"}</div>
+![Image Name](assets/flow.png){width="500px"}
+</div>
 
 This repo contains the three parts that support the creation and execution of Dash Agents.
 
@@ -31,7 +32,7 @@ Read our [quickstart](https://www.commanddash.io/docs/quickstart) guide to get s
 
 ## Contributing
 
-CommandDash is growing 
+CommandDash is growing! 
 
 * **Feature Requests:** Suggest new capabilities for the framework by opening an issue in the [issue tracker](https://github.com/CommandDash/packages/issues).
 * **Bug Fixes:** Encountered any bug? Report to us and pull requests with fixes are welcome. 
