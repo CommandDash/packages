@@ -16,6 +16,7 @@ Dash Agents Framework enables developers to create custom programming agents, ex
 <div align="center">
 
 ![Image Name](assets/flow.png){width="500px"}
+
 </div>
 
 This repo contains the three parts that support the creation and execution of Dash Agents.
