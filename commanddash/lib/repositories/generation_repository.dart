@@ -5,6 +5,7 @@ part 'generation_exceptions.dart';
 
 //Can be implemented to provide generations.
 abstract class GenerationRepository {
+  late double characterLimit;
   Future<String> getCompletion(String message);
   Future<String> getChatCompletion(
       List<ChatMessage> messages, String lastMessage);

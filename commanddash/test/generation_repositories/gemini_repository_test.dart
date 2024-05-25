@@ -1,3 +1,4 @@
+import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:test/test.dart';
@@ -76,6 +77,29 @@ void main() {
                 ],
               ),
           throwsA(isA<InvalidApiKeyException>()));
+    });
+  });
+  group('Completion', () {
+    test('get completion with correct key', () async {
+      final geminiRepository = GeminiRepository(apiKey!);
+      final result = await geminiRepository.getCompletion("12345 till 10");
+
+      expect(result, isA<String>());
+    });
+
+    test('get chat compeltion', () async {
+      final geminiRepository = GeminiRepository(apiKey!);
+      final messages = [
+        ChatMessage(
+          role: ChatRole.user,
+          message: 'Hello',
+        ),
+      ];
+      final lastMessage = 'Hello';
+
+      final response =
+          await geminiRepository.getChatCompletion(messages, lastMessage);
+      expect(response, isA<String>());
     });
   });
 }

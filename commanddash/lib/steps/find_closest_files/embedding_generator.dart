@@ -73,6 +73,10 @@ class EmbeddingGenerator {
           calculateCosineSimilarity(queryEmbeddings, b.embedding!);
       return distanceB.compareTo(distanceA);
     }));
-    return files.sublist(0, 3);
+    if (files.length > 3) {
+      return files.sublist(0, 3);
+    } else {
+      return files;
+    }
   }
 }
