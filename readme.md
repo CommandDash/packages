@@ -12,10 +12,12 @@
 
 -----------------
 
-Dash Agents Framework enables developers to create custom programming agents expert at a defined task and share them on the CommandDash marketplace.
+Dash Agents Framework enables developers to create custom programming agents, expert at a defined task, and share them on the CommandDash marketplace.
 <div align="center">
 
-![Image Name](assets/flow.png){width="500px"}</div>
+![Image Name](assets/flow.png)
+
+</div>
 
 This repo contains the three parts that support the creation and execution of Dash Agents.
 
@@ -31,9 +33,9 @@ Read our [quickstart](https://www.commanddash.io/docs/quickstart) guide to get s
 
 ## Contributing
 
-CommandDash is growing 
+CommandDash is growing! 
 
 * **Feature Requests:** Suggest new capabilities for the framework by opening an issue in the [issue tracker](https://github.com/CommandDash/packages/issues).
-* **Bug Fixes:** Encountered any bug? Report to us and pull requests with fixes are welcome. 
+* **Bug Fixes:** Encountered any bug? Report to us and Pull Requests with fixes are welcome. 
 
 We are excited to see what you build with CommandDash!
