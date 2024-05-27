@@ -70,14 +70,14 @@ class AgentValidation {
   }
 
   static Map<String, String>? validateCommandDataSourcesRegistration(
-      Map<String, dynamic> commandJson) {
+      Map<String, dynamic> commandJson, Map<String, dynamic> agentJson) {
     final usedDataSources = <String>{};
-    final registeredDataSources = commandJson['data_sources']?.cast<String>();
+    final registeredDataSources = agentJson['data_sources']?.cast<String>();
     final steps = commandJson['steps']?.cast<Map<String, dynamic>>();
 
     // fetch data sources from the [ChatMode]
     usedDataSources
-        .addAll(commandJson['chat_mode']['data_sources']?.cast<String>() ?? []);
+        .addAll(agentJson['chat_mode']['data_sources']?.cast<String>() ?? []);
 
     // collecting used data sources
     for (final step in steps) {

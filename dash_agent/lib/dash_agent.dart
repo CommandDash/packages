@@ -54,7 +54,7 @@ Future<void> processAgent(AgentConfiguration configuration) async {
     final commands = json['supported_commands'] as List<Map<String, dynamic>>;
     for (final command in commands) {
       final dataSourceValidation =
-          AgentValidation.validateCommandDataSourcesRegistration(command);
+          AgentValidation.validateCommandDataSourcesRegistration(command, json);
       final commandValidationResponse =
           AgentValidation.validateDashCommandVariableUsage(command);
       if (commandValidationResponse != null) {
