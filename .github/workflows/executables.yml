@@ -12,11 +12,11 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-latest, windows-latest, macos-13]
         include:
           - os: ubuntu-latest
             output-name: commanddash-linux
-          - os: macOS-latest
+          - os: macos-13
             output-name: commanddash-mac
           - os: windows-latest
             output-name: commanddash-windows.exe
@@ -48,7 +48,7 @@ jobs:
             binary-name: commanddash-linux
           - os: windows-latest
             binary-name: commanddash-windows.exe
-          - os: macos-latest
+          - os: macos-13
             binary-name: commanddash-mac
     
     steps:
