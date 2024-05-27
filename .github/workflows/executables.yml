@@ -109,7 +109,7 @@ jobs:
           -F "minimum_client_version=$(./executable/commanddash-linux min_client_version)" \
           -F "windows_binary=@executable/commanddash-windows.exe" \
           -F "macos_binary=@executable/commanddash-mac" \
-          -F "linux_binary=@executable/commanddash-linux"
+          -F "linux_binary=@executable/commanddash-linux" \
           -F "macos_x64_binary=@executable/commanddash-mac-x64"
 
     
