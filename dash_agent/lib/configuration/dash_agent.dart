@@ -1,4 +1,3 @@
-import 'package:dash_agent/configuration/chat_mode.dart';
 import 'package:dash_agent/configuration/command.dart';
 import 'package:dash_agent/configuration/metadata.dart';
 import 'package:dash_agent/data/datasource.dart';
