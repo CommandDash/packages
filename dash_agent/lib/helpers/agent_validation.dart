@@ -72,7 +72,7 @@ class AgentValidation {
   static Map<String, String>? validateCommandDataSourcesRegistration(
       Map<String, dynamic> commandJson) {
     final usedDataSources = <String>{};
-    final registeredDataSources = commandJson['data_sources']?.cast<String>();
+    final registerDataSources = commandJson['data_sources']?.cast<String>();
     final steps = commandJson['steps']?.cast<Map<String, dynamic>>();
 
     // fetch data sources from the [ChatMode]
@@ -89,12 +89,11 @@ class AgentValidation {
     }
 
     // checking if all the usedDataSources are indeed registered
-    final unRegisteredDataSources = registeredDataSources
+    final unregisterDataSources = registerDataSources
         .where((dataSource) => !usedDataSources.contains(dataSource))
         ?.toList();
 
-    if (unRegisteredDataSources == null ||
-        unRegisteredDataSources.length == 0) {
+    if (unregisterDataSources == null || unregisterDataSources.length == 0) {
       return null;
     }
 

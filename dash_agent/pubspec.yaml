@@ -12,6 +12,8 @@ environment:
 dependencies:
   path: ^1.8.3
   meta: ^1.8.0
+  http: ^1.0.0
+  xml: ^6.3.0
 
 dev_dependencies:
   flutter_test:

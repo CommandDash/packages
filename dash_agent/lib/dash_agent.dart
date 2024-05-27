@@ -6,6 +6,7 @@ import 'package:dash_agent/extension/map_extension.dart';
 import 'package:dash_agent/helpers/agent_validation.dart';
 
 import 'helpers/min_cli_version_helper.dart';
+export 'helpers/sitemap_helper.dart';
 
 Future<void> processAgent(AgentConfiguration configuration) async {
   final json = <String, dynamic>{};
@@ -30,7 +31,7 @@ Future<void> processAgent(AgentConfiguration configuration) async {
     }
 
     json['data_sources'] = <Map<String, dynamic>>[];
-    for (final source in configuration.registeredDataSources) {
+    for (final source in configuration.registerDataSources) {
       json['data_sources'].add(await source.process());
     }
 

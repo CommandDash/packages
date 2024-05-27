@@ -4,7 +4,7 @@ import 'package:dash_agent/data/datasource.dart';
 
 /// Base class for creating agent. [AgentConfiguration] requires following
 ///  properties passed:
-/// - `registeredDataSources` - List of [DataSource]s that will be used by agent
+/// - `registerDataSources` - List of [DataSource]s that will be used by agent
 /// commands to perform designated tasks
 /// - `registerSupportedCommands` - List of [Command]s that will be supported by
 /// the agent. This should contain atleast one `Command` for the agent to be
@@ -23,7 +23,7 @@ import 'package:dash_agent/data/datasource.dart';
 ///   final blogsSource = BlogsDataSource();
 ///
 ///   @override
-///   List<DataSource> get registeredDataSources => [docsSource, blogsSource];
+///   List<DataSource> get registerDataSources => [docsSource, blogsSource];
 ///
 ///   @override
 ///   List<Command> get registerSupportedCommands =>
@@ -85,13 +85,13 @@ abstract class AgentConfiguration {
   ///   final blogsSource = BlogsDataSource();
   ///
   ///   @override
-  ///   List<DataSource> get registeredDataSources => [docsSource, blogsSource];
+  ///   List<DataSource> get registerDataSources => [docsSource, blogsSource];
   ///
   ///   // Rest of the code
   ///   ...
   /// }
   /// ```
-  List<DataSource> get registeredDataSources;
+  List<DataSource> get registerDataSources;
 
   /// Default chat mode (also known as the commandless mode) for the agent.
   /// This will be active by default when the agent is activated. It has two
