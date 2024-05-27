@@ -21,7 +21,7 @@ jobs:
           - os: windows-latest
             output-name: commanddash-windows.exe
           - os: macos-13
-            binary-name: commanddash-mac-x64
+            output-name: commanddash-mac-x64
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
