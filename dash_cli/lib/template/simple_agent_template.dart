@@ -22,8 +22,8 @@ import 'data_sources.dart';
 /// [DataSource] - For providing additional data to commands to process.
 /// [Command] - Actions available to the user in the IDE, like "/ask", "/generate" etc
 class MyAgent extends AgentConfiguration {
-  final docsSource = DocsDataSource();
-  final blogsSource = BlogsDataSource();
+  final docsDataSource = DocsDataSource();
+  final blogsDataSource = BlogsDataSource();
 
   @override
   Metadata get metadata => Metadata(
@@ -32,15 +32,15 @@ class MyAgent extends AgentConfiguration {
       tags: []);
 
   @override
-  String get registerSystemPrompt => '';
-
-
-  @override
-  List<DataSource> get registerDataSources => [docsSource, blogsSource];
+  String get registerSystemPrompt => \'\'\'You are an X assistant. Help users in doing Y\'\'\';
 
   @override
-  List<Command> get registerSupportedCommands =>
-      [AskCommand(docsSource: docsSource)];
+  List<DataSource> get registerDataSources => [docsDataSource, blogsDataSource];
+
+  @override
+  List<Command> get registerSupportedCommands => [
+        // AskCommand(docsSource: docsDataSource) 
+      ];
 }
 ''';
 
