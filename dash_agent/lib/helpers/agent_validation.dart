@@ -69,6 +69,41 @@ class AgentValidation {
     return nonRegisteredStepVariables;
   }
 
+  static Map<String, String>? validateCommandDataSourcesRegistration(
+      Map<String, dynamic> commandJson) {
+    final usedDataSources = <String>{};
+    final registeredDataSources = commandJson['data_sources']?.cast<String>();
+    final steps = commandJson['steps']?.cast<Map<String, dynamic>>();
+
+    // fetch data sources from the [ChatMode]
+    usedDataSources
+        .addAll(commandJson['chat_mode']['data_sources']?.cast<String>() ?? []);
+
+    // collecting used data sources
+    for (final step in steps) {
+      final type = step['type'];
+
+      if (type == 'search_in_sources') {
+        usedDataSources.addAll(step['data_sources']);
+      }
+    }
+
+    // checking if all the usedDataSources are indeed registered
+    final unRegisteredDataSources = registeredDataSources
+        .where((dataSource) => !usedDataSources.contains(dataSource))
+        ?.toList();
+
+    if (unRegisteredDataSources == null ||
+        unRegisteredDataSources.length == 0) {
+      return null;
+    }
+
+    return {
+      'Data Source Registration Missing':
+          'One or more DataSource was found in commands yet not registered'
+    };
+  }
+
   static String? _validateAppendToChatStep(
       Map<String, dynamic> step, List<String> registeredVariables) {
     final nonRegisteredValueIds = _extractNonRegisteredVariablesInStep(
