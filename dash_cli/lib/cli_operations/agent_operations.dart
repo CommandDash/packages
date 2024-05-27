@@ -13,7 +13,7 @@ class AgentOperation {
 
   Future<void> createAgentProject(String projectName) async {
     // create a sample dart project
-    wtLog.startSpinner('creating dart project...');
+    wtLog.startSpinner('Creating agent project...');
 
     try {
       await runCommand('dart', ['create', projectName]);

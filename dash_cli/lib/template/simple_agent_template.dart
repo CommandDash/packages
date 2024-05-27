@@ -26,7 +26,17 @@ class MyAgent extends AgentConfiguration {
   final blogsSource = BlogsDataSource();
 
   @override
-  List<DataSource> get registeredDataSources => [docsSource, blogsSource];
+  Metadata get metadata => Metadata(
+      name: 'Your Agent Name',
+      avatarProfile: 'assets/your-logo.png',
+      tags: []);
+
+  @override
+  String get registerSystemPrompt => '';
+
+
+  @override
+  List<DataSource> get registerDataSources => [docsSource, blogsSource];
 
   @override
   List<Command> get registerSupportedCommands =>
@@ -89,9 +99,10 @@ class AskCommand extends Command {
   final DataSource docsSource;
 
   /// Inputs to be provided by the user in the text field
-  final userQuery = StringInput('Your query', optional: false);
+  final userQuery = StringInput('Your query');
   final codeAttachment = CodeInput(
     'Primary method',
+    optional: true
   );
 
   @override
@@ -120,7 +131,7 @@ class AskCommand extends Command {
           output: matchingDocuments),
       PromptQueryStep(
         prompt:
-            '''You are an X agent. Here is the $userQuery, here is the $codeAttachment and some relevant documents for your reference: $matchingDocuments. 
+            '''You are an X agent. Here is the user query: $userQuery, here is a reference code snippet: $codeAttachment and some relevant documents for your reference: $matchingDocuments. 
             
             Answer the user's query.''',
         promptOutput: promptOutput,
