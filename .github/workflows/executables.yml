@@ -12,16 +12,14 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest, macos-13]
+        os: [ubuntu-latest, macos-13, windows-latest]
         include:
           - os: ubuntu-latest
             output-name: commanddash-linux
-          - os: macOS-latest
+          - os: macos-13
             output-name: commanddash-mac
           - os: windows-latest
             output-name: commanddash-windows.exe
-          - os: macos-13
-            output-name: commanddash-mac-x64
     steps:
       - uses: actions/checkout@v4
       - uses: dart-lang/setup-dart@v1
@@ -50,10 +48,8 @@ jobs:
             binary-name: commanddash-linux
           - os: windows-latest
             binary-name: commanddash-windows.exe
-          - os: macos-latest
-            binary-name: commanddash-mac
           - os: macos-13
-            binary-name: commanddash-mac-x64
+            binary-name: commanddash-mac
     
     steps:
       - uses: actions/checkout@v4
@@ -92,10 +88,6 @@ jobs:
         with:
             name: commanddash-windows.exe
             path: ./executable
-      - uses: actions/download-artifact@v4
-        with:
-            name: commanddash-mac-x64
-            path: ./executable
 
       - name: Submit Executables
         run: |
@@ -109,7 +101,6 @@ jobs:
           -F "minimum_client_version=$(./executable/commanddash-linux min_client_version)" \
           -F "windows_binary=@executable/commanddash-windows.exe" \
           -F "macos_binary=@executable/commanddash-mac" \
-          -F "linux_binary=@executable/commanddash-linux" \
-          -F "macos_x64_binary=@executable/commanddash-mac-x64"
+          -F "linux_binary=@executable/commanddash-linux"
 
     
