@@ -33,7 +33,7 @@ class MyAgent extends AgentConfiguration {
   final docsSource = DocsDataSource();
 
   @override
-  List<DataSource> get registeredDataSources => [docsSource];
+  List<DataSource> get registerDataSources => [docsSource];
 
   @override
   List<Command> get registerSupportedCommands =>

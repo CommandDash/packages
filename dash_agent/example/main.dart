@@ -19,7 +19,7 @@ class MyAgent extends AgentConfiguration {
   Metadata get metadata => Metadata(name: 'My Agent');
 
   @override
-  List<DataSource> get registeredDataSources => [docsSource, blogsSource];
+  List<DataSource> get registerDataSources => [docsSource, blogsSource];
 
   @override
   String get registerSystemPrompt =>
