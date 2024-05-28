@@ -56,6 +56,7 @@ abstract class Step {
         return AppendToChatStep.fromJson(json,
             (json['value'] as String).replacePlaceholder(inputs, outputs));
       case 'chat':
+        throw Exception('Chat step is not supported');
         return ChatStep.fromJson(
             json,
             (json['messages'] != null && inputs[json['messages']] != null)
@@ -63,8 +64,7 @@ abstract class Step {
                             inputs[json['messages']] as Map<String, dynamic>)
                         .messages ??
                     []
-                : [],
-            (json['query'] as String).replacePlaceholder(inputs, outputs));
+                : []);
       case 'replace_in_file':
         final codeInput = inputs[json['replaceInFile']];
         if (codeInput == null) {

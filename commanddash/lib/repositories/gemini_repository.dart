@@ -159,17 +159,22 @@ class GeminiRepository implements GenerationRepository {
 
   @override
   Future<String> getChatCompletion(
-      List<ChatMessage> messages, String lastMessage) async {
+    List<ChatMessage> messages,
+    String lastMessage, {
+    String? systemPrompt,
+  }) async {
     late final GenerateContentResponse? response;
 
     try {
       response = await _getGeminiFlashChatCompletionResponse(
-          'gemini-1.5-flash-latest', messages, lastMessage);
+          'gemini-1.5-flash-latest', messages, lastMessage,
+          systemPrompt: systemPrompt);
     } on ServerException catch (e) {
       if (e.message.contains(
           'found for API version v1beta, or is not supported for GenerateContent')) {
         response = await _getGeminiFlashChatCompletionResponse(
-            'gemini-pro', messages, lastMessage);
+            'gemini-pro', messages, lastMessage,
+            systemPrompt: systemPrompt);
       }
     }
 
@@ -188,8 +193,12 @@ class GeminiRepository implements GenerationRepository {
   }
 
   Future<GenerateContentResponse> _getGeminiFlashChatCompletionResponse(
-      String modelCode, List<ChatMessage> messages, String lastMessage) async {
-    final model = GenerativeModel(model: modelCode, apiKey: apiKey);
+      String modelCode, List<ChatMessage> messages, String lastMessage,
+      {String? systemPrompt}) async {
+    final Content? systemInstruction =
+        systemPrompt != null ? Content.text(systemPrompt) : null;
+    final model = GenerativeModel(
+        model: modelCode, apiKey: apiKey, systemInstruction: systemInstruction);
     final Content content = Content.text(lastMessage);
     final history = messages.map((e) {
       if (e.role == ChatRole.user) {

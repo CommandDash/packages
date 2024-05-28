@@ -8,7 +8,10 @@ abstract class GenerationRepository {
   late double characterLimit;
   Future<String> getCompletion(String message);
   Future<String> getChatCompletion(
-      List<ChatMessage> messages, String lastMessage);
+    List<ChatMessage> messages,
+    String lastMessage, {
+    String? systemPrompt,
+  });
   // Generates embeddings for the given [code]. This should be using a tasktype of retrievalDocument.
   Future getCodeEmbeddings(String code);
   Future<List<List<double>>> getCodeBatchEmbeddings(
