@@ -39,7 +39,7 @@ class Metadata {
   /// objects and should not be altered. It is called automatically by the framework.
   Future<Map<String, dynamic>> process() async {
     final Map<String, dynamic> processedJson = {
-      'name': name,
+      'display_name': name,
       'avatar_path': avatarProfile,
       'tags': tags,
       'version': version

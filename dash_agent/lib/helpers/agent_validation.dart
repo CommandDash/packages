@@ -72,7 +72,10 @@ class AgentValidation {
   static Map<String, String>? validateCommandDataSourcesRegistration(
       Map<String, dynamic> commandJson, Map<String, dynamic> agentJson) {
     final usedDataSources = <String>{};
-    final registerDataSources = agentJson['data_sources']?.cast<String>();
+    final registerDataSources =
+        (agentJson['data_sources']?.cast<Map>() as List<Map>)
+            .map((source) => source['id'])
+            .toList();
     final steps = commandJson['steps']?.cast<Map<String, dynamic>>();
 
     // fetch data sources from the [ChatMode]
@@ -84,16 +87,19 @@ class AgentValidation {
       final type = step['type'];
 
       if (type == 'search_in_sources') {
-        usedDataSources.addAll(step['data_sources']);
+        final dataSources =
+            (step['data_sources'].cast<String>() as List<String>)
+                .map((source) => source.substring(1, source.length - 1));
+        usedDataSources.addAll(dataSources);
       }
     }
 
     // checking if all the usedDataSources are indeed registered
-    final unregisterDataSources = registerDataSources
-        .where((dataSource) => !usedDataSources.contains(dataSource))
-        ?.toList();
+    final unregisterDataSources = usedDataSources
+        .where((dataSource) => !registerDataSources.contains(dataSource))
+        .toList();
 
-    if (unregisterDataSources == null || unregisterDataSources.length == 0) {
+    if (unregisterDataSources.isEmpty) {
       return null;
     }
 
