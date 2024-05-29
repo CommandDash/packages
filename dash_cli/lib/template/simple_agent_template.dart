@@ -24,7 +24,6 @@ import 'data_sources.dart';
 /// [Command] - Actions available to the user in the IDE, like "/ask", "/generate" etc
 class MyAgent extends AgentConfiguration {
   final docsDataSource = DocsDataSource();
-  final blogsDataSource = BlogsDataSource();
 
   @override
   Metadata get metadata => Metadata(
@@ -34,7 +33,7 @@ class MyAgent extends AgentConfiguration {
   String get registerSystemPrompt => {system_prompt};
 
   @override
-  List<DataSource> get registerDataSources => [docsDataSource, blogsDataSource];
+  List<DataSource> get registerDataSources => [docsDataSource];
 
   @override
   List<Command> get registerSupportedCommands => [
@@ -64,25 +63,7 @@ class DocsDataSource extends DataSource {
       [ProjectDataObject.fromText('Data in form of raw text')];
 
   @override
-  List<WebDataObject> get webObjects => [];
-}
-
-/// [BlogsDataSource] is a specific data source indexing blogs stored in filesystem or on web.
-///
-/// We are not using it in any of the commands.
-class BlogsDataSource extends DataSource {
-  @override
-  List<FileDataObject> get fileObjects => [
-        DirectoryFiles(Directory('directory_path_to_data_source'),
-            relativeTo: 'parent_directory_path')
-      ];
-
-  @override
-  List<ProjectDataObject> get projectObjects => [];
-
-  @override
-  List<WebDataObject> get webObjects =>
-      [WebDataObject.fromWebPage('https://sampleurl.com')];
+  List<WebDataObject> get webObjects => [WebDataObject.fromSiteMap('https://sampleurl.com/sitemap.xml')];
 }
 ''';
 
@@ -100,9 +81,9 @@ class AskCommand extends Command {
   final DataSource docsSource;
 
   /// Inputs to be provided by the user in the text field
-  final userQuery = StringInput('Your query');
+  final userQuery = StringInput('Query');
   final codeAttachment = CodeInput(
-    'Primary method',
+    'Code Reference',
     optional: true
   );
 
@@ -132,7 +113,7 @@ class AskCommand extends Command {
           output: matchingDocuments),
       PromptQueryStep(
         prompt:
-            '''You are an X agent. Here is the user query: $userQuery, here is a reference code snippet: $codeAttachment and some relevant documents for your reference: $matchingDocuments. 
+            '''You are a X agent. Here is the user query: $userQuery, here is a reference code snippet: $codeAttachment and some relevant documents for your reference: $matchingDocuments. 
             
             Answer the user's query.''',
         promptOutput: promptOutput,
