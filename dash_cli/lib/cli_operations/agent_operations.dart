@@ -128,7 +128,9 @@ class AgentOperation {
 
       final metadata = agentJson['metadata'] as Map;
       final avatarPath = metadata['avatar_path'];
-      metadata['avatar'] = _fetchAvatar(avatarPath);
+      if (avatarPath != null) {
+        metadata['avatar'] = _fetchAvatar(avatarPath);
+      }
       metadata.remove('avatar_path');
 
       wtLog.log('✔︎ Agent configuration fetched');
