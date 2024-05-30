@@ -67,8 +67,8 @@ class AgentHandler {
         agentName: json['agent_name'],
         agentVersion: json['agent_version'],
         isTest: json['testing'] ?? false,
-        dataSources: json['chat_mode']['data_sources'] ?? [],
-        systemPrompt: json['chat_mode']['system_prompt'],
+        dataSources: json['chat_mode']?['data_sources'] ?? [],
+        systemPrompt: json['chat_mode']?['system_prompt'],
         lastMessage: json['last_message']);
   }
 

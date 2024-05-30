@@ -15,7 +15,7 @@ class ChatMessage {
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
       role: json['role'] == 'model' ? ChatRole.model : ChatRole.user,
-      message: json['message'],
+      message: json['parts'],
       data: json['data'],
     );
   }
