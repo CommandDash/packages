@@ -67,7 +67,10 @@ class AgentHandler {
         agentName: json['agent_name'],
         agentVersion: json['agent_version'],
         isTest: json['testing'] ?? false,
-        dataSources: json['chat_mode']?['data_sources'] ?? [],
+        dataSources:
+            ((json['chat_mode']?['data_sources'] ?? []) as List<dynamic>)
+                .map((e) => e.toString())
+                .toList(),
         systemPrompt: json['chat_mode']?['system_prompt'],
         lastMessage: json['last_message']);
   }
