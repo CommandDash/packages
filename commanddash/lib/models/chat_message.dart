@@ -1,6 +1,6 @@
 import 'package:commanddash/agent/input_model.dart';
 
-enum ChatRole { model, user }
+enum ChatRole { model, user, unknown }
 
 class ChatMessage {
   final ChatRole role;
@@ -14,7 +14,11 @@ class ChatMessage {
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
-      role: json['role'] == 'model' ? ChatRole.model : ChatRole.user,
+      role: json['role'] == 'model'
+          ? ChatRole.model
+          : json['role'] == 'user'
+              ? ChatRole.user
+              : ChatRole.unknown,
       message: json['parts'],
       data: json['data'],
     );

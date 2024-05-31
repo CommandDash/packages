@@ -115,8 +115,9 @@ class ChatStep extends Step {
       ..sort(((a, b) {
         return b.value.compareTo(a.value);
       }));
-    String contextualCode =
+    String contextualCodePrefix =
         "[CONTEXTUAL CODE FOR YOUR INFORMATION FROM USER PROJECT]\n\n";
+    String contextualCode = "";
 
     ///TODO: Figure out a way to attach the most relevant part of the file if the full file is extremely long
     for (final nestedFilePath in sortedNestedCode.map((e) => e.key)) {
@@ -143,8 +144,11 @@ class ChatStep extends Step {
       contextualCode = '$contextualCode$nestedFilePath\n```$content```\n\n';
       availableToken -= content.length;
     }
-    contextualCode = '$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
-    prompt = '$contextualCode$prompt';
+    if (contextualCode.isNotEmpty) {
+      contextualCode =
+          '$contextualCodePrefix$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
+      prompt = '$contextualCode$prompt';
+    }
     print(prompt);
     var filesInvolved = Set<String>.from(
             includedInPrompt.map((e) => e.path).toList() +
