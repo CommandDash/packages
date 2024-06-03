@@ -93,27 +93,18 @@ abstract class AgentConfiguration {
   /// ```
   List<DataSource> get registerDataSources;
 
-  /// Default chat mode (also known as the commandless mode) for the agent.
-  /// This will be active by default when the agent is activated. It has two
-  /// parameters - `systemPrompt` and `dataSources`:
-  /// - `systemPrompt`: It is the instruction provided to agent that is used
-  /// to set the context and guide the agent on how to respond to the user request.
-  /// - `dataSources`: This is optional. Default the agent will use all the registered
-  /// datasources to respond to user's queries but if provided explicitly the agent
-  /// will only use the selective list of data sources mentioned to providing
-  /// references to answer user queries.
+  /// System prompt for default chat mode (also known as the commandless mode) 
+  /// for the agent. This mode will be active by default when the agent is 
+  /// activated. 
   ///
   /// Example:
   /// ```dart
   ///  @override
-  ///  ChatMode get registerAgentDefaultMode => ChatMode(
-  ///     systemPrompt: '''You are a Flutter expert who answers user queries related to the framework.
+  ///  systemPrompt => '''You are a Flutter expert who answers user queries related to the framework.
   ///
   ///   Note:
   ///   1. If the references don't address the question, state that "I couldn't fetch your answer from the doc sources, but I'll try to answer from my own knowledge".
   ///   2. Be truthful, complete and detailed with your responses and include code snippets wherever required''',
-  ///   dataSources: [DocsDataSource(), BlogsDataSource()]
-  ///   );
   /// ```
   String get registerSystemPrompt;
 
