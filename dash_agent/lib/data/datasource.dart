@@ -108,8 +108,8 @@ abstract class DataSource {
   ///   - `SiteMap` - Pass the data by providing the site map url of the domain
   /// contain the relevant data. You can use `WebDataObject.fromSiteMap` to  create
   /// [SiteMap]
-  ///  - `GitHub` - Pass the repo data by providing github repo url along with 
-  /// optional code and issue filter to extract specific data. You can use 
+  ///  - `GitHub` - Pass the repo data by providing github repo url along with
+  /// optional code and issue filter to extract specific data. You can use
   /// `WebDataObject.fromGithub` to create [Github]
   ///
   /// Example:

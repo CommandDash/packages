@@ -11,9 +11,9 @@ import 'package:dash_agent/data/datasource.dart';
 /// meanigful
 /// - `metadata` - [Metadata] for the agent including display name, avatar
 /// path, and list of tags associated with the agent.
-/// - `registerSystemPrompt` - System prompt for default chat mode (also 
-/// known as the commandless mode) for the agent. This mode will be active by 
-/// default when the agent is activated. 
+/// - `registerSystemPrompt` - System prompt for default chat mode (also
+/// known as the commandless mode) for the agent. This mode will be active by
+/// default when the agent is activated.
 ///
 /// Agents are like bots for IDE who can do tasks that predefined in the form of
 /// [Command]s. This tasks can vary from code generation, code analysis, code
@@ -112,9 +112,9 @@ abstract class AgentConfiguration {
   /// ```
   List<DataSource> get registerDataSources;
 
-  /// System prompt for default chat mode (also known as the commandless mode) 
-  /// for the agent. This mode will be active by default when the agent is 
-  /// activated. 
+  /// System prompt for default chat mode (also known as the commandless mode)
+  /// for the agent. This mode will be active by default when the agent is
+  /// activated.
   ///
   /// Example:
   /// ```dart
