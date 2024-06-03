@@ -31,24 +31,41 @@ Sample example of `AgentConfiguration`:
 ```dart
 class MyAgent extends AgentConfiguration {
   final docsSource = DocsDataSource();
+  final blogsSource = BlogsDataSource();
 
   @override
-  List<DataSource> get registerDataSources => [docsSource];
+  List<DataSource> get registerDataSources => [docsSource, blogsSource];
 
   @override
   List<Command> get registerSupportedCommands =>
       [AskCommand(docsSource: docsSource)];
+
+  @override
+  Metadata get metadata => Metadata(
+    name: 'My Agent',
+    avatarProfile: 'assets/images/agent_avatar.png',
+    tags: ['flutter', 'dart'],
+  );
+
+  @override
+  String get registerSystemPrompt => '''You are a Flutter expert who answers user queries related to the framework.
+
+  Note:
+  1. If the references don't address the question, state that "I couldn't fetch your answer from the doc sources, but I'll try to answer from my own knowledge".
+  2. Be truthful, complete and detailed with your responses and include code snippets wherever required''';
 }
 ```
 
-The above AgentConfiguration registers your data sources and supported commands.
+The above AgentConfiguration registers your data sources, supported commands, metadata, and system prompt.
 
-- `DataSource`: Data sources enable you to provide any form of data that your agent might need to perform its intended tasks.
-- `Command`: Commands are the specialised tasks you want your agents to perform (like answering developer's query, refactoring, code generation, etc).
+- `DataSource`: Data sources are crucial for providing your agent with the information it needs. This could be anything from official documentation, blog posts, code examples, or even custom knowledge bases. In the example above, docsSource and blogsSource represent potential data sources.
+- `Command`: Commands define the specialized actions your agent can perform. These are like building blocks for more complex tasks. The example uses the AskCommand which allows your agent to answer user queries based on the provided docsSource.
+- `Metadata`: Metadata provides information about your agent, such as its name, display avatar, and associated tags. This helps users understand what the agent is about and how it can be used.
+- `System Prompt`: The system prompt sets the initial context for your agent. This is like giving it instructions or defining its persona. In this example, the prompt makes it clear that "My Agent" is a Flutter expert, how it should handle responses, and the desired level of detail in its answers.
 
 ### Datasource
 
-As described above data sources let you attach the data that your agent will need to perform its tasks. It can be anything from raw texts, JSON, file data, or even webpages.
+As described above data sources let you attach the data that your agent will need to perform its tasks. It can be anything from raw texts, JSON, file data, or webpages or even repos.
 
 Example for DataSource:
 
@@ -73,11 +90,12 @@ class DocsDataSource extends DataSource {
 
 
  /// Enables your agent to use web pages by indexing specified web page 
- /// URLs or sitemaps in the object.
+ /// URLs or sitemaps or even github repos in the object.
   @override
  List<WebDataObject> get webObjects =>
      [WebDataObject.fromWebPage('https://sampleurl.com'), 
-     WebDataObject.fromSiteMap('https://sampleurl.com/sitemap.xml')];
+     WebDataObject.fromSiteMap('https://sampleurl.com/sitemap.xml'),
+     WebDataObject.fromGithub('https://github.com/user/repo', '<personal access token>', CodeFilter(pathRegex: '.*\.dart'),  IssueFilter(labels: ['bug']))];
 }
 ```
 

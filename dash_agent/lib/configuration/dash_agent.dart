@@ -9,6 +9,11 @@ import 'package:dash_agent/data/datasource.dart';
 /// - `registerSupportedCommands` - List of [Command]s that will be supported by
 /// the agent. This should contain atleast one `Command` for the agent to be
 /// meanigful
+/// - `metadata` - [Metadata] for the agent including display name, avatar
+/// path, and list of tags associated with the agent.
+/// - `registerSystemPrompt` - System prompt for default chat mode (also 
+/// known as the commandless mode) for the agent. This mode will be active by 
+/// default when the agent is activated. 
 ///
 /// Agents are like bots for IDE who can do tasks that predefined in the form of
 /// [Command]s. This tasks can vary from code generation, code analysis, code
@@ -28,6 +33,20 @@ import 'package:dash_agent/data/datasource.dart';
 ///   @override
 ///   List<Command> get registerSupportedCommands =>
 ///       [AskCommand(docsSource: docsSource)];
+///
+///   @override
+///   Metadata get metadata => Metadata(
+///     name: 'My Agent',
+///     avatarProfile: 'assets/images/agent_avatar.png',
+///     tags: ['flutter', 'dart'],
+///   );
+///
+///   @override
+///   String get registerSystemPrompt => '''You are a Flutter expert who answers user queries related to the framework.
+///
+///   Note:
+///   1. If the references don't address the question, state that "I couldn't fetch your answer from the doc sources, but I'll try to answer from my own knowledge".
+///   2. Be truthful, complete and detailed with your responses and include code snippets wherever required''';
 /// }
 /// ```
 abstract class AgentConfiguration {
