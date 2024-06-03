@@ -40,6 +40,8 @@ abstract class WebDataObject {
   /// Example:
   /// ```dart
   /// final githubUrl = 'https://github.com/flutter/flutter';
+  /// 
+  /// final accessToken = 'your personal github access token'
   ///
   /// // filter out dart files
   /// final codeFilter = CodeFilter(pathRegex: '.*\.dart');
@@ -47,7 +49,7 @@ abstract class WebDataObject {
   /// // filter out issues with label "bug"
   /// final issueFilter = IssueFilter(labels: ['bug']);
   ///
-  /// final githubObject = WebDataObject.fromGithub(githubUrl,
+  /// final githubObject = WebDataObject.fromGithub(githubUrl, accessToken,
   ///     codeFilter: codeFilter, issueFilter: issueFilter);
   /// ```
   static Github fromGithub(String url, String accessToken,
@@ -181,6 +183,11 @@ class Github extends WebDataObject {
   /// **issue status**: Issues which are either open, closed, or all of them
   final IssueFilter? issueFilter;
 
+  /// Your personal github access token that can be used to get data from the 
+  /// Github APIs. See [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic) 
+  /// to learn to generate one for you.
+  /// 
+  /// Note: Make sure to not exponse this token in public
   final String accessToken;
 
   /// Creates a new [Github] object.
