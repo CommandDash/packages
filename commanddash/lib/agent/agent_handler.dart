@@ -107,15 +107,10 @@ class AgentHandler {
         final searchResult = await searchInSourceStep.run(
             taskAssist, generationRepository, dashRepository);
 
-        // Add placeholders for this to the lastMessage
-        final randomInt = Random().nextInt(99999999); // ID for the datasoruces
-        final Map<String, Output> outputs = {};
-        lastMessage =
-            "${lastMessage!}\n\nHere are some reference which might be helpful:\n\n<$randomInt>";
         final ChatStep chatStep = ChatStep(
           outputIds: [],
           inputs: inputs,
-          outputs: {randomInt.toString(): searchResult.first},
+          outputs: {},
           messages: messages,
           lastMessage: lastMessage!,
         );

@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/models/chat_message.dart';
+import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/generation_repository.dart';
@@ -17,6 +19,7 @@ class ChatStep extends Step {
   final Map<String, Input> inputs;
   final Map<String, Output> outputs;
   final String? systemPrompt;
+  final List<DataSourceResultOutput> documents;
   ChatStep(
       {required List<String> outputIds,
       required this.messages,
@@ -24,6 +27,7 @@ class ChatStep extends Step {
       this.systemPrompt,
       required this.lastMessage,
       required this.outputs,
+      this.documents = const <DataSourceResultOutput>[],
       Loader loader = const MessageLoader('Preparing Result')})
       : super(outputIds: outputIds, type: StepType.chat, loader: loader);
 
@@ -48,6 +52,7 @@ class ChatStep extends Step {
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     String prompt = lastMessage.replacePlaceholder(inputs, outputs);
+
     final List<CodeInput> codeInputs = inputs.values
         .whereType<CodeInput>()
         .toList(); // These are the inputs to be used to get contextual code;
@@ -69,7 +74,36 @@ class ChatStep extends Step {
     if (availableToken <= 0) {
       return [];
     }
-
+    final referenceString =
+        "\n\nHere are some references which might be helpful\n\n";
+    if (documents.isNotEmpty) {
+      availableToken -=
+          referenceString.length - documents.first.maxCharsInPrompt!;
+      messages.removeWhere((element) => element.message.isEmpty);
+      if (availableToken >= 0) {
+        if (messages.isNotEmpty) {
+          if (messages.first.data != null) {
+            for (DataSource doc in documents.first.value!) {
+              if (availableToken - doc.content!.length > 0) {
+                if ((messages.first.data!['prompt'] as String)
+                    .contains(doc.content!)) continue;
+                messages.first.data!['prompt'] =
+                    "${messages.first.data!['prompt']}$referenceString\n\n${doc.content}";
+                availableToken -= doc.content!.length;
+              }
+            }
+          }
+        } else {
+          for (DataSource doc in documents.first.value!) {
+            if (prompt.contains(doc.content!)) continue;
+            if (availableToken - doc.content!.length > 0) {
+              prompt = "$prompt$referenceString\n\n${doc.content}";
+              availableToken -= doc.content!.length;
+            }
+          }
+        }
+      }
+    }
     List<WorkspaceFile> includedInPrompt = [];
     final Map<String, int> nestedCodes = {};
 
@@ -156,6 +190,7 @@ class ChatStep extends Step {
         .map((e) => e.split('/').last)
         .take(7)
         .toList();
+    // TODO: send complete conversation history to IDE to replace
     await taskAssist.processStep(
         kind: 'prompt_update',
         args: {"prompt": prompt},

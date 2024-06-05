@@ -5,7 +5,7 @@ enum ChatRole { model, user, unknown }
 class ChatMessage {
   final ChatRole role;
   String message;
-  final Map<String, dynamic>? data;
+  Map<String, dynamic>? data;
   ChatMessage({
     required this.role,
     required this.message,
