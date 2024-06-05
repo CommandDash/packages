@@ -21,8 +21,8 @@ class GeminiRepository implements GenerationRepository {
   ) async {
     late final GenerateContentResponse? response;
     try {
-      response = await _getGeminiFlashCompletionResponse(
-          'gemini-1.5-flash-latest', messages);
+      response =
+          await _getGeminiFlashCompletionResponse('gemini-1.5-flash', messages);
     } on ServerException catch (e) {
       if (e.message.contains(
           'found for API version v1beta, or is not supported for GenerateContent')) {
@@ -167,8 +167,7 @@ class GeminiRepository implements GenerationRepository {
 
     try {
       response = await _getGeminiFlashChatCompletionResponse(
-          'gemini-1.5-flash-latest', messages, lastMessage,
-          systemPrompt: systemPrompt);
+          'gemini-1.5-flash', messages, lastMessage);
     } on ServerException catch (e) {
       if (e.message.contains(
           'found for API version v1beta, or is not supported for GenerateContent')) {
