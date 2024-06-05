@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
@@ -19,7 +20,9 @@ class ChatStep extends Step {
   final Map<String, Input> inputs;
   final Map<String, Output> outputs;
   final String? systemPrompt;
-  final List<DataSourceResultOutput> documents;
+  final List<DataSourceResultOutput> newDocuments;
+  final String?
+      existingDocuments; //TODO: See if we can save data source result output only
   ChatStep(
       {required List<String> outputIds,
       required this.messages,
@@ -27,24 +30,10 @@ class ChatStep extends Step {
       this.systemPrompt,
       required this.lastMessage,
       required this.outputs,
-      this.documents = const <DataSourceResultOutput>[],
+      required this.newDocuments,
+      required this.existingDocuments,
       Loader loader = const MessageLoader('Preparing Result')})
       : super(outputIds: outputIds, type: StepType.chat, loader: loader);
-
-  // This is for now useless as the chat step is not accesible to agent builders.
-  factory ChatStep.fromJson(
-    Map<String, dynamic> json,
-    List<ChatMessage> chatMessages,
-  ) {
-    return ChatStep(
-      outputIds:
-          (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
-      messages: chatMessages,
-      outputs: {},
-      inputs: {},
-      lastMessage: json['last_message'],
-    );
-  }
 
   @override
   Future<List<DefaultOutput>> run(
@@ -74,36 +63,24 @@ class ChatStep extends Step {
     if (availableToken <= 0) {
       return [];
     }
-    final referenceString =
-        "\n\nHere are some references which might be helpful\n\n";
-    if (documents.isNotEmpty) {
+    String chatDocuments = existingDocuments ??
+        "Please note the below references from the latest documentations, examples and github issues that would be helpful in answering user's requests:\n\n";
+    if (newDocuments.isNotEmpty) {
       availableToken -=
-          referenceString.length - documents.first.maxCharsInPrompt!;
-      messages.removeWhere((element) => element.message.isEmpty);
+          chatDocuments.length - newDocuments.first.maxCharsInPrompt!;
+
       if (availableToken >= 0) {
-        if (messages.isNotEmpty) {
-          if (messages.first.data != null) {
-            for (DataSource doc in documents.first.value!) {
-              if (availableToken - doc.content!.length > 0) {
-                if ((messages.first.data!['prompt'] as String)
-                    .contains(doc.content!)) continue;
-                messages.first.data!['prompt'] =
-                    "${messages.first.data!['prompt']}$referenceString\n\n${doc.content}";
-                availableToken -= doc.content!.length;
-              }
-            }
-          }
-        } else {
-          for (DataSource doc in documents.first.value!) {
-            if (prompt.contains(doc.content!)) continue;
-            if (availableToken - doc.content!.length > 0) {
-              prompt = "$prompt$referenceString\n\n${doc.content}";
-              availableToken -= doc.content!.length;
-            }
+        for (DataSource doc in newDocuments.first.value!) {
+          if (availableToken - doc.content!.length > 0) {
+            if (chatDocuments.contains(doc.content!)) continue;
+            chatDocuments = "$chatDocuments\n\n${doc.content}";
+            availableToken -= doc.content!.length;
           }
         }
       }
     }
+    messages.insert(
+        0, ChatMessage(role: ChatRole.user, message: chatDocuments, data: {}));
     List<WorkspaceFile> includedInPrompt = [];
     final Map<String, int> nestedCodes = {};
 
@@ -192,6 +169,10 @@ class ChatStep extends Step {
         .toList();
     // TODO: send complete conversation history to IDE to replace
     await taskAssist.processStep(
+        kind: 'chat_document_update',
+        args: {'content': chatDocuments},
+        timeoutKind: TimeoutKind.sync);
+    await taskAssist.processStep(
         kind: 'prompt_update',
         args: {"prompt": prompt},
         timeoutKind: TimeoutKind.sync);
@@ -200,6 +181,10 @@ class ChatStep extends Step {
         args: ProcessingFilesLoader(filesInvolved, message: 'Preparing Result')
             .toJson(),
         timeoutKind: TimeoutKind.sync);
+    taskAssist.sendLogMessage(message: 'prompt', data: {
+      'data':
+          json.encode(messages.map((e) => "${e.role}: ${e.message}").toList())
+    });
     final response = await generationRepository.getChatCompletion(
       messages,
       prompt,
