@@ -160,13 +160,16 @@ class ChatStep extends Step {
           '$contextualCodePrefix$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
       prompt = '$contextualCode$prompt';
     }
-    print(prompt);
     var filesInvolved = Set<String>.from(
             includedInPrompt.map((e) => e.path).toList() +
                 nestedCodes.keys.toList())
         .map((e) => e.split('/').last)
         .take(7)
         .toList();
+    taskAssist.sendLogMessage(message: 'prompt', data: {
+      'data':
+          json.encode(messages.map((e) => "${e.role}: ${e.message}").toList())
+    });
     // TODO: send complete conversation history to IDE to replace
     await taskAssist.processStep(
         kind: 'chat_document_update',
@@ -181,16 +184,12 @@ class ChatStep extends Step {
         args: ProcessingFilesLoader(filesInvolved, message: 'Preparing Result')
             .toJson(),
         timeoutKind: TimeoutKind.sync);
-    taskAssist.sendLogMessage(message: 'prompt', data: {
-      'data':
-          json.encode(messages.map((e) => "${e.role}: ${e.message}").toList())
-    });
+
     final response = await generationRepository.getChatCompletion(
       messages,
       prompt,
       systemPrompt: systemPrompt,
     );
-    print(response);
     return [DefaultOutput(response)];
   }
 }
