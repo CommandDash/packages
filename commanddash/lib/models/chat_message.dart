@@ -1,15 +1,26 @@
-enum ChatRole { model, user }
+import 'package:commanddash/agent/input_model.dart';
+
+enum ChatRole { model, user, unknown }
 
 class ChatMessage {
   final ChatRole role;
-  final String message;
-
-  ChatMessage({required this.role, required this.message});
+  String message;
+  Map<String, dynamic>? data;
+  ChatMessage({
+    required this.role,
+    required this.message,
+    required this.data,
+  });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
-      role: json['role'] == 'model' ? ChatRole.model : ChatRole.user,
-      message: json['message'],
+      role: json['role'] == 'model'
+          ? ChatRole.model
+          : json['role'] == 'user'
+              ? ChatRole.user
+              : ChatRole.unknown,
+      message: json['parts'],
+      data: json['data'],
     );
   }
 }

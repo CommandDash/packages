@@ -132,7 +132,8 @@ class ChatQueryInput extends Input {
     final value = jsonDecode(json['value']);
     return ChatQueryInput(
       json['id'],
-      (value as List).map((e) => ChatMessage.fromJson(e)).toList(),
+      (value as List).map((e) => ChatMessage.fromJson(e)).toList()
+        ..removeWhere((e) => e.role == ChatRole.unknown),
     );
   }
 
