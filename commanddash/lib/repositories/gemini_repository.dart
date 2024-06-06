@@ -12,7 +12,7 @@ class UnknownException implements Exception {
 class GeminiRepository implements GenerationRepository {
   final String apiKey;
   @override
-  double characterLimit = 100000 * 2.7;
+  double characterLimit = 125000 * 2.7;
 
   GeminiRepository(this.apiKey);
   @override
@@ -167,7 +167,8 @@ class GeminiRepository implements GenerationRepository {
 
     try {
       response = await _getGeminiFlashChatCompletionResponse(
-          'gemini-1.5-flash', messages, lastMessage);
+          'gemini-1.5-flash', messages, lastMessage,
+          systemPrompt: systemPrompt);
     } on ServerException catch (e) {
       if (e.message.contains(
           'found for API version v1beta, or is not supported for GenerateContent')) {
@@ -194,10 +195,10 @@ class GeminiRepository implements GenerationRepository {
   Future<GenerateContentResponse> _getGeminiFlashChatCompletionResponse(
       String modelCode, List<ChatMessage> messages, String lastMessage,
       {String? systemPrompt}) async {
-    final Content? systemInstruction =
-        systemPrompt != null ? Content.text(systemPrompt) : null;
-    final model = GenerativeModel(
-        model: modelCode, apiKey: apiKey, systemInstruction: systemInstruction);
+    // system intructions are not being adapted that well by Gemini models.
+    // final Content? systemInstruction =
+    //     systemPrompt != null ? Content.text(systemPrompt) : null;
+    final model = GenerativeModel(model: modelCode, apiKey: apiKey);
     final Content content = Content.text(lastMessage);
     final history = messages.map((e) {
       if (e.role == ChatRole.user) {
@@ -206,6 +207,10 @@ class GeminiRepository implements GenerationRepository {
         return Content.model([TextPart(e.message)]);
       }
     }).toList();
+
+    if (systemPrompt != null) {
+      history.insert(0, Content.text(systemPrompt));
+    }
 
     final chat = model.startChat(history: history);
     return chat.sendMessage(content);
