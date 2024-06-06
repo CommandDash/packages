@@ -128,7 +128,8 @@ class AgentHandler {
         messages: messages,
         lastMessage: userMessage!,
         newDocuments: searchResult,
-        existingDocuments: chatDocuments);
+        existingDocuments: chatDocuments,
+        systemPrompt: systemPrompt);
 
     final List<DefaultOutput> output =
         await chatStep.run(taskAssist, generationRepository, dashRepository);

@@ -1,6 +1,6 @@
 name: commanddash
-description: CLI enhancments to Dash-AI
-version: 0.1.0
+description: Processing engine for CommandDash clients like the IDEs
+version: 0.1.1
 repository: https://github.com/Welltested-AI/commanddash
 
 environment:
