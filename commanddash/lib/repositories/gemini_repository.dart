@@ -12,7 +12,7 @@ class UnknownException implements Exception {
 class GeminiRepository implements GenerationRepository {
   final String apiKey;
   @override
-  double characterLimit = 100000 * 2.7;
+  double characterLimit = 125000 * 2.7;
 
   GeminiRepository(this.apiKey);
   @override
