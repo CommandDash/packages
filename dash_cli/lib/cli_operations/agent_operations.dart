@@ -172,6 +172,8 @@ class AgentOperation {
       throw 'Failed to fetch agent configuration\n$errorMessage';
     }
 
+    // Disabled since resizing function messes up the transparency of the image
+
     // if (image.width > 512 || image.height > 512) {
     //   wtLog.info(
     //       'Agent Validation Update: Avatar size detected more than 512*512. Resizing the image. This could lead to poor avatar quality');
