@@ -70,9 +70,7 @@ class AgentHandler {
         agentVersion: json['agent_version'],
         isTest: json['testing'] ?? false,
         dataSources:
-            ((json['chat_mode']?['data_sources'] ?? []) as List<dynamic>)
-                .map((e) => e.toString())
-                .toList(),
+            List<String>.from(json['chat_mode']?['data_sources'] ?? []),
         systemPrompt: json['chat_mode']?['system_prompt'],
         userMessage: json['user_message'],
         chatDocuments: json['chat_documents']);
@@ -109,7 +107,7 @@ class AgentHandler {
     }
     final List<ChatMessage> messages =
         inputs.values.whereType<ChatQueryInput>().first.messages ?? [];
-    final dataSources = this.dataSources.map((e) => DataSource(id: e)).toList();
+
     final SearchInSourceStep searchInSourceStep = SearchInSourceStep(
         outputIds: [],
         query: userMessage!,
