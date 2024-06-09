@@ -172,12 +172,12 @@ class AgentOperation {
       throw 'Failed to fetch agent configuration\n$errorMessage';
     }
 
-    if (image.width > 512 || image.height > 512) {
-      wtLog.info(
-          'Agent Validation Update: Avatar size detected more than 512*512. Resizing the image. This could lead to poor avatar quality');
-      final resizedImage = img.copyResize(image, width: 512, height: 512);
-      avatarFile.writeAsBytesSync(img.encodeJpg(resizedImage));
-    }
+    // if (image.width > 512 || image.height > 512) {
+    //   wtLog.info(
+    //       'Agent Validation Update: Avatar size detected more than 512*512. Resizing the image. This could lead to poor avatar quality');
+    //   final resizedImage = img.copyResize(image, width: 512, height: 512);
+    //   avatarFile.writeAsBytesSync(img.encodeJpg(resizedImage));
+    // }
 
     if (image.width != image.height) {
       final errorMessage =
