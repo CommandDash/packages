@@ -1,3 +1,4 @@
+import '../constants/enums.dart';
 import '../filters/filter.dart';
 
 /// Base class for adding data to [DataSource] from the web pages
@@ -34,8 +35,8 @@ abstract class WebDataObject {
   }
 
   /// static method to create and return [Github]. It takes a GitHub repository
-  /// `url` as input and optionally accepts [CodeFilter] and [IssueFilter]
-  /// objects.
+  /// `url` as input and optionally accepts [CodeFilter], [IssueFilter], 
+  /// and [GithubExtract] objects.
   ///
   /// Example:
   /// ```dart
@@ -48,17 +49,23 @@ abstract class WebDataObject {
   ///
   /// // filter out issues with label "bug"
   /// final issueFilter = IssueFilter(labels: ['bug']);
+  /// 
+  /// // specificy what objects need to be extracted - code, issue, both
+  /// final extractObject = GithubExtract.code
   ///
   /// final githubObject = WebDataObject.fromGithub(githubUrl, accessToken,
-  ///     codeFilter: codeFilter, issueFilter: issueFilter);
+  ///     codeFilter: codeFilter, issueFilter: issueFilter, extractOnly: extractObject);
   /// ```
   static Github fromGithub(String url, String accessToken,
-      {CodeFilter? codeFilter, IssueFilter? issueFilter}) {
+      {CodeFilter? codeFilter,
+      IssueFilter? issueFilter,
+      GithubExtract extractOnly = GithubExtract.code}) {
     return Github(
         url: url,
         accessToken: accessToken,
         codeFilter: codeFilter,
-        issueFilter: issueFilter);
+        issueFilter: issueFilter,
+        extractOnly: extractOnly);
   }
 
   /// Internal method used by dash_agent to convert the shared `DataSource` to json
@@ -183,6 +190,17 @@ class Github extends WebDataObject {
   /// **issue status**: Issues which are either open, closed, or all of them
   final IssueFilter? issueFilter;
 
+  /// This parameter is optional. [GithubExtract] enum allows you to specify
+  /// what do you want to extract from the shared github repo.
+  /// - `GithubExtract.code` - Instructs only extracting code from the repo.
+  /// - `GithubExtract.issue` - Instructs only extrating issues from the repo.
+  /// - `GithubExtract.all` - Instructs extracting both code and issues from the
+  /// repo.
+  ///
+  /// By default it is set to `GithubExtract.code`. Therefore, it only extracts
+  /// code from the repo
+  final GithubExtract extractOnly;
+
   /// Your personal github access token that can be used to get data from the
   /// Github APIs. See [here](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens#creating-a-personal-access-token-classic)
   /// to learn to generate one for you.
@@ -201,7 +219,8 @@ class Github extends WebDataObject {
       {required this.url,
       required this.accessToken,
       this.codeFilter,
-      this.issueFilter});
+      this.issueFilter,
+      this.extractOnly = GithubExtract.code});
 
   /// Internal method used by dash_agent to convert the shared `DataSource` to json
   /// format that can be sent on the web
@@ -217,6 +236,7 @@ class Github extends WebDataObject {
       'type': 'github',
       'github_url': url,
       'access_token': accessToken,
+      'extract_only': extractOnly.value,
       'code_filter': codeFilterJson,
       'issue_filter': issueFilterJson,
       'version': minCliVersion
