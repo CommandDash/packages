@@ -49,7 +49,7 @@ class SearchInWorkspaceStep extends Step {
       taskAssist.sendErrorMessage(message: "No open workspace found", data: {});
       throw Exception("No open workspace found");
     }
-    final dartFiles = EmbeddingGenerator.getDartFiles(workspacePath);
+    final dartFiles = EmbeddingGenerator.getProjectFiles(workspacePath);
     final codeCacheHash = jsonDecode((await taskAssist.processStep(
         kind: 'cache', args: {}, timeoutKind: TimeoutKind.sync))['value']);
     final filesToUpdate =

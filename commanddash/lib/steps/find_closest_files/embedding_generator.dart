@@ -4,6 +4,27 @@ import 'package:commanddash/repositories/generation_repository.dart';
 import 'package:commanddash/utils/embedding_utils.dart';
 
 class EmbeddingGenerator {
+  static List<WorkspaceFile> getProjectFiles(String workspacePath) {
+    final directory = Directory(workspacePath);
+    final gitIgnore = File('${workspacePath}/.gitignore');
+    String excludePattern = '';
+    if (gitIgnore.existsSync()) {
+      final ignorePatterns = gitIgnore.readAsLinesSync();
+      excludePattern = ignorePatterns
+          .map((pattern) =>
+              pattern.replaceAll('/', r"[/\\]").replaceAll('*', '.*'))
+          .join('|');
+    }
+    final dartFiles = directory.listSync(recursive: true).where((file) {
+      return !RegExp(excludePattern).hasMatch(file.path);
+    }).toList();
+    final fileContents = dartFiles.map((file) {
+      return WorkspaceFile.fromPath(file.path);
+    }).toList();
+    fileContents.removeWhere((element) => (element.fileContent).isEmpty);
+    return fileContents;
+  }
+
   static List<WorkspaceFile> getDartFiles(String workspacePath) {
     final directory = Directory(workspacePath);
     const excludePattern =
