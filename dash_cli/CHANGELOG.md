@@ -1,3 +1,7 @@
+## 0.2.0
+
+* **dash_agent 0.3.0 Support**: Updated `dash_cli publish` operation to support **dash_agent 0.3.0**
+
 ## 0.1.1
 
 * **Updated README**: Fixed broken images in README.

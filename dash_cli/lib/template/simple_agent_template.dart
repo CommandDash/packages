@@ -1,5 +1,5 @@
 class SimpleAgentTemplate {
-  static const main = r'''
+  static String get main => r'''
 import 'package:dash_agent/dash_agent.dart';
 import 'package:{project_name}/agent.dart';
 
@@ -9,7 +9,8 @@ Future<void> main() async {
 }
 ''';
 
-  static const myAgent = r'''
+  static String get myAgent => r'''
+import 'package:dash_agent/configuration/metadata.dart';
 import 'package:dash_agent/data/datasource.dart';
 import 'package:dash_agent/configuration/command.dart';
 import 'package:dash_agent/configuration/dash_agent.dart';
@@ -22,19 +23,28 @@ import 'data_sources.dart';
 /// [DataSource] - For providing additional data to commands to process.
 /// [Command] - Actions available to the user in the IDE, like "/ask", "/generate" etc
 class MyAgent extends AgentConfiguration {
-  final docsSource = DocsDataSource();
-  final blogsSource = BlogsDataSource();
+  final docsDataSource = DocsDataSource();
 
   @override
-  List<DataSource> get registeredDataSources => [docsSource, blogsSource];
+  Metadata get metadata => Metadata(
+      name: 'Your Agent Name', avatarProfile: 'assets/logo.png', tags: []);
 
   @override
-  List<Command> get registerSupportedCommands =>
-      [AskCommand(docsSource: docsSource)];
+  String get registerSystemPrompt => {system_prompt};
+
+  @override
+  List<DataSource> get registerDataSources => [docsDataSource];
+
+  @override
+  List<Command> get registerSupportedCommands => [
+        // AskCommand(docsSource: docsDataSource)
+      ];
 }
-''';
+'''
+      .replaceAll('{system_prompt}',
+          "'''You are an X assistant. Help users in doing Y'''");
 
-  static const dataSources = r'''
+  static String get dataSources => r'''
 import 'dart:io';
 
 import 'package:dash_agent/data/datasource.dart';
@@ -53,29 +63,11 @@ class DocsDataSource extends DataSource {
       [ProjectDataObject.fromText('Data in form of raw text')];
 
   @override
-  List<WebDataObject> get webObjects => [];
-}
-
-/// [BlogsDataSource] is a specific data source indexing blogs stored in filesystem or on web.
-///
-/// We are not using it in any of the commands.
-class BlogsDataSource extends DataSource {
-  @override
-  List<FileDataObject> get fileObjects => [
-        DirectoryFiles(Directory('directory_path_to_data_source'),
-            relativeTo: 'parent_directory_path')
-      ];
-
-  @override
-  List<ProjectDataObject> get projectObjects => [];
-
-  @override
-  List<WebDataObject> get webObjects =>
-      [WebDataObject.fromWebPage('https://sampleurl.com')];
+  List<WebDataObject> get webObjects => [WebDataObject.fromSiteMap('https://sampleurl.com/sitemap.xml')];
 }
 ''';
 
-  static const askCommand = r"""
+  static String get askCommand => r"""
 import 'package:dash_agent/configuration/command.dart';
 import 'package:dash_agent/data/datasource.dart';
 import 'package:dash_agent/steps/steps.dart';
@@ -89,9 +81,10 @@ class AskCommand extends Command {
   final DataSource docsSource;
 
   /// Inputs to be provided by the user in the text field
-  final userQuery = StringInput('Your query', optional: false);
+  final userQuery = StringInput('Query');
   final codeAttachment = CodeInput(
-    'Primary method',
+    'Code Reference',
+    optional: true
   );
 
   @override
@@ -120,7 +113,7 @@ class AskCommand extends Command {
           output: matchingDocuments),
       PromptQueryStep(
         prompt:
-            '''You are an X agent. Here is the $userQuery, here is the $codeAttachment and some relevant documents for your reference: $matchingDocuments. 
+            '''You are a X agent. Here is the user query: $userQuery, here is a reference code snippet: $codeAttachment and some relevant documents for your reference: $matchingDocuments. 
             
             Answer the user's query.''',
         promptOutput: promptOutput,
@@ -131,7 +124,7 @@ class AskCommand extends Command {
 }
 """;
 
-  static const readme = '''
+  static String get readme => '''
 # Agent Reamde File
 
 This is a sample readme file for agent. You add description about the agent and any other instruction or information.

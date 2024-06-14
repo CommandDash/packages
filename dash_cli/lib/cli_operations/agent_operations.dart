@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:image/image.dart' as img;
 import 'package:dash_cli/parsers/pubspec_parser.dart';
 import 'package:dash_cli/repository/agent_repository.dart';
 import 'package:dash_cli/template/simple_agent_template.dart';
@@ -13,7 +15,7 @@ class AgentOperation {
 
   Future<void> createAgentProject(String projectName) async {
     // create a sample dart project
-    wtLog.startSpinner('creating dart project...');
+    wtLog.startSpinner('Creating agent project...');
 
     try {
       await runCommand('dart', ['create', projectName]);
@@ -115,14 +117,21 @@ class AgentOperation {
 
       final agentJson = await IsolateFunction.getAgentJson(projectDirectory);
 
-      final agentName = pubSpecData.packageName;
+      final agentId = pubSpecData.packageName;
       final agentDescription = pubSpecData.packageDescription;
       final agentVersion = pubSpecData.packageVersion;
 
-      agentJson['name'] = agentName;
-      agentJson['description'] = agentDescription;
+      agentJson['name'] = agentId;
+      agentJson['metadata']['description'] = agentDescription;
       agentJson['version'] = agentVersion;
       agentJson['testing'] = isTest;
+
+      final metadata = agentJson['metadata'] as Map;
+      final avatarPath = metadata['avatar_path'];
+      if (avatarPath != null) {
+        metadata['avatar'] = _fetchAvatar(avatarPath);
+      }
+      metadata.remove('avatar_path');
 
       wtLog.log('✔︎ Agent configuration fetched');
       wtLog.updateSpinnerMessage('Publishing agent...');
@@ -137,5 +146,48 @@ class AgentOperation {
       wtLog.error(error.toString());
       return;
     }
+  }
+
+  Map<String, String> _fetchAvatar(String avatarPath) {
+    final avatarFile = File(avatarPath);
+
+    if (!avatarFile.existsSync()) {
+      final errorMessage =
+          'Agent Validation Error: Avatar path shared doesn\'t exist: $avatarPath';
+      throw 'Failed to fetch agent configuration\n$errorMessage';
+    }
+
+    final image = img.decodeImage(avatarFile.readAsBytesSync());
+
+    if (image == null) {
+      final errorMessage =
+          'Agent Validation Error: Error fetching Avatar. Likely cause: Unknown image format';
+      throw 'Failed to fetch agent configuration\n$errorMessage';
+    }
+
+    final format = avatarFile.path.split('.').last.toLowerCase();
+    if (format != 'jpeg' && format != 'png') {
+      final errorMessage =
+          'Agent Validation Error: Avatar format should be JPEG or PNG. Currrent file format $format';
+      throw 'Failed to fetch agent configuration\n$errorMessage';
+    }
+
+    // Disabled since resizing function messes up the transparency of the image
+
+    // if (image.width > 512 || image.height > 512) {
+    //   wtLog.info(
+    //       'Agent Validation Update: Avatar size detected more than 512*512. Resizing the image. This could lead to poor avatar quality');
+    //   final resizedImage = img.copyResize(image, width: 512, height: 512);
+    //   avatarFile.writeAsBytesSync(img.encodeJpg(resizedImage));
+    // }
+
+    if (image.width != image.height) {
+      final errorMessage =
+          'Agent Validation Error: Image ratio should be 1:1. Current raio ${image.width / image.height} width/height';
+      throw 'Failed to fetch agent configuration\n$errorMessage';
+    }
+
+    final base64Image = base64Encode(avatarFile.readAsBytesSync());
+    return {'image': base64Image, 'format': format};
   }
 }

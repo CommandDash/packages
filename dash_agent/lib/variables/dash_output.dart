@@ -1,11 +1,16 @@
 import 'package:dash_agent/variables/variable.dart';
 
+/// Base class for all Dash Outputs.
 abstract class DashOutput extends Variable {
   DashOutput();
 
   Future<Map<String, dynamic>> process();
 }
 
+/// Represents a Match Document output.
+///
+/// This output represents a document that are fetched from CommandDash server
+/// based on the matches from a particular search query in the [MatchDocumentStep]
 class MatchDocumentOuput extends DashOutput {
   MatchDocumentOuput();
 
@@ -19,6 +24,9 @@ class MatchDocumentOuput extends DashOutput {
   }
 }
 
+/// Represents a Multi Code Object output.
+///
+/// This output represents a collection of code objects.
 class MultiCodeObject extends DashOutput {
   MultiCodeObject();
 
@@ -32,6 +40,9 @@ class MultiCodeObject extends DashOutput {
   }
 }
 
+/// Represents a Prompt output.
+///
+/// This output represents a output from the [PromptQueryStep]
 class PromptOutput extends DashOutput {
   PromptOutput();
 
@@ -45,6 +56,9 @@ class PromptOutput extends DashOutput {
   }
 }
 
+/// Represents a Code output.
+///
+/// This output represents a code snippet.
 class CodeOutput extends DashOutput {
   CodeOutput();
 
@@ -58,6 +72,9 @@ class CodeOutput extends DashOutput {
   }
 }
 
+/// Represents a Boolean output.
+///
+/// This output represents a boolean value.
 class BooleanOutput extends DashOutput {
   BooleanOutput();
 

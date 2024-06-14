@@ -84,82 +84,87 @@ class ChatStep extends Step {
     List<WorkspaceFile> includedInPrompt = [];
     final Map<String, int> nestedCodes = {};
 
-    void appendNestedCodeCount(String filePath, {int priority = 1}) {
-      nestedCodes[filePath] = (nestedCodes[filePath] ?? 0) + priority;
-    }
+    // This function is commented out because it is not used as contextual code is not added for now.
+    // void appendNestedCodeCount(String filePath, {int priority = 1}) {
+    //   nestedCodes[filePath] = (nestedCodes[filePath] ?? 0) + priority;
+    // }
 
-    void markIncludedInPrompt(
-        {required String path, required List<Range> ranges}) {
-      final existingFileIndex =
-          includedInPrompt.indexWhere((file) => file.path == path);
-      if (existingFileIndex != -1) {
-        includedInPrompt[existingFileIndex].selectedRanges.addAll(ranges);
-      } else {
-        includedInPrompt
-            .add(WorkspaceFile.fromPath(path, selectedRanges: ranges));
-      }
-    }
+    // void markIncludedInPrompt(
+    //     {required String path, required List<Range> ranges}) {
+    //   final existingFileIndex =
+    //       includedInPrompt.indexWhere((file) => file.path == path);
+    //   if (existingFileIndex != -1) {
+    //     includedInPrompt[existingFileIndex].selectedRanges.addAll(ranges);
+    //   } else {
+    //     includedInPrompt
+    //         .add(WorkspaceFile.fromPath(path, selectedRanges: ranges));
+    //   }
+    // }
 
-    for (CodeInput code in codeInputs) {
-      /// add the code file itself as context
-      appendNestedCodeCount(code.filePath, priority: 10);
+    // Skipping adding contextual code for now due to the lack of a consistent way to retrieve document definitions for all languages.
+    // This feature may be added in the future when a reliable method becomes available.
+    // Commented out the code below that adds contextual code.
+    // for (CodeInput code in codeInputs) {
+    //   /// add the code file itself as context
+    //   appendNestedCodeCount(code.filePath, priority: 10);
 
-      final data = await taskAssist.processStep(
-        kind: "context",
-        args: {
-          "filePath": code.filePath,
-          "range": code.range.toJson(),
-        },
-        timeoutKind: TimeoutKind.stretched,
-      );
-      final context = data['context'];
-      if (context != null) {
-        final listOfContext = List<Map<String, dynamic>>.from(context);
-        for (final nestedCode in listOfContext) {
-          final filePath = nestedCode['filePath'];
-          appendNestedCodeCount(filePath);
-        }
-      }
-    }
+    //   final data = await taskAssist.processStep(
+    //     kind: "context",
+    //     args: {
+    //       "filePath": code.filePath,
+    //       "range": code.range.toJson(),
+    //     },
+    //     timeoutKind: TimeoutKind.stretched,
+    //   );
+    //   final context = data['context'];
+    //   if (context != null) {
+    //     final listOfContext = List<Map<String, dynamic>>.from(context);
+    //     for (final nestedCode in listOfContext) {
+    //       final filePath = nestedCode['filePath'];
+    //       appendNestedCodeCount(filePath);
+    //     }
+    //   }
+    // }
     // nestedCode sorted by frequency
-    final sortedNestedCode = nestedCodes.entries.toList()
-      ..sort(((a, b) {
-        return b.value.compareTo(a.value);
-      }));
-    String contextualCodePrefix =
-        "[CONTEXTUAL CODE FOR YOUR INFORMATION FROM USER PROJECT]\n\n";
-    String contextualCode = "";
+    // final sortedNestedCode = nestedCodes.entries.toList()
+    //   ..sort(((a, b) {
+    //     return b.value.compareTo(a.value);
+    //   }));
+    // String contextualCodePrefix =
+    //     "[CONTEXTUAL CODE FOR YOUR INFORMATION FROM USER PROJECT]\n\n";
+    // String contextualCode = "";
 
-    ///TODO: Figure out a way to attach the most relevant part of the file if the full file is extremely long
-    for (final nestedFilePath in sortedNestedCode.map((e) => e.key)) {
-      final includedInPromptIndex = includedInPrompt
-          .indexWhere((element) => element.path == nestedFilePath);
-      if (includedInPromptIndex != -1) {
-        final content =
-            includedInPrompt[includedInPromptIndex].surroundingContent;
-        if (content != null) {
-          if (availableToken - content.length > 0) {
-            contextualCode =
-                '$contextualCode$nestedFilePath\n```$content```\n\n';
-            availableToken -= content.length;
-          }
-        }
-        continue;
-      }
-      final content = (await File(nestedFilePath).readAsString())
-          .replaceAll(RegExp(r"[\n\s]+"), "");
-      if (content.length > 9500) {
-        continue; // Don't include extremely large nested code files.
-      }
-      if (availableToken - content.length < 0) continue;
-      contextualCode = '$contextualCode$nestedFilePath\n```$content```\n\n';
-      availableToken -= content.length;
-    }
-    if (contextualCode.isNotEmpty) {
-      contextualCode =
-          '$contextualCodePrefix$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
-      prompt = '$contextualCode$prompt';
-    }
+    // ///TODO: Figure out a way to attach the most relevant part of the file if the full file is extremely long
+    // for (final nestedFilePath in sortedNestedCode.map((e) => e.key)) {
+    //   final includedInPromptIndex = includedInPrompt
+    //       .indexWhere((element) => element.path == nestedFilePath);
+    //   if (includedInPromptIndex != -1) {
+    //     final content =
+    //         includedInPrompt[includedInPromptIndex].surroundingContent;
+    //     if (content != null) {
+    //       if (availableToken - content.length > 0) {
+    //         contextualCode =
+    //             '$contextualCode$nestedFilePath\n```$content```\n\n';
+    //         availableToken -= content.length;
+    //       }
+    //     }
+    //     continue;
+    //   }
+    //   final content = (await File(nestedFilePath).readAsString())
+    //       .replaceAll(RegExp(r"[\n\s]+"), "");
+    //   if (content.length > 9500) {
+    //     continue; // Don't include extremely large nested code files.
+    //   }
+    //   if (availableToken - content.length < 0) continue;
+    //   contextualCode = '$contextualCode$nestedFilePath\n```$content```\n\n';
+    //   availableToken -= content.length;
+    // }
+    // if (contextualCode.isNotEmpty) {
+    //   contextualCode =
+    //       '$contextualCodePrefix$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
+    //   prompt = '$contextualCode$prompt';
+    // }
+    print(prompt);
     var filesInvolved = Set<String>.from(
             includedInPrompt.map((e) => e.path).toList() +
                 nestedCodes.keys.toList())

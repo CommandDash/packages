@@ -1,3 +1,9 @@
+## 0.3.0
+
+* **Github Data Object Support**: Added support to extract Github repo data conviniently. You can use `WebDataObject.fromGithub` for indexing a specific repo code and issues now.
+* **Commandless Mode Support**: Added Commandless mode which is active by default when an agent is activated. Now you can interact with agent more naturally by chatting.
+* **Metadata**: Added support to provide agent avatar and human readable display name. As an agent creator you can also set tags for agents that will help better visibilty for agents in the agent marketplace as well as devs to understand for what purposes or framework the agent can be used.
+
 ## 0.2.1
 
 * **Updated README**: Fixed broken images in README
