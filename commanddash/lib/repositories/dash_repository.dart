@@ -27,7 +27,7 @@ class DashRepository {
       {required String agentName,
       required String agentVersion,
       required String query,
-      required List<DataSource> datasources,
+      required List<String> datasources,
       required bool isTest}) async {
     try {
       final response = await dio.post(
@@ -36,7 +36,7 @@ class DashRepository {
           "name": agentName,
           "query": query,
           "version": agentVersion,
-          "matching_doc_data_source_ids": datasources.map((e) => e.id).toList(),
+          "matching_doc_data_source_ids": datasources,
           "testing": isTest,
         },
       );

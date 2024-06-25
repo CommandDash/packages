@@ -1,9 +1,8 @@
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
-import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 
 import '../steps_utils.dart';
@@ -11,7 +10,7 @@ import '../steps_utils.dart';
 // TODO: To be tested
 class SearchInSourceStep extends Step {
   final String query;
-  final List<DataSource> dataSource;
+  final List<String> dataSource;
   final String agentName;
   final String agentVersion;
   final bool isTest;
@@ -44,15 +43,13 @@ class SearchInSourceStep extends Step {
         query: query,
         agentName: agentName,
         agentVersion: agentVersion,
-        dataSource: (json['data_sources'] as List)
-            .map((e) => DataSource(id: e))
-            .toList(),
+        dataSource: List<String>.from(json['data_sources'] ?? []),
         isTest: isTest);
   }
 
   @override
   Future<List<DataSourceResultOutput>> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository,
+      TaskAssist taskAssist, GeminiRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     if (dashRepository == null) {

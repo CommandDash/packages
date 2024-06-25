@@ -1,6 +1,5 @@
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/output_model.dart';
-import 'package:commanddash/server/server.dart';
 
 enum StepType {
   searchInWorkspace,

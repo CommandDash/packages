@@ -1,7 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
-
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
@@ -10,12 +8,13 @@ import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/steps_utils.dart';
+import 'package:commanddash/utils/embedding_utils.dart';
 
 class ChatStep extends Step {
-  final List<ChatMessage> messages;
+  final List<ChatMessage> existingMessages;
   final String lastMessage;
   final Map<String, Input> inputs;
   final Map<String, Output> outputs;
@@ -25,7 +24,7 @@ class ChatStep extends Step {
       existingDocuments; //TODO: See if we can save data source result output only
   ChatStep(
       {required List<String> outputIds,
-      required this.messages,
+      required this.existingMessages,
       required this.inputs,
       this.systemPrompt,
       required this.lastMessage,
@@ -37,50 +36,41 @@ class ChatStep extends Step {
 
   @override
   Future<List<DefaultOutput>> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository,
+      TaskAssist taskAssist, GeminiRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
-    String prompt = lastMessage.replacePlaceholder(inputs, outputs);
 
-    final List<CodeInput> codeInputs = inputs.values
-        .whereType<CodeInput>()
-        .toList(); // These are the inputs to be used to get contextual code;
-    double promptLength = 0;
-    for (final message in messages) {
-      if (message.role == ChatRole.user) {
-        if (message.data != null && message.data!['prompt'] != null) {
-          promptLength += message.data!['prompt'].length;
-          // Content for all the previours messages is the prompt constructed at the time of their request
-          message.message = message.data!['prompt'];
-        } else {
-          promptLength += message.message.length;
-        }
-      } else {
-        promptLength += message.message.length;
-      }
-    }
-    double availableToken = generationRepository.characterLimit - promptLength;
-    if (availableToken <= 0) {
-      return [];
-    }
-    String chatDocuments = existingDocuments ??
+    /// Part 1: Reference Documents attachment
+    final String referencesStart =
         "Please note the below references from the latest documentations, examples and github issues that would be helpful in answering user's requests:\n\n";
-    if (newDocuments.isNotEmpty) {
-      availableToken -=
-          chatDocuments.length - newDocuments.first.maxCharsInPrompt!;
+    String chatDocuments = existingDocuments ?? referencesStart;
 
-      if (availableToken >= 0) {
-        for (DataSource doc in newDocuments.first.value!) {
-          if (availableToken - doc.content!.length > 0) {
-            if (chatDocuments.contains(doc.content!)) continue;
+    if (chatDocuments.length > 75000.tokenized) {
+      /// keep reducing references size to accomodate new documents
+      chatDocuments =
+          referencesStart + chatDocuments.substring(30000.tokenized);
+    }
+    if (newDocuments.isNotEmpty) {
+      for (DataSource doc in newDocuments.first.value!) {
+        if (!chatDocuments.contains(doc.content)) {
+          if (chatDocuments.length + doc.content.length < 90000.tokenized) {
             chatDocuments = "$chatDocuments\n\n${doc.content}";
-            availableToken -= doc.content!.length;
           }
         }
       }
     }
-    messages.insert(
-        0, ChatMessage(role: ChatRole.user, message: chatDocuments, data: {}));
+
+    /// Part 2: Converation history
+    for (final message in existingMessages) {
+      if (message.role == ChatRole.user) {
+        if (message.data != null && message.data!['prompt'] != null) {
+          // data['prompt'] is the actual message sent to the LLM which contains the contextual code as well.
+          message.message = message.data!['prompt'];
+        }
+      }
+    }
+
+    /// Part 3: Trigger Message
     List<WorkspaceFile> includedInPrompt = [];
     final Map<String, int> nestedCodes = {};
 
@@ -101,30 +91,14 @@ class ChatStep extends Step {
       }
     }
 
+    final List<CodeInput> codeInputs = inputs.values
+        .whereType<CodeInput>()
+        .toList(); // These are the inputs to be used to get contextual code;
+
     for (CodeInput code in codeInputs) {
       /// add the code file itself as context
       appendNestedCodeCount(code.filePath, priority: 10);
       markIncludedInPrompt(path: code.filePath, ranges: [code.range]);
-
-      // Skipping adding contextual code for now due to the lack of a consistent way to retrieve document definitions for all languages.
-      // This feature may be added in the future when a reliable method becomes available.
-
-      // final data = await taskAssist.processStep(
-      //   kind: "context",
-      //   args: {
-      //     "filePath": code.filePath,
-      //     "range": code.range.toJson(),
-      //   },
-      //   timeoutKind: TimeoutKind.stretched,
-      // );
-      // final context = data['context'];
-      // if (context != null) {
-      //   final listOfContext = List<Map<String, dynamic>>.from(context);
-      //   for (final nestedCode in listOfContext) {
-      //     final filePath = nestedCode['filePath'];
-      //     appendNestedCodeCount(filePath);
-      //   }
-      // }
     }
     // nestedCode sorted by frequency
     final sortedNestedCode = nestedCodes.entries.toList()
@@ -142,24 +116,32 @@ class ChatStep extends Step {
         final content =
             includedInPrompt[includedInPromptIndex].surroundingContent;
         if (content != null) {
-          if (availableToken - content.length > 0) {
-            contextualCode =
-                '$contextualCode$nestedFilePath\n```$content```\n\n';
-            availableToken -= content.length;
-          }
+          contextualCode = '$contextualCode$nestedFilePath\n```$content```\n\n';
         }
         continue;
       }
       final content = (await File(nestedFilePath).readAsString())
           .replaceAll(RegExp(r"[\n\s]+"), "");
-      if (availableToken - content.length < 0) continue;
+
       contextualCode = '$contextualCode$nestedFilePath\n```$content```\n\n';
-      availableToken -= content.length;
     }
+
+    String prompt = lastMessage.replacePlaceholder(inputs, outputs);
     if (contextualCode.isNotEmpty) {
       contextualCode =
           '$contextualCodePrefix$contextualCode\n\n[END OF CONTEXTUAL CODE.]\n\n';
       prompt = '$contextualCode$prompt';
+    }
+
+    /// remove messages earlier in the history to comply with limits
+    while ((systemPrompt?.length ?? 0) +
+            chatDocuments.length +
+            existingMessages.map((e) => e.message).join('').length >
+        generationRepository.characterLimit) {
+      if (existingMessages.length < 3) {
+        break; // we want to preserve the last couple messages.
+      }
+      existingMessages.removeAt(0);
     }
 
     var filesInvolved = Set<String>.from(
@@ -168,9 +150,14 @@ class ChatStep extends Step {
         .map((e) => e.split('/').last)
         .take(7)
         .toList();
+
     taskAssist.sendLogMessage(message: 'prompt', data: {
-      'data':
-          json.encode(messages.map((e) => "${e.role}: ${e.message}").toList())
+      'system_prompt': systemPrompt,
+      'chat_documents': chatDocuments,
+      'chat_documents_length': chatDocuments.length,
+      'prompt': prompt,
+      'data': json.encode(
+          existingMessages.map((e) => "${e.role}: ${e.message}").toList())
     });
     // TODO: send complete conversation history to IDE to replace
     await taskAssist.processStep(
@@ -188,7 +175,10 @@ class ChatStep extends Step {
         timeoutKind: TimeoutKind.sync);
 
     final response = await generationRepository.getChatCompletion(
-      messages,
+      [
+        ChatMessage(role: ChatRole.user, message: chatDocuments, data: {}),
+        ...existingMessages
+      ],
       prompt,
       systemPrompt: systemPrompt,
     );

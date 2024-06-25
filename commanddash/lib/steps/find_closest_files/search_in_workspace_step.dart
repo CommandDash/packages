@@ -4,7 +4,7 @@ import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/find_closest_files/embedding_generator.dart';
 import 'package:commanddash/steps/steps_utils.dart';
@@ -38,7 +38,7 @@ class SearchInWorkspaceStep extends Step {
 
   @override
   Future<List<MultiCodeOutput>?> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository,
+      TaskAssist taskAssist, GeminiRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     final workspacePath = (await taskAssist.processStep(

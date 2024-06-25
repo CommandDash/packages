@@ -1,9 +1,9 @@
 class DataSource {
-  String? content;
+  String content;
   String id;
   String? publisher;
 
-  DataSource({this.content, required this.id, this.publisher});
+  DataSource({required this.id, required this.content, this.publisher});
 
   factory DataSource.fromJson(Map<String, dynamic> json) {
     return DataSource(

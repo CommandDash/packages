@@ -1,4 +1,4 @@
-part of 'generation_repository.dart';
+part of 'gemini_repository.dart';
 
 class ModelException implements Exception {
   final String? message;
