@@ -1,43 +1,38 @@
+import 'dart:convert';
+
 import 'package:commanddash/models/chat_message.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/client/dio_client.dart';
+
+import 'package:commanddash/server/task_assist.dart';
+import 'package:dio/dio.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:google_generative_ai/src/client.dart';
 import 'package:google_generative_ai/src/error.dart';
+
+part 'generation_exceptions.dart';
 
 class UnknownException implements Exception {
   UnknownException(this.message);
   final String message;
 }
 
-class GeminiRepository implements GenerationRepository {
+class GeminiRepository {
   final String apiKey;
-  @override
-  double characterLimit = 125000 * 2.7;
+  late Dio dio;
 
-  GeminiRepository(this.apiKey);
-  @override
-  Future<String> getCompletion(
-    String messages,
-  ) async {
-    late final GenerateContentResponse? response;
-    try {
-      response =
-          await _getGeminiFlashCompletionResponse('gemini-1.5-flash', messages);
-    } on ServerException catch (e) {
-      if (e.message.contains(
-          'found for API version v1beta, or is not supported for GenerateContent')) {
-        response =
-            await _getGeminiFlashCompletionResponse('gemini-pro', messages);
-      }
-    }
-    if (response != null && response.text != null) {
-      return response.text!;
-    } else {
-      throw ModelException("No response recieved from gemini");
-    }
+  double characterLimit = 120000 * 2.7;
+
+  GeminiRepository(this.apiKey, this.dio);
+
+  factory GeminiRepository.fromKeys(
+      String keys, String githubAccessToken, TaskAssist taskAssist) {
+    final client = getClient(
+        githubAccessToken,
+        () async => taskAssist
+            .processOperation(kind: 'refresh_access_token', args: {}));
+    return GeminiRepository(keys, client);
   }
 
-  @override
   Future<List<double>> getCodeEmbeddings(
     String value,
   ) async {
@@ -64,7 +59,6 @@ class GeminiRepository implements GenerationRepository {
     }
   }
 
-  @override
   Future<List<List<double>>> getCodeBatchEmbeddings(
       List<Map<String, dynamic>> code) async {
     try {
@@ -89,7 +83,6 @@ class GeminiRepository implements GenerationRepository {
     }
   }
 
-  @override
   Future<List<double>> getStringEmbeddings(String value) async {
     try {
       final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey);
@@ -112,7 +105,6 @@ class GeminiRepository implements GenerationRepository {
     }
   }
 
-  @override
   Future<List<List<double>>> getStringBatchEmbeddings(
       List<String> values) async {
     //TODO: update to batch embed
@@ -157,27 +149,20 @@ class GeminiRepository implements GenerationRepository {
     }
   }
 
-  @override
-  Future<String> getChatCompletion(
-    List<ChatMessage> messages,
-    String lastMessage, {
-    String? systemPrompt,
-  }) async {
+  Future<String> getCompletion(
+    String messages,
+  ) async {
     late final GenerateContentResponse? response;
-
     try {
-      response = await _getGeminiFlashChatCompletionResponse(
-          'gemini-1.5-flash', messages, lastMessage,
-          systemPrompt: systemPrompt);
+      response =
+          await _getGeminiFlashCompletionResponse('gemini-1.5-flash', messages);
     } on ServerException catch (e) {
       if (e.message.contains(
           'found for API version v1beta, or is not supported for GenerateContent')) {
-        response = await _getGeminiFlashChatCompletionResponse(
-            'gemini-pro', messages, lastMessage,
-            systemPrompt: systemPrompt);
+        response =
+            await _getGeminiFlashCompletionResponse('gemini-pro', messages);
       }
     }
-
     if (response != null && response.text != null) {
       return response.text!;
     } else {
@@ -192,7 +177,32 @@ class GeminiRepository implements GenerationRepository {
     return model.generateContent(content);
   }
 
-  Future<GenerateContentResponse> _getGeminiFlashChatCompletionResponse(
+  Future<String> getChatCompletion(
+    List<ChatMessage> messages,
+    String lastMessage, {
+    String? systemPrompt,
+  }) async {
+    String response;
+
+    try {
+      // throw GenerativeAIException('recitation');
+      response = await _getGeminiFlashChatCompletionResponse(
+          'gemini-1.5-flash', messages, lastMessage,
+          systemPrompt: systemPrompt);
+    } on GenerativeAIException catch (e) {
+      if (e.message.contains('recitation') ||
+          e.message
+              .contains('User location is not supported for the API use')) {
+        response = await getApiCompletionResponse(messages, lastMessage,
+            systemPrompt: systemPrompt);
+      } else {
+        rethrow;
+      }
+    }
+    return response;
+  }
+
+  Future<String> _getGeminiFlashChatCompletionResponse(
       String modelCode, List<ChatMessage> messages, String lastMessage,
       {String? systemPrompt}) async {
     // system intructions are not being adapted that well by Gemini models.
@@ -213,6 +223,41 @@ class GeminiRepository implements GenerationRepository {
     }
 
     final chat = model.startChat(history: history);
-    return chat.sendMessage(content);
+    final response = await chat.sendMessage(content);
+    if (response.text != null) {
+      return response.text!;
+    } else {
+      throw ModelException("No response recieved from gemini");
+    }
+  }
+
+  Future<String> getApiCompletionResponse(
+      List<ChatMessage> messages, String lastMessage,
+      {String? systemPrompt}) async {
+    final List<Map<String, String>> message = [];
+
+    if (systemPrompt != null) {
+      message.add({'role': 'model', 'text': systemPrompt});
+    }
+    for (final e in messages) {
+      if (e.role == ChatRole.user) {
+        message.add({'role': 'model', 'text': e.message});
+      } else {
+        message.add({'role': 'user', 'text': e.message});
+      }
+    }
+    message.add({'role': 'user', 'text': lastMessage});
+
+    final response = await dio.post(
+      '/ai/agent/answer',
+      data: {
+        'message': message,
+      },
+    );
+    if (response.statusCode == 200) {
+      return response.data['content'] as String;
+    }
+    throw ModelException(
+        '${response.statusCode}: ${jsonDecode(response.data)['message']}');
   }
 }

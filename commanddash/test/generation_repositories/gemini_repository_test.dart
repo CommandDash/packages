@@ -1,12 +1,13 @@
 import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/repositories/gemini_repository.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:dio/dio.dart';
 import 'package:test/test.dart';
 
 import '../test_utils.dart';
 
 void main() {
   String? apiKey;
+
   setUp(() async {
     await EnvReader.load();
     apiKey = EnvReader.get('GEMINI_KEY');
@@ -17,7 +18,7 @@ void main() {
 
   group('GeminiRepository', () {
     test('getEmbeddings With correct api Key', () async {
-      final geminiRepository = GeminiRepository(apiKey!);
+      final geminiRepository = GeminiRepository(apiKey!, Dio());
       final testString = "The quick brown fox jumps over the lazy dog.";
       final result = await geminiRepository.getCodeEmbeddings(testString);
 
@@ -26,7 +27,7 @@ void main() {
 
     //TODO: This test fails because the packge API doesn't handle this error correctly
     test('getEmbeddings With incorrect api Key', () async {
-      final geminiRepository = GeminiRepository('invalidApiKey');
+      final geminiRepository = GeminiRepository('invalidApiKey', Dio());
       final testString = "The quick brown fox jumps over the lazy dog.";
       expect(
           () async => await geminiRepository.getCodeEmbeddings(testString),
@@ -35,7 +36,7 @@ void main() {
     });
 
     test('getCodeBatchEmbeddings [custom api implementation]', () async {
-      final geminiRepository = GeminiRepository(apiKey!);
+      final geminiRepository = GeminiRepository(apiKey!, Dio());
       final result = await geminiRepository.getCodeBatchEmbeddings(
         [
           {'content': 'Hello', 'title': 'Hello'},
@@ -46,7 +47,8 @@ void main() {
     });
     test('getCodeBatchEmbeddings [custom api implementation] with wrong key',
         () async {
-      final geminiRepository = GeminiRepository('AIzaSyCGXM9N6U9LkUoNou4KX-');
+      final geminiRepository =
+          GeminiRepository('AIzaSyCGXM9N6U9LkUoNou4KX-', Dio());
       expect(
           () async => await geminiRepository.getCodeBatchEmbeddings(
                 [
@@ -57,7 +59,7 @@ void main() {
           throwsA(isA<InvalidApiKeyException>()));
     });
     test('getStringBatchEmbeddings [custom api implementation]', () async {
-      final geminiRepository = GeminiRepository(apiKey!);
+      final geminiRepository = GeminiRepository(apiKey!, Dio());
       final result = await geminiRepository.getCodeBatchEmbeddings(
         [
           {'content': 'Hello', 'title': 'Hello'},
@@ -68,7 +70,8 @@ void main() {
     });
     test('getStringBatchEmbeddings [custom api implementation] with wrong key',
         () async {
-      final geminiRepository = GeminiRepository('AIzaSyCGXM9N6U9LkUoNou4KX-');
+      final geminiRepository =
+          GeminiRepository('AIzaSyCGXM9N6U9LkUoNou4KX-', Dio());
       expect(
           () async => await geminiRepository.getCodeBatchEmbeddings(
                 [
@@ -81,19 +84,16 @@ void main() {
   });
   group('Completion', () {
     test('get completion with correct key', () async {
-      final geminiRepository = GeminiRepository(apiKey!);
+      final geminiRepository = GeminiRepository(apiKey!, Dio());
       final result = await geminiRepository.getCompletion("12345 till 10");
 
       expect(result, isA<String>());
     });
 
     test('get chat compeltion', () async {
-      final geminiRepository = GeminiRepository(apiKey!);
+      final geminiRepository = GeminiRepository(apiKey!, Dio());
       final messages = [
-        ChatMessage(
-          role: ChatRole.user,
-          message: 'Hello',
-        ),
+        ChatMessage(role: ChatRole.user, message: 'Hello', data: {}),
       ];
       final lastMessage = 'Hello';
 

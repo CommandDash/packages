@@ -2,10 +2,9 @@ import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/append_to_chat/append_to_chat_step.dart';
-import 'package:commanddash/steps/chat/chat_step.dart';
 import 'package:commanddash/steps/find_closest_files/search_in_sources_step.dart';
 import 'package:commanddash/steps/find_closest_files/search_in_workspace_step.dart';
 import 'package:commanddash/steps/prompt_query/prompt_query_step.dart';
@@ -82,7 +81,7 @@ abstract class Step {
   }
 
   Future<List<Output>?> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository,
+      TaskAssist taskAssist, GeminiRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await taskAssist.processStep(
         kind: 'loader_update',

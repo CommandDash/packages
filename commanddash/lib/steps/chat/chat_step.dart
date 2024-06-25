@@ -10,7 +10,7 @@ import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/models/workspace_file.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/steps_utils.dart';
 
@@ -37,7 +37,7 @@ class ChatStep extends Step {
 
   @override
   Future<List<DefaultOutput>> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository,
+      TaskAssist taskAssist, GeminiRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     String prompt = lastMessage.replacePlaceholder(inputs, outputs);
@@ -66,8 +66,7 @@ class ChatStep extends Step {
     String chatDocuments = existingDocuments ??
         "Please note the below references from the latest documentations, examples and github issues that would be helpful in answering user's requests:\n\n";
     if (newDocuments.isNotEmpty) {
-      availableToken -=
-          chatDocuments.length - newDocuments.first.maxCharsInPrompt!;
+      availableToken -= chatDocuments.length;
 
       if (availableToken >= 0) {
         for (DataSource doc in newDocuments.first.value!) {

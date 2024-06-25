@@ -1,4 +1,4 @@
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/append_to_chat/append_to_chat_step.dart';
 import 'package:mockito/annotations.dart';
@@ -7,16 +7,16 @@ import 'package:test/test.dart';
 
 import 'append_to_chat_test.mocks.dart';
 
-@GenerateNiceMocks([MockSpec<TaskAssist>(), MockSpec<GenerationRepository>()])
+@GenerateNiceMocks([MockSpec<TaskAssist>(), MockSpec<GeminiRepository>()])
 void main() {
   group('AppendToChatStep', () {
     late AppendToChatStep step;
     late MockTaskAssist taskAssist;
-    late MockGenerationRepository generationRepository;
+    late MockGeminiRepository geminiRepository;
 
     setUp(() {
       taskAssist = MockTaskAssist();
-      generationRepository = MockGenerationRepository();
+      geminiRepository = MockGeminiRepository();
       step = AppendToChatStep(outputIds: ['output-id'], message: 'message');
     });
 
@@ -45,7 +45,7 @@ void main() {
                 'error': {'message': 'error message'}
               });
 
-      expectLater(() async => step.run(taskAssist, generationRepository),
+      expectLater(() async => step.run(taskAssist, geminiRepository),
           throwsA(isA<Exception>()));
       //TODO: add a way to check for error message.
     });
@@ -58,7 +58,7 @@ void main() {
               timeoutKind: TimeoutKind.sync))
           .thenAnswer((_) async => {});
 
-      expect(await step.run(taskAssist, generationRepository), isNull);
+      expect(await step.run(taskAssist, geminiRepository), isNull);
     });
   });
 }

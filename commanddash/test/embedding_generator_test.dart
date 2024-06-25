@@ -1,5 +1,5 @@
 import 'package:commanddash/models/workspace_file.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/steps/find_closest_files/embedding_generator.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -7,13 +7,13 @@ import 'package:test/test.dart';
 
 import 'embedding_generator_test.mocks.dart';
 
-@GenerateMocks([GenerationRepository, WorkspaceFile])
+@GenerateMocks([GeminiRepository, WorkspaceFile])
 void main() {
   group('updateEmbeddings', () {
-    late MockGenerationRepository mockGenerationRepository;
+    late MockGeminiRepository mockGeminiRepository;
 
     setUp(() {
-      mockGenerationRepository = MockGenerationRepository();
+      mockGeminiRepository = MockGeminiRepository();
     });
 
     test('should batch and update file embeddings < 100', () async {
@@ -31,7 +31,7 @@ void main() {
         );
       });
 
-      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+      when(mockGeminiRepository.getCodeBatchEmbeddings(files
               .map((file) => {'content': file.fileContent, 'title': file.path})
               .toList()))
           .thenAnswer((_) async => files
@@ -39,12 +39,12 @@ void main() {
               .toList());
 
       final updatedFiles = await EmbeddingGenerator.updateEmbeddings(
-          files, mockGenerationRepository);
+          files, mockGeminiRepository);
       for (int i = 0; i < files.length; i++) {
         expect(updatedFiles[i].embedding,
             getMockEmbeddingForString(files[i].fileContent));
       }
-      verify(mockGenerationRepository.getCodeBatchEmbeddings(any)).called(1);
+      verify(mockGeminiRepository.getCodeBatchEmbeddings(any)).called(1);
     });
     test('should batch and update file embeddings > 100', () async {
       final files = List.generate(125, (i) {
@@ -61,7 +61,7 @@ void main() {
         );
       });
 
-      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+      when(mockGeminiRepository.getCodeBatchEmbeddings(files
               .sublist(0, 100)
               .map((file) => {'content': file.fileContent, 'title': file.path})
               .toList()))
@@ -69,7 +69,7 @@ void main() {
               .sublist(0, 100)
               .map((e) => getMockEmbeddingForString(e.fileContent!))
               .toList());
-      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+      when(mockGeminiRepository.getCodeBatchEmbeddings(files
               .sublist(100)
               .map((file) => {'content': file.fileContent!, 'title': file.path})
               .toList()))
@@ -79,12 +79,12 @@ void main() {
               .toList());
 
       final updatedFiles = await EmbeddingGenerator.updateEmbeddings(
-          files, mockGenerationRepository);
+          files, mockGeminiRepository);
       for (int i = 0; i < files.length; i++) {
         expect(updatedFiles[i].embedding,
             getMockEmbeddingForString(files[i].fileContent!));
       }
-      verify(mockGenerationRepository.getCodeBatchEmbeddings(any)).called(2);
+      verify(mockGeminiRepository.getCodeBatchEmbeddings(any)).called(2);
     });
     test('should batch and update file embeddings > 200', () async {
       final files = List.generate(250, (i) {
@@ -101,7 +101,7 @@ void main() {
         );
       });
 
-      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+      when(mockGeminiRepository.getCodeBatchEmbeddings(files
               .sublist(0, 100)
               .map((file) => {'content': file.fileContent, 'title': file.path})
               .toList()))
@@ -109,7 +109,7 @@ void main() {
               .sublist(0, 100)
               .map((e) => getMockEmbeddingForString(e.fileContent))
               .toList());
-      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+      when(mockGeminiRepository.getCodeBatchEmbeddings(files
               .sublist(100, 200)
               .map((file) => {'content': file.fileContent, 'title': file.path})
               .toList()))
@@ -117,7 +117,7 @@ void main() {
               .sublist(100, 200)
               .map((e) => getMockEmbeddingForString(e.fileContent!))
               .toList());
-      when(mockGenerationRepository.getCodeBatchEmbeddings(files
+      when(mockGeminiRepository.getCodeBatchEmbeddings(files
               .sublist(200)
               .map((file) => {'content': file.fileContent, 'title': file.path})
               .toList()))
@@ -127,12 +127,12 @@ void main() {
               .toList());
 
       final updatedFiles = await EmbeddingGenerator.updateEmbeddings(
-          files, mockGenerationRepository);
+          files, mockGeminiRepository);
       for (int i = 0; i < files.length; i++) {
         expect(updatedFiles[i].embedding,
             getMockEmbeddingForString(files[i].fileContent));
       }
-      verify(mockGenerationRepository.getCodeBatchEmbeddings(any)).called(3);
+      verify(mockGeminiRepository.getCodeBatchEmbeddings(any)).called(3);
     });
   });
 }
