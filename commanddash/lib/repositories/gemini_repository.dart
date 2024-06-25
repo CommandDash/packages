@@ -4,6 +4,7 @@ import 'package:commanddash/models/chat_message.dart';
 import 'package:commanddash/repositories/client/dio_client.dart';
 
 import 'package:commanddash/server/task_assist.dart';
+import 'package:commanddash/utils/embedding_utils.dart';
 import 'package:dio/dio.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:google_generative_ai/src/client.dart';
@@ -20,7 +21,7 @@ class GeminiRepository {
   final String apiKey;
   late Dio dio;
 
-  double characterLimit = 120000 * 2.7;
+  final int characterLimit = 120000.tokenized;
 
   GeminiRepository(this.apiKey, this.dio);
 

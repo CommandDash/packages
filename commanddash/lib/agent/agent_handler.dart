@@ -2,7 +2,6 @@ import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/models/chat_message.dart';
-import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
 import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
@@ -120,7 +119,7 @@ class AgentHandler {
         outputIds: [],
         inputs: inputs,
         outputs: {},
-        messages: messages,
+        existingMessages: messages,
         lastMessage: userMessage!,
         newDocuments: searchResult,
         existingDocuments: chatDocuments,

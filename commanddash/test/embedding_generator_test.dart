@@ -67,15 +67,15 @@ void main() {
               .toList()))
           .thenAnswer((_) async => files
               .sublist(0, 100)
-              .map((e) => getMockEmbeddingForString(e.fileContent!))
+              .map((e) => getMockEmbeddingForString(e.fileContent))
               .toList());
       when(mockGeminiRepository.getCodeBatchEmbeddings(files
               .sublist(100)
-              .map((file) => {'content': file.fileContent!, 'title': file.path})
+              .map((file) => {'content': file.fileContent, 'title': file.path})
               .toList()))
           .thenAnswer((_) async => files
               .sublist(100)
-              .map((e) => getMockEmbeddingForString(e.fileContent!))
+              .map((e) => getMockEmbeddingForString(e.fileContent))
               .toList());
 
       final updatedFiles = await EmbeddingGenerator.updateEmbeddings(

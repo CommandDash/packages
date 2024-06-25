@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:crypto/crypto.dart';
 
+extension TokenFactor on int {
+  int get tokenized => (this * 3.2).toInt();
+}
+
 String computeCodeHash(String fileContents) {
   // Normalize the file content by removing whitespace and newlines
   String normalizedContent = fileContents.replaceAll(RegExp(r'\s+'), '');

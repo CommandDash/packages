@@ -52,7 +52,7 @@ class PromptQueryStep extends Step {
     String prompt = query;
     int promptLength = prompt.length;
 
-    double availableToken = generationRepository.characterLimit -
+    double availableToken = generationRepository.characterLimit.toDouble() -
         promptLength; // Max limit should come from the generation repository
     // If there are available token, we will add the outputs
     if (availableToken <= 0) {
