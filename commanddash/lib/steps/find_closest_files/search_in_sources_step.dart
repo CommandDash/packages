@@ -11,7 +11,7 @@ import '../steps_utils.dart';
 // TODO: To be tested
 class SearchInSourceStep extends Step {
   final String query;
-  final List<DataSource> dataSource;
+  final List<String> dataSource;
   final String agentName;
   final String agentVersion;
   final bool isTest;
@@ -44,9 +44,7 @@ class SearchInSourceStep extends Step {
         query: query,
         agentName: agentName,
         agentVersion: agentVersion,
-        dataSource: (json['data_sources'] as List)
-            .map((e) => DataSource(id: e))
-            .toList(),
+        dataSource: List<String>.from(json['data_sources'] ?? []),
         isTest: isTest);
   }
 
