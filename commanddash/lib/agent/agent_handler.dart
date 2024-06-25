@@ -1,12 +1,9 @@
-import 'dart:math';
-
 import 'package:commanddash/agent/input_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
 import 'package:commanddash/models/chat_message.dart';
-import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 import 'package:commanddash/steps/append_to_chat/append_to_chat_step.dart';
 import 'package:commanddash/steps/chat/chat_step.dart';
@@ -16,8 +13,8 @@ class AgentHandler {
   final Map<String, Input> inputs;
   final Map<String, Output> outputs;
   final List<Map<String, dynamic>> steps;
-  final GenerationRepository generationRepository;
-  final String? githubAccessToken;
+  final String githubAccessToken;
+  final String geminiApiKey;
   final String agentName;
   final String agentVersion;
   final List<String> dataSources;
@@ -34,10 +31,10 @@ class AgentHandler {
       {required this.inputs,
       required this.outputs,
       required this.steps,
-      required this.generationRepository,
       required this.agentName,
       required this.agentVersion,
-      this.githubAccessToken,
+      required this.githubAccessToken,
+      required this.geminiApiKey,
       this.dataSources = const [],
       this.systemPrompt,
       this.isTest = false,
@@ -57,15 +54,12 @@ class AgentHandler {
     final List<Map<String, dynamic>> steps =
         ((json['steps'] ?? []) as List).cast<Map<String, dynamic>>();
 
-    final GenerationRepository generationRepository =
-        GenerationRepository.fromJson(json['auth_details']);
-
     return AgentHandler(
         inputs: inputs,
         outputs: outputs,
         steps: steps,
-        generationRepository: generationRepository,
         githubAccessToken: json['auth_details']['github_token'],
+        geminiApiKey: json['auth_details']['key'],
         agentName: json['agent_name'],
         agentVersion: json['agent_version'],
         isTest: json['testing'] ?? false,
@@ -77,16 +71,18 @@ class AgentHandler {
   }
 
   Future<void> runTask(TaskAssist taskAssist) async {
-    DashRepository? dashRepository;
-    if (githubAccessToken != null) {
-      dashRepository = DashRepository.fromKeys(githubAccessToken!, taskAssist);
-    }
+    final dashRepository =
+        DashRepository.fromKeys(githubAccessToken, taskAssist);
+    final geminiRepository =
+        GeminiRepository.fromKeys(geminiApiKey, githubAccessToken, taskAssist);
+
     try {
       ///TODO: See if abstraction could be introduced
       if (steps.isEmpty) {
-        await _handleChatRequest(taskAssist, dashRepository);
+        await _handleChatRequest(taskAssist, geminiRepository, dashRepository);
       } else {
-        await _handleCommandRequest(taskAssist, dashRepository);
+        await _handleCommandRequest(
+            taskAssist, geminiRepository, dashRepository);
       }
 
       taskAssist.sendResultMessage(message: "TASK_COMPLETE", data: {});
@@ -98,8 +94,8 @@ class AgentHandler {
     }
   }
 
-  Future<void> _handleChatRequest(
-      TaskAssist taskAssist, DashRepository? dashRepository) async {
+  Future<void> _handleChatRequest(TaskAssist taskAssist,
+      GeminiRepository geminiRepository, DashRepository dashRepository) async {
     if (userMessage == null) {
       taskAssist.sendErrorMessage(
           message: "User message is required for chat request", data: {});
@@ -117,35 +113,37 @@ class AgentHandler {
         isTest: isTest);
 
     final searchResult = await searchInSourceStep.run(
-        taskAssist, generationRepository, dashRepository);
+        taskAssist, geminiRepository, dashRepository);
 
     final ChatStep chatStep = ChatStep(
         outputIds: [],
         inputs: inputs,
         outputs: {},
-        messages: messages,
+        existingMessages: messages,
         lastMessage: userMessage!,
         newDocuments: searchResult,
         existingDocuments: chatDocuments,
         systemPrompt: systemPrompt);
 
     final List<DefaultOutput> output =
-        await chatStep.run(taskAssist, generationRepository, dashRepository);
+        await chatStep.run(taskAssist, geminiRepository, dashRepository);
     final AppendToChatStep appendToChatStep = AppendToChatStep(
       message: output.first.value ?? '',
     );
-    await appendToChatStep.run(taskAssist, generationRepository);
+    await appendToChatStep.run(taskAssist, geminiRepository);
   }
 
   Future<void> _handleCommandRequest(
-      TaskAssist taskAssist, DashRepository? dashRepository) async {
+    TaskAssist taskAssist,
+    GeminiRepository geminiRepository,
+    DashRepository dashRepository,
+  ) async {
     for (Map<String, dynamic> stepJson in steps) {
       try {
         final step = Step.fromJson(
             stepJson, inputs, outputs, agentName, agentVersion, isTest);
         final results =
-            await step.run(taskAssist, generationRepository, dashRepository) ??
-                [];
+            await step.run(taskAssist, geminiRepository, dashRepository) ?? [];
         if (step.outputIds != null) {
           if (results.isEmpty) {
             taskAssist.sendErrorMessage(

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:commanddash/models/workspace_file.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/utils/embedding_utils.dart';
 
 class EmbeddingGenerator {
@@ -33,8 +33,8 @@ class EmbeddingGenerator {
     return filesToUpdate;
   }
 
-  static Future<List<WorkspaceFile>> updateEmbeddings(List<WorkspaceFile> files,
-      GenerationRepository generationRepository) async {
+  static Future<List<WorkspaceFile>> updateEmbeddings(
+      List<WorkspaceFile> files, GeminiRepository generationRepository) async {
     // Batch the files in batches of 100s
     const batchSize = 100;
     final batches = <List<WorkspaceFile>>[];
@@ -60,12 +60,12 @@ class EmbeddingGenerator {
   }
 
   static Future<List<double>> getQueryEmbedding(
-      String query, GenerationRepository generationRepository) async {
+      String query, GeminiRepository generationRepository) async {
     return await generationRepository.getStringEmbeddings(query);
   }
 
   static List<WorkspaceFile> getTop3NearestFiles(List<WorkspaceFile> files,
-      List<double> queryEmbeddings, GenerationRepository generationRepository) {
+      List<double> queryEmbeddings, GeminiRepository generationRepository) {
     files.sort(((a, b) {
       final distanceA =
           calculateCosineSimilarity(queryEmbeddings, a.embedding!);

@@ -1,5 +1,3 @@
-import 'package:commanddash/agent/input_model.dart';
-
 enum ChatRole { model, user, unknown }
 
 class ChatMessage {

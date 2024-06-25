@@ -1,9 +1,8 @@
 import 'package:commanddash/agent/loader_model.dart';
 import 'package:commanddash/agent/output_model.dart';
 import 'package:commanddash/agent/step_model.dart';
-import 'package:commanddash/models/data_source.dart';
 import 'package:commanddash/repositories/dash_repository.dart';
-import 'package:commanddash/repositories/generation_repository.dart';
+import 'package:commanddash/repositories/gemini_repository.dart';
 import 'package:commanddash/server/task_assist.dart';
 
 import '../steps_utils.dart';
@@ -50,7 +49,7 @@ class SearchInSourceStep extends Step {
 
   @override
   Future<List<DataSourceResultOutput>> run(
-      TaskAssist taskAssist, GenerationRepository generationRepository,
+      TaskAssist taskAssist, GeminiRepository generationRepository,
       [DashRepository? dashRepository]) async {
     await super.run(taskAssist, generationRepository);
     if (dashRepository == null) {

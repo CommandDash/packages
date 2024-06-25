@@ -117,13 +117,11 @@ class DataSourceResultOutput extends Output {
     // do not add if limit is reched here.
     String result = "";
     for (DataSource ds in value!) {
-      if (ds.content != null) {
-        final newLength = result.length + ds.content!.length;
-        if (newLength > maxCharsInPrompt!) {
-          return result;
-        }
-        result += "${ds.content}\n";
+      final newLength = result.length + ds.content.length;
+      if (newLength > maxCharsInPrompt!) {
+        return result;
       }
+      result += "${ds.content}\n";
     }
     return result;
   }
