@@ -1,3 +1,8 @@
+## 0.4.0
+
+* **Github Data Object Update**: Updated github object to allow extraction of only code, issues, or both. When defining `Github` object via `WebDataObject.fromGithub`, you can pass list of `GithubExtract` enums containing all the intended data types that you want to be extracted and index. For example, passing `[GithubExtract.code, GithubExtract.issues]` will index both code and issues.
+* **Deep Crawling Web Page Support**: Added support for deep crawling the website to extract sites data without the need of providing explicit sitemap. You can use `WebDataObject.fromWebPage` along with base url of the website that you want to index. Additionally, you will also need to pass `deepCrawl` to `true` to enable deep crawling. By default the value is `false`, which means it will only index the shared url page only 
+
 ## 0.3.0
 
 * **Github Data Object Support**: Added support to extract Github repo data conviniently. You can use `WebDataObject.fromGithub` for indexing a specific repo code and issues now.
