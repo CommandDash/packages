@@ -10,15 +10,17 @@ abstract class WebDataObject {
   const WebDataObject();
 
   /// static method to create and return [WebPage]. It takes `url` of web page as
-  /// an argument
+  /// an argument. Additionally, you can provide `performDeepCrawl` argument. If
+  /// `performDeepCrawl` set to true. It will crawl the whole website of the shared
+  /// url and index all of the pages in it.
   ///
   /// Example:
   /// ```dart
   /// final webUrl = 'https://sampleurl.com';
-  /// final webPageObject = WebDataObject.fromWebPage(webUrl);
+  /// final webPageObject = WebDataObject.fromWebPage(webUrl, performDeepCrawl = false);
   /// ```
-  static WebPage fromWebPage(String url) {
-    return WebPage(url);
+  static WebPage fromWebPage(String url, {bool performDeepCrawl = false}) {
+    return WebPage(url, performDeepCrawl: performDeepCrawl);
   }
 
   /// static method to create and return [SiteMap]. It takes `xml` as an argument
@@ -82,22 +84,29 @@ abstract class WebDataObject {
 /// Example:
 /// ```dart
 /// final webUrl = 'https://sampleurl.com';
-/// final webPageObject = WebDataObject.fromWebPage(webUrl);
+/// final webPageObject = WebDataObject.fromWebPage(webUrl, performDeepCrawl = false);
 /// ```
 class WebPage extends WebDataObject {
   /// Creates a new [WebPage] object.
   ///
-  /// * url: URL of the web page that contains the content that you want to save for referencing.
-  WebPage(this.url);
+  /// * url: URL of the web page that contains the content that you want to save
+  /// for referencing.
+  /// * performDeepCrawl:  Boolean value for enabling deep crawl of the website
+  /// if set to `true`. Default is `false`
+  WebPage(this.url, {this.performDeepCrawl = false});
 
   /// url of the web page that contains the content that you want to save for referencing.
   final String url;
 
+  /// Boolean value for enabling deep crawl of the website if set to `true`. Default is `false`
+  final bool performDeepCrawl;
+
   @override
   Future<Map<String, dynamic>> process() async {
+    final objectType = performDeepCrawl ? 'deep_crawl_page' : 'web_page';
     return {
       'id': hashCode.toString(),
-      'type': 'web_page',
+      'type': objectType,
       'url': url,
       'version': minCliVersion
     };
