@@ -4,7 +4,10 @@ import 'package:dio/dio.dart';
 
 typedef RefreshAccessToken = Future<Map<String, dynamic>> Function();
 
-Dio getClient(String accessToken, RefreshAccessToken updateAccessToken) {
+Dio getClient(
+  String accessToken,
+  RefreshAccessToken updateAccessToken,
+) {
   final dio = Dio();
   dio.options.baseUrl = 'https://api.commanddash.dev';
   dio.interceptors.add(CustomInterceptor(

@@ -14,7 +14,7 @@ class AgentHandler {
   final Map<String, Output> outputs;
   final List<Map<String, dynamic>> steps;
   final String githubAccessToken;
-  final String geminiApiKey;
+  final String? geminiApiKey;
   final String agentName;
   final String agentVersion;
   final List<String> dataSources;
@@ -59,7 +59,9 @@ class AgentHandler {
         outputs: outputs,
         steps: steps,
         githubAccessToken: json['auth_details']['github_token'],
-        geminiApiKey: json['auth_details']['key'],
+        geminiApiKey: json['auth_details']['key'].isEmpty
+            ? null
+            : json['auth_details']['key'],
         agentName: json['agent_name'],
         agentVersion: json['agent_version'],
         isTest: json['testing'] ?? false,
