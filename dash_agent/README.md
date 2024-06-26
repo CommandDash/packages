@@ -93,9 +93,10 @@ class DocsDataSource extends DataSource {
  /// URLs or sitemaps or even github repos in the object.
   @override
  List<WebDataObject> get webObjects =>
-     [WebDataObject.fromWebPage('https://sampleurl.com'), 
+     [WebDataObject.fromWebPage('https://sampleurl.com'),
+     WebDataObject.fromWebPage('https://sampleurl.com', deepCrawl: true), // to index all the pages of sampleurl.com
      WebDataObject.fromSiteMap('https://sampleurl.com/sitemap.xml'),
-     WebDataObject.fromGithub('https://github.com/user/repo', '<personal access token>', CodeFilter(pathRegex: '.*\.dart'),  IssueFilter(labels: ['bug']))];
+     WebDataObject.fromGithub('https://github.com/user/repo', '<personal access token>', codeFilter: CodeFilter(pathRegex: '.*\.dart'),  issueFilter: IssueFilter(labels: ['bug']))];
 }
 ```
 
