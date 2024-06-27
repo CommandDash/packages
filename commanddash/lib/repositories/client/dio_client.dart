@@ -1,12 +1,17 @@
 import 'dart:async';
 
+import 'package:commanddash/runner.dart';
 import 'package:dio/dio.dart';
 
 typedef RefreshAccessToken = Future<Map<String, dynamic>> Function();
 
-Dio getClient(String accessToken, RefreshAccessToken updateAccessToken) {
+Dio getClient(
+  String accessToken,
+  RefreshAccessToken updateAccessToken,
+) {
   final dio = Dio();
   dio.options.baseUrl = 'https://api.commanddash.dev';
+  dio.options.headers['Engine-Version'] = version;
   dio.interceptors.add(CustomInterceptor(
       dio: dio,
       accessToken: accessToken,

@@ -21,6 +21,8 @@ class ProcessCommand extends Command {
   }
 }
 
+final version = '0.1.5';
+
 class VersionCommand extends Command {
   @override
   final String name = "version";
@@ -33,7 +35,7 @@ class VersionCommand extends Command {
   @override
   void run() {
     /// It is not possible to fetch version from pubspec.yaml hence assigning manually
-    print('0.1.4');
+    print(version);
   }
 }
 

@@ -1,6 +1,6 @@
 name: commanddash
 description: Processing engine for CommandDash clients like the IDEs
-version: 0.1.4
+version: 0.1.5
 repository: https://github.com/Welltested-AI/commanddash
 
 environment:

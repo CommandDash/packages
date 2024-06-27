@@ -45,8 +45,8 @@ abstract class Step {
         }).toList();
         return PromptQueryStep.fromJson(
           json,
+          agentName,
           (json['prompt'] as String),
-          // .replacePlaceholder(inputs, outputs),
           outputsList,
           inputs,
           outputs,
