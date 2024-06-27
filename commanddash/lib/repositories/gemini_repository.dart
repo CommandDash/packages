@@ -161,9 +161,8 @@ class GeminiRepository {
     }
   }
 
-  Future<String> getCompletion(
-    String message,
-  ) async {
+  Future<String> getCompletion(String message, String agentName,
+      {String? command}) async {
     String response;
     if (apiKey != null) {
       try {
@@ -174,19 +173,15 @@ class GeminiRepository {
         if (e.message.contains('recitation') ||
             e.message
                 .contains('User location is not supported for the API use')) {
-          response = await getApiCompletionResponse(
-            [],
-            message,
-          );
+          response = await getApiCompletionResponse([], message,
+              agentName: agentName, command: command);
         } else {
           rethrow;
         }
       }
     } else {
-      response = await getApiCompletionResponse(
-        [],
-        message,
-      );
+      response = await getApiCompletionResponse([], message,
+          agentName: agentName, command: command);
     }
 
     return response;
@@ -195,6 +190,8 @@ class GeminiRepository {
   Future<String> getChatCompletion(
     List<ChatMessage> messages,
     String lastMessage, {
+    required String agent,
+    String? command,
     String? systemPrompt,
   }) async {
     String response;
@@ -209,14 +206,14 @@ class GeminiRepository {
             e.message
                 .contains('User location is not supported for the API use')) {
           response = await getApiCompletionResponse(messages, lastMessage,
-              systemPrompt: systemPrompt);
+              systemPrompt: systemPrompt, agentName: agent, command: command);
         } else {
           rethrow;
         }
       }
     } else {
       response = await getApiCompletionResponse(messages, lastMessage,
-          systemPrompt: systemPrompt);
+          systemPrompt: systemPrompt, agentName: agent, command: command);
     }
 
     return response;
@@ -253,7 +250,9 @@ class GeminiRepository {
 
   Future<String> getApiCompletionResponse(
       List<ChatMessage> messages, String lastMessage,
-      {String? systemPrompt}) async {
+      {required String agentName,
+      String? command,
+      String? systemPrompt}) async {
     final List<Map<String, String>> message = [];
 
     if (systemPrompt != null) {
@@ -270,14 +269,11 @@ class GeminiRepository {
 
     final response = await dio.post(
       '/ai/agent/answer',
-      data: {
-        'message': message,
-      },
+      data: {'message': message, 'agent': agentName, 'command': command},
     );
     if (response.statusCode == 200) {
       return response.data['content'] as String;
     }
-    throw ModelException(
-        '${response.statusCode}: ${jsonDecode(response.data)['message']}');
+    throw ModelException('${response.statusCode}: ${response.data['message']}');
   }
 }

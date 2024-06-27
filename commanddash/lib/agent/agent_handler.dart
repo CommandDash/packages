@@ -118,6 +118,7 @@ class AgentHandler {
         taskAssist, geminiRepository, dashRepository);
 
     final ChatStep chatStep = ChatStep(
+        agentName: agentName,
         outputIds: [],
         inputs: inputs,
         outputs: {},
