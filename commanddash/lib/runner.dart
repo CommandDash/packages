@@ -21,7 +21,7 @@ class ProcessCommand extends Command {
   }
 }
 
-final version = '0.1.4';
+final version = '0.1.5';
 
 class VersionCommand extends Command {
   @override
