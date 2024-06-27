@@ -10,12 +10,14 @@ import 'package:commanddash/steps/prompt_query/prompt_response_parsers.dart';
 import 'package:commanddash/steps/steps_utils.dart';
 
 class PromptQueryStep extends Step {
+  final String agentName;
   final String query;
   final List<Output> outputs;
   Map<String, Input> inputs;
   Map<String, Output> outputsUntilNow; //TODO:rename needed
   PromptQueryStep(
-      {required List<String>? outputIds,
+      {required this.agentName,
+      required List<String>? outputIds,
       required this.outputs,
       required this.query,
       required this.inputs,
@@ -25,12 +27,14 @@ class PromptQueryStep extends Step {
 
   factory PromptQueryStep.fromJson(
     Map<String, dynamic> json,
+    String agentName,
     String query,
     List<Output> outputs,
     Map<String, Input> inputs,
     Map<String, Output> outputsUntilNow,
   ) {
     return PromptQueryStep(
+      agentName: agentName,
       outputIds:
           (json['outputs'] as List<dynamic>).map((e) => e.toString()).toList(),
       outputs: outputs,
@@ -187,7 +191,8 @@ class PromptQueryStep extends Step {
         args: ProcessingFilesLoader(filesInvolved, message: 'Preparing Result')
             .toJson(),
         timeoutKind: TimeoutKind.sync);
-    final response = await generationRepository.getCompletion(prompt);
+    final response = await generationRepository.getCompletion(prompt, agentName,
+        command: 'untracked');
     final result = <Output>[];
     for (Output output in outputs) {
       if (output is CodeOutput) {

@@ -18,7 +18,7 @@ class UnknownException implements Exception {
 }
 
 class GeminiRepository {
-  final String apiKey;
+  final String? apiKey;
   late Dio dio;
 
   final int characterLimit = 120000.tokenized;
@@ -26,19 +26,22 @@ class GeminiRepository {
   GeminiRepository(this.apiKey, this.dio);
 
   factory GeminiRepository.fromKeys(
-      String keys, String githubAccessToken, TaskAssist taskAssist) {
+      String? apiKey, String githubAccessToken, TaskAssist taskAssist) {
     final client = getClient(
         githubAccessToken,
         () async => taskAssist
             .processOperation(kind: 'refresh_access_token', args: {}));
-    return GeminiRepository(keys, client);
+    return GeminiRepository(apiKey, client);
   }
 
   Future<List<double>> getCodeEmbeddings(
     String value,
   ) async {
+    if (apiKey == null) {
+      throw Exception('This functionality is not supported without Gemini Key');
+    }
     try {
-      final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey);
+      final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey!);
       final content = Content.text(value);
 
       final result = await model.embedContent(
@@ -62,8 +65,11 @@ class GeminiRepository {
 
   Future<List<List<double>>> getCodeBatchEmbeddings(
       List<Map<String, dynamic>> code) async {
+    if (apiKey == null) {
+      throw Exception('This functionality is not supported without Gemini Key');
+    }
     try {
-      final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey);
+      final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey!);
       final embedRequest = code
           .map((value) => EmbedContentRequest(Content.text(value['content']),
               title: value['title'], taskType: TaskType.retrievalDocument))
@@ -85,8 +91,11 @@ class GeminiRepository {
   }
 
   Future<List<double>> getStringEmbeddings(String value) async {
+    if (apiKey == null) {
+      throw Exception('This functionality is not supported without Gemini Key');
+    }
     try {
-      final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey);
+      final model = GenerativeModel(model: 'embedding-001', apiKey: apiKey!);
       final content = Content.text(value);
       final result = await model.embedContent(
         content,
@@ -108,9 +117,11 @@ class GeminiRepository {
 
   Future<List<List<double>>> getStringBatchEmbeddings(
       List<String> values) async {
-    //TODO: update to batch embed
+    if (apiKey == null) {
+      throw Exception('This functionality is not supported without Gemini Key');
+    }
     try {
-      final response = await HttpApiClient(apiKey: apiKey).makeRequest(
+      final response = await HttpApiClient(apiKey: apiKey!).makeRequest(
           Uri.https('generativelanguage.googleapis.com').resolveUri(Uri(
               pathSegments: [
                 'v1',
@@ -150,61 +161,66 @@ class GeminiRepository {
     }
   }
 
-  Future<String> getCompletion(
-    String messages,
-  ) async {
-    late final GenerateContentResponse? response;
-    try {
-      response =
-          await _getGeminiFlashCompletionResponse('gemini-1.5-flash', messages);
-    } on ServerException catch (e) {
-      if (e.message.contains(
-          'found for API version v1beta, or is not supported for GenerateContent')) {
-        response =
-            await _getGeminiFlashCompletionResponse('gemini-pro', messages);
+  Future<String> getCompletion(String message, String agentName,
+      {String? command}) async {
+    String response;
+    if (apiKey != null) {
+      try {
+        response = await _getGeminiFlashChatCompletionResponse(
+            'gemini-1.5-flash', [], message, apiKey!);
+      } on ServerException catch (e) {
+        // throw GenerativeAIException('recitation');
+        if (e.message.contains('recitation') ||
+            e.message
+                .contains('User location is not supported for the API use')) {
+          response = await getApiCompletionResponse([], message,
+              agentName: agentName, command: command);
+        } else {
+          rethrow;
+        }
       }
-    }
-    if (response != null && response.text != null) {
-      return response.text!;
     } else {
-      throw ModelException("No response recieved from gemini");
+      response = await getApiCompletionResponse([], message,
+          agentName: agentName, command: command);
     }
-  }
 
-  Future<GenerateContentResponse> _getGeminiFlashCompletionResponse(
-      String modelCode, String messages) async {
-    final model = GenerativeModel(model: modelCode, apiKey: apiKey);
-    final content = [Content.text(messages)];
-    return model.generateContent(content);
+    return response;
   }
 
   Future<String> getChatCompletion(
     List<ChatMessage> messages,
     String lastMessage, {
+    required String agent,
+    String? command,
     String? systemPrompt,
   }) async {
     String response;
-
-    try {
-      // throw GenerativeAIException('recitation');
-      response = await _getGeminiFlashChatCompletionResponse(
-          'gemini-1.5-flash', messages, lastMessage,
-          systemPrompt: systemPrompt);
-    } on GenerativeAIException catch (e) {
-      if (e.message.contains('recitation') ||
-          e.message
-              .contains('User location is not supported for the API use')) {
-        response = await getApiCompletionResponse(messages, lastMessage,
+    if (apiKey != null) {
+      try {
+        response = await _getGeminiFlashChatCompletionResponse(
+            'gemini-1.5-flash', messages, lastMessage, apiKey!,
             systemPrompt: systemPrompt);
-      } else {
-        rethrow;
+      } on GenerativeAIException catch (e) {
+        // throw GenerativeAIException('recitation');
+        if (e.message.contains('recitation') ||
+            e.message
+                .contains('User location is not supported for the API use')) {
+          response = await getApiCompletionResponse(messages, lastMessage,
+              systemPrompt: systemPrompt, agentName: agent, command: command);
+        } else {
+          rethrow;
+        }
       }
+    } else {
+      response = await getApiCompletionResponse(messages, lastMessage,
+          systemPrompt: systemPrompt, agentName: agent, command: command);
     }
+
     return response;
   }
 
-  Future<String> _getGeminiFlashChatCompletionResponse(
-      String modelCode, List<ChatMessage> messages, String lastMessage,
+  Future<String> _getGeminiFlashChatCompletionResponse(String modelCode,
+      List<ChatMessage> messages, String lastMessage, String apiKey,
       {String? systemPrompt}) async {
     // system intructions are not being adapted that well by Gemini models.
     // final Content? systemInstruction =
@@ -234,7 +250,9 @@ class GeminiRepository {
 
   Future<String> getApiCompletionResponse(
       List<ChatMessage> messages, String lastMessage,
-      {String? systemPrompt}) async {
+      {required String agentName,
+      String? command,
+      String? systemPrompt}) async {
     final List<Map<String, String>> message = [];
 
     if (systemPrompt != null) {
@@ -251,14 +269,11 @@ class GeminiRepository {
 
     final response = await dio.post(
       '/ai/agent/answer',
-      data: {
-        'message': message,
-      },
+      data: {'message': message, 'agent': agentName, 'command': command},
     );
     if (response.statusCode == 200) {
       return response.data['content'] as String;
     }
-    throw ModelException(
-        '${response.statusCode}: ${jsonDecode(response.data)['message']}');
+    throw ModelException('${response.statusCode}: ${response.data['message']}');
   }
 }

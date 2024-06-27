@@ -14,6 +14,7 @@ import 'package:commanddash/steps/steps_utils.dart';
 import 'package:commanddash/utils/embedding_utils.dart';
 
 class ChatStep extends Step {
+  final String agentName;
   final List<ChatMessage> existingMessages;
   final String lastMessage;
   final Map<String, Input> inputs;
@@ -23,7 +24,8 @@ class ChatStep extends Step {
   final String?
       existingDocuments; //TODO: See if we can save data source result output only
   ChatStep(
-      {required List<String> outputIds,
+      {required this.agentName,
+      required List<String> outputIds,
       required this.existingMessages,
       required this.inputs,
       this.systemPrompt,
@@ -180,6 +182,7 @@ class ChatStep extends Step {
         ...existingMessages
       ],
       prompt,
+      agent: agentName,
       systemPrompt: systemPrompt,
     );
     return [DefaultOutput(response)];
